@@ -17,6 +17,7 @@ function App() {
         </div>
         <div>
           <h1>CareerSeal</h1>
+          <h1 className="text-3xl font-bold text-blue-500">Tailwind Works!</h1>
           <p>
             Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
           </p>
