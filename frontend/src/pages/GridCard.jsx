@@ -17,7 +17,7 @@ function GridCard() {
 
   const fetchGridCard = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/grid', {
+      const response = await axios.get('https://careerseal-web.onrender.com/api/grid', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setGridCard(response.data.gridCard)
@@ -38,7 +38,7 @@ function GridCard() {
   const handleSaveProfile = async () => {
     setSaving(true)
     try {
-      await axios.put('http://localhost:5000/api/grid/profile', { education, skills }, {
+      await axios.put('https://careerseal-web.onrender.com/api/grid/profile', { education, skills }, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setMessage('Profile updated!')
@@ -53,7 +53,7 @@ function GridCard() {
   const handleVerify = async (type) => {
     setVerifying(type)
     try {
-      await axios.post(`http://localhost:5000/api/grid/verify/${type}`, {}, {
+      await axios.post(`https://careerseal-web.onrender.com/api/grid/verify/${type}`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       })
       setVerified(prev => ({ ...prev, [type]: true }))

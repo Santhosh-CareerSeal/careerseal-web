@@ -11,7 +11,7 @@ function CompanyPipeline() {
 
   const fetchApplications = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/applications/company', {
+      const response = await axios.get('https://careerseal-web.onrender.com/api/applications/company', {
         headers: { Authorization: `Bearer ${token}` }
       })
       setApplications(response.data.applications)
@@ -29,7 +29,7 @@ function CompanyPipeline() {
 
   const updateStatus = async (applicationId, newStatus) => {
     try {
-      await axios.patch(`http://localhost:5000/api/applications/${applicationId}`, { status: newStatus }, {
+      await axios.patch(`https://careerseal-web.onrender.com/api/applications/${applicationId}`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       })
       fetchApplications()

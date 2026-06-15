@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import API_URL from '../config'
 
 function Login() {
   const navigate = useNavigate()
@@ -15,7 +16,7 @@ function Login() {
     setError('')
     setLoading(true)
     try {
-      const url = isLogin ? 'http://localhost:5000/api/auth/login' : 'http://localhost:5000/api/auth/signup'
+      const url = isLogin ? 'https://careerseal-web.onrender.com/api/auth/login' : 'https://careerseal-web.onrender.com/api/auth/signup'
       const data = isLogin ? { email, password } : { name, email, password, role: 'student' }
       const response = await axios.post(url, data)
       localStorage.setItem('token', response.data.token)

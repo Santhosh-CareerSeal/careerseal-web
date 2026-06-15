@@ -13,7 +13,7 @@ function Dashboard() {
       try {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
-        const response = await axios.get('http://localhost:5000/api/dashboard/student', {
+        const response = await axios.get('https://careerseal-web.onrender.com/api/dashboard/student', {
           headers: { Authorization: `Bearer ${token}` }
         })
         setUser(response.data.user)
