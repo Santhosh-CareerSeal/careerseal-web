@@ -33,6 +33,8 @@ function Dashboard() {
     navigate('/login')
   }
 
+  const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
+
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center"><p className="text-[#1A3C6E] text-xl font-bold">Loading...</p></div>
 
   return (
@@ -41,13 +43,11 @@ function Dashboard() {
         <h1 className="text-white text-xl font-bold">CareerSeal</h1>
         <div className="flex items-center gap-4">
           <button onClick={handleLogout} className="text-white/70 text-sm">Logout</button>
-          <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
-            {user?.name?.charAt(0).toUpperCase()}
-          </div>
+          <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">{capitalize(user?.name).charAt(0)}</div>
         </div>
       </div>
       <div className="px-6 py-6">
-        <h2 className="text-[#1A3C6E] text-2xl font-bold mb-1">Welcome back, {user?.name}!</h2>
+        <h2 className="text-[#1A3C6E] text-2xl font-bold mb-1">Welcome back, {capitalize(user?.name)}!</h2>
         <p className="text-gray-500 mb-6">Here is your career summary</p>
         <div className="grid grid-cols-2 gap-4 mb-6">
           <div className="bg-white rounded-2xl p-4 shadow-sm">
@@ -71,17 +71,17 @@ function Dashboard() {
           <div onClick={() => navigate('/jobs')} className="bg-[#0D7377] rounded-2xl p-6 cursor-pointer hover:bg-[#0a5f63] transition-colors">
             <p className="text-white/70 text-sm mb-1">Job Board</p>
             <p className="text-white text-xl font-bold">Browse Available Jobs</p>
-            <p className="text-white/70 text-sm mt-2">Find your next opportunity →</p>
+            <p className="text-white/70 text-sm mt-2">Find your next opportunity</p>
           </div>
           <div onClick={() => navigate('/tracker')} className="bg-white rounded-2xl p-6 cursor-pointer hover:shadow-md transition-shadow">
             <p className="text-gray-500 text-sm mb-1">My Applications</p>
             <p className="text-[#1A3C6E] text-xl font-bold">Track Application Status</p>
-            <p className="text-[#0D7377] text-sm mt-2">View timeline →</p>
+            <p className="text-[#0D7377] text-sm mt-2">View timeline</p>
           </div>
           <div onClick={() => navigate('/grid')} className="bg-[#1A3C6E] rounded-2xl p-6 cursor-pointer hover:bg-[#0D7377] transition-colors">
             <p className="text-white/70 text-sm mb-1">My GRID Card</p>
             <p className="text-white text-xl font-bold">View your professional identity</p>
-            <p className="text-white/70 text-sm mt-2">Tap to open →</p>
+            <p className="text-white/70 text-sm mt-2">Tap to open</p>
           </div>
         </div>
       </div>
