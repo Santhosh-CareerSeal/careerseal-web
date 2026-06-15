@@ -4,6 +4,8 @@ const dotenv = require('dotenv')
 const { PrismaClient } = require('@prisma/client')
 const authRoutes = require('./routes/authRoutes')
 const dashboardRoutes = require('./routes/dashboardRoutes')
+const jobRoutes = require('./routes/jobRoutes')
+const applicationRoutes = require('./routes/applicationRoutes')
 
 dotenv.config()
 
@@ -25,6 +27,8 @@ app.get('/', async (req, res) => {
 
 app.use('/api/auth', authRoutes)
 app.use('/api/dashboard', dashboardRoutes)
+app.use('/api/jobs', jobRoutes)
+app.use('/api/applications', applicationRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
