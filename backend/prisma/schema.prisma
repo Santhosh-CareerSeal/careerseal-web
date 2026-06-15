@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  name         String
+  email        String    @unique
+  passwordHash String
+  role         String?   @default("student")
+  createdAt    DateTime? @default(now()) @db.Timestamp(6)
+  company      Company?
+  student      Student?
+}
+
+model Student {
+  id           Int           @id @default(autoincrement())
+  userId       Int?          @unique
+  education    String?
+  skills       String?
+  gridNumber   String?       @unique
+  applications Application[]
+  user         User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Company {
+  id          Int     @id @default(autoincrement())
+  userId      Int?    @unique
+  companyName String
+  mcaStatus   String?
+  user        User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  jobs        Job[]
+}
+
+model Job {
+  id           Int           @id @default(autoincrement())
+  companyId    Int?
+  title        String
+  description  String?
+  salaryRange  String?
+  createdAt    DateTime?     @default(now()) @db.Timestamp(6)
+  applications Application[]
+  company      Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Application {
+  id        Int       @id @default(autoincrement())
+  studentId Int?
+  jobId     Int?
+  status    String?   @default("pending")
+  createdAt DateTime? @default(now()) @db.Timestamp(6)
+  job       Job?      @relation(fields: [jobId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  student   Student?  @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
