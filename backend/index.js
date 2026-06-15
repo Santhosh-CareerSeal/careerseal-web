@@ -2,6 +2,7 @@ const express = require('express')
 const cors = require('cors')
 const dotenv = require('dotenv')
 const { PrismaClient } = require('@prisma/client')
+const authRoutes = require('./routes/authRoutes')
 
 dotenv.config()
 
@@ -20,6 +21,8 @@ app.get('/', async (req, res) => {
     res.json({ message: 'CareerSeal API is running!', database: 'Failed ❌', error: error.message })
   }
 })
+
+app.use('/api/auth', authRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
