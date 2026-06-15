@@ -48,3 +48,43 @@ const getMyApplications = async (req, res) => {
 }
 
 module.exports = { applyToJob, getMyApplications }
+
+const getCompanyApplications = async (req, res) => {
+  try {
+    const userId = req.user.userId
+
+    const company = await prisma.company.findUnique({ where: { userId } })
+    if (!company) return res.json({ applications: [] })
+
+    const applications = await prisma.application.findMany({
+      where: { job: { companyId: company.id } },
+      include: {
+        job: true,
+        student: { include: { user: true } }
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
+    res.json({ applications })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const updateApplicationStatus = async (req, res) => {
+  try {
+    const { id } = req.params
+    const { status } = req.body
+
+    const application = await prisma.application.update({
+      where: { id: parseInt(id) },
+      data: { status }
+    })
+
+    res.json({ message: 'Status updated', application })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { applyToJob, getMyApplications, getCompanyApplications, updateApplicationStatus }

@@ -7,6 +7,7 @@ import GridCard from './pages/GridCard'
 import CompanyDashboard from './pages/CompanyDashboard'
 import JobTracker from './pages/JobTracker'
 import Jobs from './pages/Jobs'
+import CompanyPipeline from './pages/CompanyPipeline'
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/company" element={<CompanyDashboard />} />
         <Route path="/tracker" element={<JobTracker />} />
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/pipeline" element={<CompanyPipeline />} />
       </Routes>
     </BrowserRouter>
   )

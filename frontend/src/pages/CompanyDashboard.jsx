@@ -50,7 +50,10 @@ function CompanyDashboard() {
     <div className="min-h-screen bg-gray-100">
       <div className="bg-[#1A3C6E] px-6 py-4 flex justify-between items-center">
         <h1 className="text-white text-xl font-bold">CareerSeal — Company</h1>
-        <button onClick={() => navigate('/login')} className="text-white/70 text-sm">Logout</button>
+        <div className="flex gap-4">
+  <button onClick={() => navigate('/pipeline')} className="text-white/70 text-sm">Pipeline</button>
+  <button onClick={() => { localStorage.removeItem('token'); navigate('/login') }} className="text-white/70 text-sm">Logout</button>
+</div>
       </div>
       <div className="px-6 py-6 max-w-2xl mx-auto">
         <h2 className="text-[#1A3C6E] text-2xl font-bold mb-6">Post a New Job</h2>
