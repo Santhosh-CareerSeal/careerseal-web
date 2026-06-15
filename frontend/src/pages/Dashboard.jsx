@@ -27,14 +27,23 @@ function Dashboard() {
     fetchDashboard()
   }, [])
 
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
+  }
+
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center"><p className="text-[#1A3C6E] text-xl font-bold">Loading...</p></div>
 
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="bg-[#1A3C6E] px-6 py-4 flex justify-between items-center">
         <h1 className="text-white text-xl font-bold">CareerSeal</h1>
-        <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
-          {user?.name?.charAt(0).toUpperCase()}
+        <div className="flex items-center gap-4">
+          <button onClick={handleLogout} className="text-white/70 text-sm">Logout</button>
+          <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
+            {user?.name?.charAt(0).toUpperCase()}
+          </div>
         </div>
       </div>
       <div className="px-6 py-6">
@@ -58,10 +67,22 @@ function Dashboard() {
             <p className="text-[#1A3C6E] text-3xl font-bold">{stats.profileViews}</p>
           </div>
         </div>
-        <div onClick={() => navigate('/grid')} className="bg-[#1A3C6E] rounded-2xl p-6 cursor-pointer hover:bg-[#0D7377] transition-colors">
-          <p className="text-white/70 text-sm mb-1">My GRID Card</p>
-          <p className="text-white text-xl font-bold">View your professional identity</p>
-          <p className="text-[#0D7377] text-sm mt-2">Tap to open →</p>
+        <div className="flex flex-col gap-4">
+          <div onClick={() => navigate('/jobs')} className="bg-[#0D7377] rounded-2xl p-6 cursor-pointer hover:bg-[#0a5f63] transition-colors">
+            <p className="text-white/70 text-sm mb-1">Job Board</p>
+            <p className="text-white text-xl font-bold">Browse Available Jobs</p>
+            <p className="text-white/70 text-sm mt-2">Find your next opportunity →</p>
+          </div>
+          <div onClick={() => navigate('/tracker')} className="bg-white rounded-2xl p-6 cursor-pointer hover:shadow-md transition-shadow">
+            <p className="text-gray-500 text-sm mb-1">My Applications</p>
+            <p className="text-[#1A3C6E] text-xl font-bold">Track Application Status</p>
+            <p className="text-[#0D7377] text-sm mt-2">View timeline →</p>
+          </div>
+          <div onClick={() => navigate('/grid')} className="bg-[#1A3C6E] rounded-2xl p-6 cursor-pointer hover:bg-[#0D7377] transition-colors">
+            <p className="text-white/70 text-sm mb-1">My GRID Card</p>
+            <p className="text-white text-xl font-bold">View your professional identity</p>
+            <p className="text-white/70 text-sm mt-2">Tap to open →</p>
+          </div>
         </div>
       </div>
     </div>
