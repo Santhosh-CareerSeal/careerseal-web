@@ -3,6 +3,7 @@ const cors = require('cors')
 const dotenv = require('dotenv')
 const { PrismaClient } = require('@prisma/client')
 const authRoutes = require('./routes/authRoutes')
+const dashboardRoutes = require('./routes/dashboardRoutes')
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ app.get('/', async (req, res) => {
 })
 
 app.use('/api/auth', authRoutes)
+app.use('/api/dashboard', dashboardRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
