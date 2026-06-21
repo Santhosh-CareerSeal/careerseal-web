@@ -1,13 +1,11 @@
 generator client {
   provider = "prisma-client-js"
 }
-
 datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
-
 model User {
   id           Int       @id @default(autoincrement())
   name         String
@@ -18,17 +16,25 @@ model User {
   company      Company?
   student      Student?
 }
-
 model Student {
-  id           Int           @id @default(autoincrement())
-  userId       Int?          @unique
-  education    String?
-  skills       String?
-  gridNumber   String?       @unique
-  applications Application[]
-  user         User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id                  Int           @id @default(autoincrement())
+  userId              Int?          @unique
+  education           String?
+  skills              String?
+  gridNumber          String?       @unique
+  profileComplete     Boolean       @default(false)
+  contactNumber       String?
+  address             String?
+  schoolCollege       String?
+  hobbies             String?
+  workExperience      String?
+  photoUrl            String?
+  preferredWorkLocation String?
+  pfAccountNumber     String?
+  aadhaarVerified     Boolean       @default(false)
+  user                User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  applications        Application[]
 }
-
 model Company {
   id          Int     @id @default(autoincrement())
   userId      Int?    @unique
@@ -37,7 +43,6 @@ model Company {
   user        User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   jobs        Job[]
 }
-
 model Job {
   id           Int           @id @default(autoincrement())
   companyId    Int?
@@ -48,7 +53,6 @@ model Job {
   applications Application[]
   company      Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
-
 model Application {
   id        Int       @id @default(autoincrement())
   studentId Int?

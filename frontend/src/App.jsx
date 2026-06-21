@@ -8,6 +8,7 @@ import CompanyDashboard from './pages/CompanyDashboard'
 import JobTracker from './pages/JobTracker'
 import Jobs from './pages/Jobs'
 import CompanyPipeline from './pages/CompanyPipeline'
+import ProfileDetails from './pages/ProfileDetails'
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/tracker" element={<JobTracker />} />
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/pipeline" element={<CompanyPipeline />} />
+        <Route path="/profile-details" element={<ProfileDetails />} />
       </Routes>
     </BrowserRouter>
   )
