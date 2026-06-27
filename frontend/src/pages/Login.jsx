@@ -1,10 +1,11 @@
-import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 
 function Login() {
   const navigate = useNavigate()
+  const location = useLocation()
   const [role, setRole] = useState('student')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -14,6 +15,13 @@ function Login() {
   const [showForgot, setShowForgot] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
+  const [fromRegister, setFromRegister] = useState(false)
+
+  useEffect(() => {
+    if (location.state?.fromRegister) {
+      setFromRegister(true)
+    }
+  }, [location.state])
 
   const handleSubmit = async () => {
     setError('')
@@ -22,7 +30,11 @@ function Login() {
       const response = await axios.post(`${API_URL}/api/auth/login`, { email, password })
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
-      navigate(response.data.user.role === 'company' ? '/company' : '/dashboard')
+      if (fromRegister && response.data.user.role === 'student') {
+        navigate('/profile-details')
+      } else {
+        navigate(response.data.user.role === 'company' ? '/company' : '/dashboard')
+      }
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
@@ -49,7 +61,6 @@ function Login() {
     <div className="min-h-screen flex flex-col md:flex-row relative">
       <div className="flex-1 flex flex-col justify-center px-8 md:px-20 py-12 bg-white">
         <div className="max-w-sm mx-auto w-full">
-
           <div className="flex items-center gap-2 mb-1">
             <svg width="22" height="22" viewBox="0 0 22 22">
               <circle cx="11" cy="11" r="11" fill="#0D7377" />
@@ -59,13 +70,16 @@ function Login() {
           </div>
           <p className="text-gray-400 text-sm mb-8">Your career journey starts here</p>
 
+          {fromRegister && (
+            <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
+              <p className="text-green-700 text-sm font-bold">Account created successfully!</p>
+              <p className="text-green-600 text-xs mt-1">Please sign in with your credentials to continue setting up your profile.</p>
+            </div>
+          )}
+
           <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            <button onClick={() => setRole('student')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${role === 'student' ? 'bg-white text-[#1A3C6E] shadow-sm' : 'text-gray-500'}`}>
-              Student
-            </button>
-            <button onClick={() => setRole('company')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${role === 'company' ? 'bg-white text-[#1A3C6E] shadow-sm' : 'text-gray-500'}`}>
-              Company
-            </button>
+            <button onClick={() => setRole('student')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${role === 'student' ? 'bg-white text-[#1A3C6E] shadow-sm' : 'text-gray-500'}`}>Student</button>
+            <button onClick={() => setRole('company')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${role === 'company' ? 'bg-white text-[#1A3C6E] shadow-sm' : 'text-gray-500'}`}>Company</button>
           </div>
 
           <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">Welcome back</h2>
@@ -92,11 +106,9 @@ function Login() {
           {error ? <p className="text-red-500 text-sm mb-4">{error}</p> : null}
 
           <div className="flex flex-col gap-3">
-            <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
-            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
-            <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#0D7377] font-bold -mt-1">
-              Forgot password?
-            </button>
+            <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" autoComplete="off" />
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" autoComplete="off" />
+            <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#0D7377] font-bold -mt-1">Forgot password?</button>
             <button onClick={handleSubmit} disabled={loading} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-1">
               {loading ? 'Please wait...' : 'Sign In'}
             </button>
@@ -104,11 +116,8 @@ function Login() {
 
           <p className="text-center text-sm text-gray-500 mt-6">
             New to CareerSeal?{' '}
-            <button onClick={() => navigate('/register')} className="text-[#0D7377] font-bold">
-              Join now
-            </button>
+            <button onClick={() => navigate('/register')} className="text-[#0D7377] font-bold">Join now</button>
           </p>
-
         </div>
       </div>
 
@@ -141,9 +150,7 @@ function Login() {
                 <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Reset your password</h3>
                 <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a reset link.</p>
                 <input type="email" placeholder="Email Address" value={resetEmail} onChange={e => setResetEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full mb-4" />
-                <button onClick={() => setResetSent(true)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">
-                  Send Reset Link
-                </button>
+                <button onClick={() => setResetSent(true)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">Send Reset Link</button>
                 <button onClick={closeForgot} className="text-gray-400 text-sm w-full text-center">Cancel</button>
               </>
             ) : (

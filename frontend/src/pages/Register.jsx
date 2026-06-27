@@ -31,12 +31,10 @@ function Register() {
     }
     setLoading(true)
     try {
-      const response = await axios.post(`${API_URL}/api/auth/signup`, {
+      await axios.post(`${API_URL}/api/auth/signup`, {
         name, email, password, role: 'student', workStatus, mobile
       })
-      localStorage.setItem('token', response.data.token)
-      localStorage.setItem('user', JSON.stringify(response.data.user))
-      navigate('/profile-details')
+      navigate('/login', { state: { email, password, fromRegister: true } })
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
@@ -46,7 +44,6 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
-
       <div className="hidden md:flex w-80 bg-[#1A3C6E] flex-col justify-center px-10 py-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
         <div className="relative z-10">
@@ -78,7 +75,6 @@ function Register() {
 
       <div className="flex-1 flex flex-col justify-center px-8 md:px-16 py-12 bg-white">
         <div className="max-w-md mx-auto w-full">
-
           <div className="flex items-center gap-2 mb-1 md:hidden">
             <svg width="20" height="20" viewBox="0 0 22 22">
               <circle cx="11" cy="11" r="11" fill="#0D7377" />
@@ -97,19 +93,16 @@ function Register() {
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Full Name <span className="text-red-400">*</span></label>
               <input type="text" placeholder="What is your name?" value={name} onChange={e => setName(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
-
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Email ID <span className="text-red-400">*</span></label>
               <input type="email" placeholder="Tell us your Email ID" value={email} onChange={e => setEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
               <p className="text-gray-400 text-xs mt-1">We'll send relevant jobs and updates to this email</p>
             </div>
-
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Password <span className="text-red-400">*</span></label>
               <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
               <p className="text-gray-400 text-xs mt-1">This helps your account stay protected</p>
             </div>
-
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Mobile Number <span className="text-red-400">*</span></label>
               <div className="flex gap-2">
@@ -124,11 +117,7 @@ function Register() {
             <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3 block">Work Status <span className="text-red-400">*</span></label>
             <div className="grid grid-cols-3 gap-3">
               {statuses.map(s => (
-                <button
-                  key={s.id}
-                  onClick={() => setWorkStatus(s.id)}
-                  className={`border-2 rounded-xl p-4 text-left transition-all ${workStatus === s.id ? 'border-[#0D7377] bg-[#0D7377]/5' : 'border-gray-200 hover:border-gray-300'}`}
-                >
+                <button key={s.id} onClick={() => setWorkStatus(s.id)} className={`border-2 rounded-xl p-4 text-left transition-all ${workStatus === s.id ? 'border-[#0D7377] bg-[#0D7377]/5' : 'border-gray-200 hover:border-gray-300'}`}>
                   <i className={`ti ${s.icon} text-2xl mb-2 block ${workStatus === s.id ? 'text-[#0D7377]' : 'text-gray-400'}`}></i>
                   <p className={`text-sm font-bold mb-1 ${workStatus === s.id ? 'text-[#1A3C6E]' : 'text-gray-700'}`}>{s.label}</p>
                   <p className="text-xs text-gray-400 leading-tight">{s.desc}</p>
@@ -143,14 +132,9 @@ function Register() {
 
           <p className="text-center text-sm text-gray-500">
             Already have an account?{' '}
-            <button onClick={() => navigate('/login')} className="text-[#0D7377] font-bold">
-              Sign in
-            </button>
+            <button onClick={() => navigate('/login')} className="text-[#0D7377] font-bold">Sign in</button>
           </p>
-
-          <p className="text-center text-xs text-gray-400 mt-4">
-            By registering, you agree to CareerSeal's Terms & Privacy Policy
-          </p>
+          <p className="text-center text-xs text-gray-400 mt-4">By registering, you agree to CareerSeal's Terms & Privacy Policy</p>
         </div>
       </div>
     </div>

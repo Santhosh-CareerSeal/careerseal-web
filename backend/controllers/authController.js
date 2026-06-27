@@ -6,7 +6,7 @@ const prisma = new PrismaClient()
 
 const signup = async (req, res) => {
   try {
-    const { name, email, password, role } = req.body
+    const { name, email, password, role, mobile, workStatus } = req.body
 
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) {
@@ -19,9 +19,23 @@ const signup = async (req, res) => {
       data: { name, email, passwordHash, role: role || 'student' }
     })
 
+    if (role === 'student' || !role) {
+      await prisma.student.create({
+        data: {
+          userId: user.id,
+          contactNumber: mobile || null,
+          profileComplete: false
+        }
+      })
+    }
+
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
-    res.status(201).json({ message: 'Account created successfully', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+    res.status(201).json({
+      message: 'Account created successfully',
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -43,7 +57,11 @@ const login = async (req, res) => {
 
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
-    res.json({ message: 'Login successful', token, user: { id: user.id, name: user.name, email: user.email, role: user.role } })
+    res.json({
+      message: 'Login successful',
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
