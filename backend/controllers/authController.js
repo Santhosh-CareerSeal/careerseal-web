@@ -21,11 +21,7 @@ const signup = async (req, res) => {
 
     if (role === 'student' || !role) {
       await prisma.student.create({
-        data: {
-          userId: user.id,
-          contactNumber: mobile || null,
-          profileComplete: false
-        }
+        data: { userId: user.id, contactNumber: mobile || null, profileComplete: false }
       })
     }
 
@@ -45,7 +41,10 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body
 
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { student: true }
+    })
     if (!user) {
       return res.status(400).json({ message: 'Invalid email or password' })
     }
@@ -55,11 +54,14 @@ const login = async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' })
     }
 
+    const profileComplete = user.student?.profileComplete || false
+
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
     res.json({
       message: 'Login successful',
       token,
+      profileComplete,
       user: { id: user.id, name: user.name, email: user.email, role: user.role }
     })
   } catch (error) {

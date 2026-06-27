@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
@@ -15,13 +15,7 @@ function Login() {
   const [showForgot, setShowForgot] = useState(false)
   const [resetEmail, setResetEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
-  const [fromRegister, setFromRegister] = useState(false)
-
-  useEffect(() => {
-    if (location.state?.fromRegister) {
-      setFromRegister(true)
-    }
-  }, [location.state])
+  const fromRegister = location.state?.fromRegister || false
 
   const handleSubmit = async () => {
     setError('')
@@ -30,10 +24,12 @@ function Login() {
       const response = await axios.post(`${API_URL}/api/auth/login`, { email, password })
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
-      if (fromRegister && response.data.user.role === 'student') {
+      if (response.data.user.role === 'company') {
+        navigate('/company')
+      } else if (!response.data.profileComplete) {
         navigate('/profile-details')
       } else {
-        navigate(response.data.user.role === 'company' ? '/company' : '/dashboard')
+        navigate('/dashboard')
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
@@ -45,17 +41,10 @@ function Login() {
   const handleOAuthPlaceholder = (provider) => {
     setError('')
     setConnecting(provider)
-    setTimeout(() => {
-      setConnecting(null)
-      setError(`${provider} sign-in is coming soon`)
-    }, 1200)
+    setTimeout(() => { setConnecting(null); setError(`${provider} sign-in is coming soon`) }, 1200)
   }
 
-  const closeForgot = () => {
-    setShowForgot(false)
-    setResetSent(false)
-    setResetEmail('')
-  }
+  const closeForgot = () => { setShowForgot(false); setResetSent(false); setResetEmail('') }
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
@@ -73,7 +62,7 @@ function Login() {
           {fromRegister && (
             <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
               <p className="text-green-700 text-sm font-bold">Account created successfully!</p>
-              <p className="text-green-600 text-xs mt-1">Please sign in with your credentials to continue setting up your profile.</p>
+              <p className="text-green-600 text-xs mt-1">Please sign in with your credentials to continue.</p>
             </div>
           )}
 
