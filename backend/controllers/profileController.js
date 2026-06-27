@@ -14,13 +14,80 @@ const getProfileDetails = async (req, res) => {
 const completeProfile = async (req, res) => {
   try {
     const userId = req.user.userId
-    const { contactNumber, address, schoolCollege, education, skills, hobbies, workExperience, photoUrl, preferredWorkLocation, pfAccountNumber } = req.body
+    const {
+      photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
+      schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
+      twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
+      collegeName, degree, branch, collegePassingYear, collegeCGPA,
+      pgCollegeName, pgDegree, pgBranch, pgPassingYear, pgCGPA,
+      workStatus, currentCompany, jobTitle, workExperience,
+      preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
+      technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
+      hobbies, pfAccountNumber, aadhaarNumber, digiLockerStatus, bio
+    } = req.body
+
+    const education = `${degree || ''} ${branch || ''} ${collegeName || ''}`.trim()
+    const schoolCollege = collegeName || schoolName || ''
+    const skills = technicalSkills || ''
+
     const student = await prisma.student.upsert({
       where: { userId },
-      update: { contactNumber, address, schoolCollege, education, skills, hobbies, workExperience, photoUrl, preferredWorkLocation, pfAccountNumber, profileComplete: true },
-      create: { userId, contactNumber, address, schoolCollege, education, skills, hobbies, workExperience, photoUrl, preferredWorkLocation, pfAccountNumber, profileComplete: true }
+      update: {
+        photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
+        schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
+        twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
+        collegeName, degree, branch, collegePassingYear, collegeCGPA,
+        pgCollegeName, pgDegree, pgBranch, pgPassingYear, pgCGPA,
+        workStatus, currentCompany, jobTitle, workExperience,
+        preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
+        technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
+        hobbies, pfAccountNumber, aadhaarNumber, digiLockerStatus, bio,
+        education, schoolCollege, skills, profileComplete: true
+      },
+      create: {
+        userId, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
+        schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
+        twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
+        collegeName, degree, branch, collegePassingYear, collegeCGPA,
+        pgCollegeName, pgDegree, pgBranch, pgPassingYear, pgCGPA,
+        workStatus, currentCompany, jobTitle, workExperience,
+        preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
+        technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
+        hobbies, pfAccountNumber, aadhaarNumber, digiLockerStatus, bio,
+        education, schoolCollege, skills, profileComplete: true
+      }
     })
-    res.json({ message: 'Profile completed successfully', student })
+    res.json({ message: 'Profile saved successfully', student })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const moveToGrid = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const student = await prisma.student.findUnique({ where: { userId } })
+    if (!student) return res.status(404).json({ message: 'Profile not found' })
+
+    const currentMonth = new Date().getMonth()
+    const updatesThisMonth = student.gridLastUpdatedMonth === currentMonth
+      ? student.gridUpdatesThisMonth
+      : 0
+
+    if (updatesThisMonth >= 3) {
+      return res.status(400).json({ message: 'You can only update your GRID card 3 times per month.' })
+    }
+
+    await prisma.student.update({
+      where: { userId },
+      data: {
+        gridPublished: true,
+        gridUpdatesThisMonth: updatesThisMonth + 1,
+        gridLastUpdatedMonth: currentMonth
+      }
+    })
+
+    res.json({ message: 'Profile published to GRID successfully', updatesRemaining: 3 - (updatesThisMonth + 1) })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -36,4 +103,4 @@ const getProfileStatus = async (req, res) => {
   }
 }
 
-module.exports = { getProfileDetails, completeProfile, getProfileStatus }
+module.exports = { getProfileDetails, completeProfile, moveToGrid, getProfileStatus }

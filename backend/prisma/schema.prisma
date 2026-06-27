@@ -17,23 +17,70 @@ model User {
   student      Student?
 }
 model Student {
-  id                  Int           @id @default(autoincrement())
-  userId              Int?          @unique
-  education           String?
-  skills              String?
-  gridNumber          String?       @unique
-  profileComplete     Boolean       @default(false)
-  contactNumber       String?
-  address             String?
-  schoolCollege       String?
-  hobbies             String?
-  workExperience      String?
-  photoUrl            String?
+  id                    Int           @id @default(autoincrement())
+  userId                Int?          @unique
+  profileComplete       Boolean       @default(false)
+  gridPublished         Boolean       @default(false)
+  gridUpdatesThisMonth  Int           @default(0)
+  gridLastUpdatedMonth  Int?
+
+  photoUrl              String?
+  dateOfBirth           String?
+  gender                String?
+  contactNumber         String?
+  address               String?
+  city                  String?
+  state                 String?
+  pincode               String?
+
+  schoolName            String?
+  schoolBoard           String?
+  schoolPassingYear     String?
+  schoolPercentage      String?
+  twelfthSchoolName     String?
+  twelfthBoard          String?
+  twelfthPassingYear    String?
+  twelfthPercentage     String?
+  collegeName           String?
+  degree                String?
+  branch                String?
+  collegePassingYear    String?
+  collegeCGPA           String?
+  pgCollegeName         String?
+  pgDegree              String?
+  pgBranch              String?
+  pgPassingYear         String?
+  pgCGPA                String?
+
+  workStatus            String?
+  currentCompany        String?
+  jobTitle              String?
+  workExperience        String?
+  preferredJobType      String?
   preferredWorkLocation String?
-  pfAccountNumber     String?
-  aadhaarVerified     Boolean       @default(false)
-  user                User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  applications        Application[]
+  noticePeriod          String?
+  expectedSalary        String?
+
+  technicalSkills       String?
+  softSkills            String?
+  languagesKnown        String?
+  certifications        String?
+  toolsAndSoftware      String?
+  skills                String?
+
+  hobbies               String?
+  pfAccountNumber       String?
+  aadhaarNumber         String?
+  aadhaarVerified       Boolean       @default(false)
+  digiLockerStatus      String?
+  bio                   String?
+
+  gridNumber            String?       @unique
+  education             String?
+  schoolCollege         String?
+
+  user                  User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  applications          Application[]
 }
 model Company {
   id          Int     @id @default(autoincrement())
