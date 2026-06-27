@@ -6,8 +6,6 @@ import API_URL from '../config'
 function Login() {
   const navigate = useNavigate()
   const [role, setRole] = useState('student')
-  const [isLogin, setIsLogin] = useState(true)
-  const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -21,17 +19,10 @@ function Login() {
     setError('')
     setLoading(true)
     try {
-      const url = isLogin ? `${API_URL}/api/auth/login` : `${API_URL}/api/auth/signup`
-      const data = isLogin ? { email, password } : { name, email, password, role }
-      const response = await axios.post(url, data)
+      const response = await axios.post(`${API_URL}/api/auth/login`, { email, password })
       localStorage.setItem('token', response.data.token)
       localStorage.setItem('user', JSON.stringify(response.data.user))
-
-      if (!isLogin && response.data.user.role === 'student') {
-        navigate('/profile-details')
-      } else {
-        navigate(response.data.user.role === 'company' ? '/company' : '/dashboard')
-      }
+      navigate(response.data.user.role === 'company' ? '/company' : '/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
@@ -48,10 +39,6 @@ function Login() {
     }, 1200)
   }
 
-  const handleForgotSubmit = () => {
-    setResetSent(true)
-  }
-
   const closeForgot = () => {
     setShowForgot(false)
     setResetSent(false)
@@ -62,7 +49,14 @@ function Login() {
     <div className="min-h-screen flex flex-col md:flex-row relative">
       <div className="flex-1 flex flex-col justify-center px-8 md:px-20 py-12 bg-white">
         <div className="max-w-sm mx-auto w-full">
-          <h1 className="text-3xl font-bold text-[#1A3C6E] mb-1">CareerSeal</h1>
+
+          <div className="flex items-center gap-2 mb-1">
+            <svg width="22" height="22" viewBox="0 0 22 22">
+              <circle cx="11" cy="11" r="11" fill="#0D7377" />
+              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+            </svg>
+            <h1 className="text-2xl font-bold text-[#1A3C6E]">CareerSeal</h1>
+          </div>
           <p className="text-gray-400 text-sm mb-8">Your career journey starts here</p>
 
           <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
@@ -74,11 +68,9 @@ function Login() {
             </button>
           </div>
 
-          <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">
-            {isLogin ? 'Welcome back' : 'Create your account'}
-          </h2>
+          <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">Welcome back</h2>
           <p className="text-gray-500 text-sm mb-6">
-            {isLogin ? 'Sign in to continue your journey' : role === 'student' ? 'Start building your professional identity' : 'Start hiring top student talent'}
+            {role === 'student' ? 'Sign in to continue your journey' : 'Sign in to manage your hiring pipeline'}
           </p>
 
           <button onClick={() => handleOAuthPlaceholder('Google')} disabled={connecting === 'Google'} className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-3 mb-3 font-bold text-gray-700 hover:bg-gray-50 transition-colors text-sm">
@@ -91,7 +83,7 @@ function Login() {
             {connecting === 'Zoho' ? 'Connecting...' : 'Continue with Zoho'}
           </button>
 
-          <div className="flex items-center gap-3 my-5">
+          <div className="flex items-center gap-3 mb-5">
             <div className="h-px bg-gray-200 flex-1"></div>
             <span className="text-gray-400 text-xs">OR</span>
             <div className="h-px bg-gray-200 flex-1"></div>
@@ -100,29 +92,23 @@ function Login() {
           {error ? <p className="text-red-500 text-sm mb-4">{error}</p> : null}
 
           <div className="flex flex-col gap-3">
-            {!isLogin && (
-              <input type="text" placeholder={role === 'student' ? 'Full Name' : 'Company Name'} value={name} onChange={e => setName(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
-            )}
             <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
             <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
-
-            {isLogin && (
-              <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#0D7377] font-bold -mt-1">
-                Forgot password?
-              </button>
-            )}
-
+            <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#0D7377] font-bold -mt-1">
+              Forgot password?
+            </button>
             <button onClick={handleSubmit} disabled={loading} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-1">
-              {loading ? 'Please wait...' : isLogin ? 'Sign In' : 'Create Account'}
+              {loading ? 'Please wait...' : 'Sign In'}
             </button>
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            {isLogin ? "New to CareerSeal? " : "Already have an account? "}
-            <button onClick={() => setIsLogin(!isLogin)} className="text-[#0D7377] font-bold">
-              {isLogin ? 'Join now' : 'Sign in'}
+            New to CareerSeal?{' '}
+            <button onClick={() => navigate('/register')} className="text-[#0D7377] font-bold">
+              Join now
             </button>
           </p>
+
         </div>
       </div>
 
@@ -153,22 +139,18 @@ function Login() {
             {!resetSent ? (
               <>
                 <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Reset your password</h3>
-                <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a link to reset your password.</p>
+                <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a reset link.</p>
                 <input type="email" placeholder="Email Address" value={resetEmail} onChange={e => setResetEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full mb-4" />
-                <button onClick={handleForgotSubmit} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">
+                <button onClick={() => setResetSent(true)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">
                   Send Reset Link
                 </button>
-                <button onClick={closeForgot} className="text-gray-400 text-sm w-full text-center">
-                  Cancel
-                </button>
+                <button onClick={closeForgot} className="text-gray-400 text-sm w-full text-center">Cancel</button>
               </>
             ) : (
               <>
                 <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Check your email</h3>
-                <p className="text-gray-500 text-sm mb-5">Password reset isn't fully wired up yet — this is a placeholder. Real email delivery is coming soon.</p>
-                <button onClick={closeForgot} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full">
-                  Got it
-                </button>
+                <p className="text-gray-500 text-sm mb-5">Password reset coming soon — this is a placeholder for now.</p>
+                <button onClick={closeForgot} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold w-full">Got it</button>
               </>
             )}
           </div>

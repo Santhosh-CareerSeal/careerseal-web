@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Splash from './pages/Splash'
 import Onboarding from './pages/Onboarding'
 import Login from './pages/Login'
+import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import GridCard from './pages/GridCard'
 import CompanyDashboard from './pages/CompanyDashboard'
@@ -17,6 +18,7 @@ function App() {
         <Route path="/" element={<Splash />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/grid" element={<GridCard />} />
         <Route path="/company" element={<CompanyDashboard />} />
