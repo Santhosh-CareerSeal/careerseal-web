@@ -24,6 +24,7 @@ model Student {
   gridUpdatesThisMonth  Int           @default(0)
   gridLastUpdatedMonth  Int?
 
+  legalFullName         String?
   photoUrl              String?
   dateOfBirth           String?
   gender                String?
@@ -71,6 +72,8 @@ model Student {
   hobbies               String?
   pfAccountNumber       String?
   aadhaarNumber         String?
+  panNumber             String?
+  passportNumber        String?
   aadhaarVerified       Boolean       @default(false)
   digiLockerStatus      String?
   bio                   String?

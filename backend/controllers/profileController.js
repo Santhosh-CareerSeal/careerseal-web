@@ -15,7 +15,7 @@ const completeProfile = async (req, res) => {
   try {
     const userId = req.user.userId
     const {
-      photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
+      legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
       schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
       twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
       collegeName, degree, branch, collegePassingYear, collegeCGPA,
@@ -23,7 +23,7 @@ const completeProfile = async (req, res) => {
       workStatus, currentCompany, jobTitle, workExperience,
       preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
       technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-      hobbies, pfAccountNumber, aadhaarNumber, digiLockerStatus, bio
+      hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio
     } = req.body
 
     const education = `${degree || ''} ${branch || ''} ${collegeName || ''}`.trim()
@@ -33,7 +33,7 @@ const completeProfile = async (req, res) => {
     const student = await prisma.student.upsert({
       where: { userId },
       update: {
-        photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
+        legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
         schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
         twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
         collegeName, degree, branch, collegePassingYear, collegeCGPA,
@@ -41,11 +41,11 @@ const completeProfile = async (req, res) => {
         workStatus, currentCompany, jobTitle, workExperience,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-        hobbies, pfAccountNumber, aadhaarNumber, digiLockerStatus, bio,
+        hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio,
         education, schoolCollege, skills, profileComplete: true
       },
       create: {
-        userId, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
+        userId, legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
         schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
         twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
         collegeName, degree, branch, collegePassingYear, collegeCGPA,
@@ -53,7 +53,7 @@ const completeProfile = async (req, res) => {
         workStatus, currentCompany, jobTitle, workExperience,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-        hobbies, pfAccountNumber, aadhaarNumber, digiLockerStatus, bio,
+        hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio,
         education, schoolCollege, skills, profileComplete: true
       }
     })
@@ -71,8 +71,7 @@ const moveToGrid = async (req, res) => {
 
     const currentMonth = new Date().getMonth()
     const updatesThisMonth = student.gridLastUpdatedMonth === currentMonth
-      ? student.gridUpdatesThisMonth
-      : 0
+      ? student.gridUpdatesThisMonth : 0
 
     if (updatesThisMonth >= 3) {
       return res.status(400).json({ message: 'You can only update your GRID card 3 times per month.' })
