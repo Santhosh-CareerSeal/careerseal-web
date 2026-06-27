@@ -31,10 +31,8 @@ function Register() {
     }
     setLoading(true)
     try {
-      await axios.post(`${API_URL}/api/auth/signup`, {
-        name, email, password, role: 'student', workStatus, mobile
-      })
-      navigate('/login', { state: { email, password, fromRegister: true } })
+      await axios.post(`${API_URL}/api/auth/signup`, { name, email, password, role: 'student', workStatus, mobile })
+      navigate('/login', { state: { fromRegister: true } })
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {
@@ -42,26 +40,20 @@ function Register() {
     }
   }
 
+  const handleKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
       <div className="hidden md:flex w-80 bg-[#1A3C6E] flex-col justify-center px-10 py-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-12">
-            <svg width="22" height="22" viewBox="0 0 22 22">
-              <circle cx="11" cy="11" r="11" fill="#0D7377" />
-              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </svg>
+            <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
             <h1 className="text-white text-xl font-bold">CareerSeal</h1>
           </div>
           <h2 className="text-white text-2xl font-bold mb-4">On registering, you can</h2>
           <div className="flex flex-col gap-4">
-            {[
-              'Build your GRID card and get discovered by top companies',
-              'Get job postings delivered right to your profile',
-              'Track all your applications in one place',
-              'Verify your identity and stand out from fake profiles'
-            ].map((item, i) => (
+            {['Build your GRID card and get discovered by top companies','Get job postings delivered right to your profile','Track all your applications in one place','Verify your identity and stand out from fake profiles'].map((item, i) => (
               <div key={i} className="flex items-start gap-3">
                 <div className="w-5 h-5 rounded-full bg-[#0D7377] flex items-center justify-center flex-shrink-0 mt-0.5">
                   <i className="ti ti-check text-white text-xs"></i>
@@ -75,14 +67,6 @@ function Register() {
 
       <div className="flex-1 flex flex-col justify-center px-8 md:px-16 py-12 bg-white">
         <div className="max-w-md mx-auto w-full">
-          <div className="flex items-center gap-2 mb-1 md:hidden">
-            <svg width="20" height="20" viewBox="0 0 22 22">
-              <circle cx="11" cy="11" r="11" fill="#0D7377" />
-              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-            </svg>
-            <h1 className="text-xl font-bold text-[#1A3C6E]">CareerSeal</h1>
-          </div>
-
           <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">Create your CareerSeal profile</h2>
           <p className="text-gray-500 text-sm mb-8">Search & apply to jobs from India's most trusted career platform</p>
 
@@ -91,23 +75,23 @@ function Register() {
           <div className="flex flex-col gap-4 mb-6">
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Full Name <span className="text-red-400">*</span></label>
-              <input type="text" placeholder="What is your name?" value={name} onChange={e => setName(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="What is your name?" value={name} onChange={e => setName(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Email ID <span className="text-red-400">*</span></label>
-              <input type="email" placeholder="Tell us your Email ID" value={email} onChange={e => setEmail(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="email" placeholder="Tell us your Email ID" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
               <p className="text-gray-400 text-xs mt-1">We'll send relevant jobs and updates to this email</p>
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Password <span className="text-red-400">*</span></label>
-              <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
               <p className="text-gray-400 text-xs mt-1">This helps your account stay protected</p>
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Mobile Number <span className="text-red-400">*</span></label>
               <div className="flex gap-2">
                 <div className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-500 bg-gray-50">+91</div>
-                <input type="tel" placeholder="Enter your mobile number" value={mobile} onChange={e => setMobile(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm flex-1" />
+                <input type="tel" placeholder="Enter your mobile number" value={mobile} onChange={e => setMobile(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm flex-1" />
               </div>
               <p className="text-gray-400 text-xs mt-1">Recruiters will contact you on this number</p>
             </div>

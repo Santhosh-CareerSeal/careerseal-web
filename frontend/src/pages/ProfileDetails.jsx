@@ -27,9 +27,7 @@ function ProfileDetails() {
       try {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
-        const response = await axios.get(`${API_URL}/api/profile/details`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const response = await axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } })
         const s = response.data.student
         if (s) {
           if (s.contactNumber) { setContactNumber(s.contactNumber); setMobileFromReg(true) }
@@ -43,9 +41,7 @@ function ProfileDetails() {
           if (s.pfAccountNumber) setPfAccountNumber(s.pfAccountNumber)
           if (s.photoUrl) setPhotoPreview(s.photoUrl)
         }
-      } catch (err) {
-        console.error(err)
-      }
+      } catch (err) { console.error(err) }
     }
     fetchExisting()
   }, [])
@@ -65,11 +61,8 @@ function ProfileDetails() {
       if (uploadError) throw uploadError
       const { data } = supabase.storage.from('profile-photos').getPublicUrl(fileName)
       return data.publicUrl
-    } catch (err) {
-      console.error(err); return null
-    } finally {
-      setUploadingPhoto(false)
-    }
+    } catch (err) { console.error(err); return null }
+    finally { setUploadingPhoto(false) }
   }
 
   const handleSubmit = async () => {
@@ -90,19 +83,16 @@ function ProfileDetails() {
       navigate('/dashboard')
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
-    } finally {
-      setLoading(false)
-    }
+    } finally { setLoading(false) }
   }
+
+  const handleKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center px-6 py-12">
       <div className="max-w-md w-full">
         <div className="flex items-center gap-2 mb-2">
-          <svg width="22" height="22" viewBox="0 0 22 22">
-            <circle cx="11" cy="11" r="11" fill="#0D7377" />
-            <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          </svg>
+          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <h1 className="text-2xl font-bold text-[#1A3C6E]">CareerSeal</h1>
         </div>
         <p className="text-gray-500 text-sm mb-8">One last step before you start exploring opportunities</p>
@@ -128,29 +118,29 @@ function ProfileDetails() {
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Contact Number</label>
               <div className="flex gap-2">
                 <div className="border border-gray-200 rounded-xl px-4 py-3 text-sm text-gray-500 bg-gray-50">+91</div>
-                <input type="tel" placeholder="Mobile number" value={contactNumber} onChange={e => setContactNumber(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm flex-1" />
+                <input type="tel" placeholder="Mobile number" value={contactNumber} onChange={e => setContactNumber(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm flex-1" />
               </div>
               {mobileFromReg && <p className="text-green-600 text-xs mt-1">✓ Auto-filled from your registration</p>}
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Address</label>
-              <input type="text" placeholder="House no, street, city, state, pincode" value={address} onChange={e => setAddress(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="House no, street, city, state, pincode" value={address} onChange={e => setAddress(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">School / College</label>
-              <input type="text" placeholder="e.g. MIT" value={schoolCollege} onChange={e => setSchoolCollege(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="e.g. MIT" value={schoolCollege} onChange={e => setSchoolCollege(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Education</label>
-              <input type="text" placeholder="e.g. B.Tech CSE, 2025" value={education} onChange={e => setEducation(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="e.g. B.Tech CSE, 2025" value={education} onChange={e => setEducation(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Skills</label>
-              <input type="text" placeholder="e.g. React, Node.js, Python" value={skills} onChange={e => setSkills(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="e.g. React, Node.js, Python" value={skills} onChange={e => setSkills(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Hobbies</label>
-              <input type="text" placeholder="e.g. Chess, Photography, Reading" value={hobbies} onChange={e => setHobbies(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="e.g. Chess, Photography, Reading" value={hobbies} onChange={e => setHobbies(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Work Experience (if any)</label>
@@ -158,11 +148,11 @@ function ProfileDetails() {
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Preferred Work Location</label>
-              <input type="text" placeholder="e.g. Bangalore, Remote" value={preferredWorkLocation} onChange={e => setPreferredWorkLocation(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="e.g. Bangalore, Remote" value={preferredWorkLocation} onChange={e => setPreferredWorkLocation(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div>
               <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">PF Account Number (if any)</label>
-              <input type="text" placeholder="e.g. KA/BNG/1234567/000/0000000" value={pfAccountNumber} onChange={e => setPfAccountNumber(e.target.value)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <input type="text" placeholder="e.g. KA/BNG/1234567/000/0000000" value={pfAccountNumber} onChange={e => setPfAccountNumber(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
             </div>
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 text-xs text-gray-500">
               Aadhaar verification is handled on your GRID Card page after this step.
