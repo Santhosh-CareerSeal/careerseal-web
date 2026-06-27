@@ -35,6 +35,7 @@ function GridCard() {
   }, [])
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
+  const skillsList = student?.skills ? student.skills.split(',').map(s => s.trim()) : []
 
   const drawRoundRect = (ctx, x, y, w, h, r) => {
     ctx.beginPath()
@@ -78,8 +79,6 @@ function GridCard() {
       ctx.fillStyle = 'rgba(0,0,0,0.15)'
       drawRoundRect(ctx, 0, 0, leftW, H, 0)
       ctx.fill()
-      ctx.fillStyle = 'rgba(0,0,0,0.15)'
-      ctx.fillRect(leftW - 1, 0, 1, H)
 
       const photoSize = 110
       const photoX = leftW / 2
@@ -165,27 +164,22 @@ function GridCard() {
       const address = student?.address || 'Not provided'
       const words = address.split(' ')
       let line = ''
-      let y = photoY + 226
+      let addrY = photoY + 226
       for (const word of words) {
         const test = line + word + ' '
         if (ctx.measureText(test).width > leftW - 60 && line !== '') {
-          ctx.fillText(line.trim(), 30, y)
+          ctx.fillText(line.trim(), 30, addrY)
           line = word + ' '
-          y += 18
-        } else {
-          line = test
-        }
+          addrY += 18
+        } else { line = test }
       }
-      ctx.fillText(line.trim(), 30, y)
+      ctx.fillText(line.trim(), 30, addrY)
 
       const rx = leftW + 40
-      ctx.fillStyle = 'rgba(255,255,255,0.06)'
-      drawRoundRect(ctx, rx, 40, 80, 24, 6)
-      ctx.fill()
       ctx.fillStyle = 'rgba(255,255,255,0.5)'
       ctx.font = '10px Arial'
       ctx.textAlign = 'left'
-      ctx.fillText('CAREERSEAL', rx + 8, 56)
+      ctx.fillText('CAREERSEAL', rx, 56)
 
       ctx.fillStyle = 'rgba(255,255,255,0.2)'
       ctx.font = '10px Arial'
@@ -199,9 +193,7 @@ function GridCard() {
       ctx.fillStyle = 'rgba(255,255,255,0.35)'
       ctx.font = '11px Arial'
       ctx.textAlign = 'left'
-      ctx.letterSpacing = '2px'
       ctx.fillText('GRID NUMBER', rx + 20, 115)
-      ctx.letterSpacing = '0px'
 
       ctx.fillStyle = 'white'
       ctx.font = 'bold 26px Arial'
@@ -227,12 +219,12 @@ function GridCard() {
 
       ctx.fillStyle = '#5DCAA5'
       ctx.beginPath()
-      ctx.arc(rx + 20, H - 60, 8, 0, Math.PI * 2)
+      ctx.arc(rx, H - 60, 8, 0, Math.PI * 2)
       ctx.fill()
 
       ctx.fillStyle = '#5DCAA5'
       ctx.font = 'bold 14px Arial'
-      ctx.fillText('CareerSeal Verified', rx + 36, H - 54)
+      ctx.fillText('CareerSeal Verified', rx + 16, H - 54)
 
       ctx.fillStyle = 'rgba(255,255,255,0.2)'
       ctx.font = '11px Arial'
@@ -275,6 +267,7 @@ function GridCard() {
           transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)'
         }}>
 
+          {/* FRONT */}
           <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', background: '#1A3C6E', borderRadius: '20px', padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -304,49 +297,94 @@ function GridCard() {
                   <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#5DCAA5' }}></div>
                   <span style={{ color: '#5DCAA5', fontSize: '12px' }}>Verified</span>
                 </div>
-                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>Tap to flip →</span>
+                <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>Tap to view resume →</span>
               </div>
             </div>
           </div>
 
-          <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', background: '#1A3C6E', borderRadius: '20px', padding: '32px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', letterSpacing: '2px' }}>CAREERSEAL</span>
-              </div>
-              <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>CONTACT INFO</span>
-            </div>
-            <div style={{ textAlign: 'center' }}>
+          {/* BACK — Full Resume Layout */}
+          <div style={{ position: 'absolute', inset: 0, backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden', transform: 'rotateY(180deg)', borderRadius: '20px', overflow: 'hidden', display: 'flex' }}>
+
+            {/* Left dark column */}
+            <div style={{ width: '115px', background: '#1A3C6E', padding: '16px 12px', display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0 }}>
               {student?.photoUrl ? (
-                <img src={student.photoUrl} alt="Profile" style={{ width: '70px', height: '70px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 12px', border: '3px solid rgba(255,255,255,0.2)', display: 'block' }} />
+                <img src={student.photoUrl} alt="Profile" style={{ width: '72px', height: '72px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto', border: '2px solid rgba(255,255,255,0.2)', display: 'block' }} />
               ) : (
-                <div style={{ width: '70px', height: '70px', borderRadius: '50%', background: '#0D7377', margin: '0 auto 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '28px', fontWeight: '500' }}>
+                <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: '#0D7377', margin: '0 auto', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '24px', fontWeight: '500' }}>
                   {getInitials(user?.name)}
                 </div>
               )}
-              <p style={{ color: 'white', fontSize: '20px', fontWeight: '500', margin: '0 0 4px' }}>{user?.name}</p>
+
+              <div>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '9px', letterSpacing: '1.5px', margin: '0 0 5px' }}>CONTACT</p>
+                {student?.contactNumber && <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '9px', margin: '0 0 2px' }}>+91 {student.contactNumber}</p>}
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '9px', margin: '0 0 2px', wordBreak: 'break-all' }}>{user?.email}</p>
+                {student?.address && <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '9px', margin: 0, lineHeight: '1.3' }}>{student.address}</p>}
+              </div>
+
+              {skillsList.length > 0 && (
+                <div>
+                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '9px', letterSpacing: '1.5px', margin: '0 0 5px' }}>SKILLS</p>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '3px' }}>
+                    {skillsList.slice(0, 6).map((skill, i) => (
+                      <span key={i} style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.8)', fontSize: '8px', padding: '2px 5px', borderRadius: '4px' }}>{skill}</span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {student?.hobbies && (
+                <div>
+                  <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '9px', letterSpacing: '1.5px', margin: '0 0 5px' }}>HOBBIES</p>
+                  {student.hobbies.split(',').slice(0, 3).map((h, i) => (
+                    <p key={i} style={{ color: 'rgba(255,255,255,0.7)', fontSize: '9px', margin: '0 0 2px' }}>{h.trim()}</p>
+                  ))}
+                </div>
+              )}
+
+              <div style={{ marginTop: 'auto' }}>
+                <div style={{ background: '#0D7377', borderRadius: '6px', padding: '5px 8px', textAlign: 'center' }}>
+                  <p style={{ color: 'white', fontSize: '8px', letterSpacing: '1px', margin: 0 }}>VERIFIED</p>
+                </div>
+                <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '7px', textAlign: 'center', margin: '4px 0 0', wordBreak: 'break-all' }}>{gridCard?.gridNumber}</p>
+              </div>
             </div>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '16px 20px' }}>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', letterSpacing: '2px', margin: '0 0 6px' }}>CONTACT NUMBER</p>
-                <p style={{ color: 'white', fontSize: '18px', fontWeight: '500', margin: 0 }}>{student?.contactNumber ? `+91 ${student.contactNumber}` : 'Not provided'}</p>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '16px 20px' }}>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', letterSpacing: '2px', margin: '0 0 6px' }}>ADDRESS</p>
-                <p style={{ color: 'white', fontSize: '14px', fontWeight: '500', margin: 0, lineHeight: '1.5' }}>{student?.address || 'Not provided'}</p>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '12px', padding: '12px 20px' }}>
-                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '10px', letterSpacing: '2px', margin: '0 0 4px' }}>GRID NUMBER</p>
-                <p style={{ color: '#5DCAA5', fontSize: '13px', fontWeight: '500', margin: 0 }}>{gridCard?.gridNumber}</p>
-              </div>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#5DCAA5' }}></div>
-                <span style={{ color: '#5DCAA5', fontSize: '12px' }}>Verified</span>
-              </div>
-              <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: '11px' }}>Tap to flip back</span>
+
+            {/* Right white column — Resume */}
+            <div style={{ flex: 1, background: 'white', padding: '16px', overflowY: 'auto' }}>
+              <p style={{ fontSize: '16px', fontWeight: '500', color: '#1A3C6E', margin: '0 0 2px' }}>{user?.name}</p>
+              {student?.education && <p style={{ fontSize: '10px', color: '#0D7377', margin: '0 0 10px' }}>{student.education}</p>}
+
+              {student?.education && (
+                <div style={{ borderTop: '1.5px solid #1A3C6E', paddingTop: '8px', marginBottom: '10px' }}>
+                  <p style={{ fontSize: '9px', fontWeight: '500', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 5px' }}>EDUCATION</p>
+                  <p style={{ fontSize: '11px', fontWeight: '500', color: '#222', margin: '0 0 1px' }}>{student.education}</p>
+                  {student?.schoolCollege && <p style={{ fontSize: '10px', color: '#0D7377', margin: 0 }}>{student.schoolCollege}</p>}
+                </div>
+              )}
+
+              {student?.workExperience && (
+                <div style={{ borderTop: '1.5px solid #1A3C6E', paddingTop: '8px', marginBottom: '10px' }}>
+                  <p style={{ fontSize: '9px', fontWeight: '500', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 5px' }}>EXPERIENCE</p>
+                  <p style={{ fontSize: '9px', color: '#555', margin: 0, lineHeight: '1.4' }}>{student.workExperience}</p>
+                </div>
+              )}
+
+              {student?.preferredWorkLocation && (
+                <div style={{ borderTop: '1.5px solid #1A3C6E', paddingTop: '8px', marginBottom: '10px' }}>
+                  <p style={{ fontSize: '9px', fontWeight: '500', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 4px' }}>PREFERRED LOCATION</p>
+                  <p style={{ fontSize: '11px', color: '#222', margin: 0 }}>{student.preferredWorkLocation}</p>
+                </div>
+              )}
+
+              {student?.pfAccountNumber && (
+                <div style={{ borderTop: '1.5px solid #1A3C6E', paddingTop: '8px', marginBottom: '10px' }}>
+                  <p style={{ fontSize: '9px', fontWeight: '500', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 4px' }}>PF ACCOUNT</p>
+                  <p style={{ fontSize: '10px', color: '#555', margin: 0 }}>{student.pfAccountNumber}</p>
+                </div>
+              )}
+
+              <p style={{ fontSize: '9px', color: '#aaa', textAlign: 'center', margin: '12px 0 0' }}>Tap to flip back</p>
             </div>
           </div>
 
