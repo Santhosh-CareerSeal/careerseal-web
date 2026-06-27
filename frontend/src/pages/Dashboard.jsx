@@ -1,23 +1,29 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
+import API_URL from '../config'
 
 function Dashboard() {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
+  const [student, setStudent] = useState(null)
   const [stats, setStats] = useState({ totalApplications: 0, interviews: 0, savedJobs: 0, profileViews: 0 })
   const [loading, setLoading] = useState(true)
+
+  const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
 
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
-        const response = await axios.get('https://careerseal-web.onrender.com/api/dashboard/student', {
-          headers: { Authorization: `Bearer ${token}` }
-        })
-        setUser(response.data.user)
-        setStats(response.data.stats)
+        const [dashRes, profileRes] = await Promise.all([
+          axios.get(`${API_URL}/api/dashboard/student`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } })
+        ])
+        setUser(dashRes.data.user)
+        setStats(dashRes.data.stats)
+        setStudent(profileRes.data.student)
       } catch (error) {
         navigate('/login')
       } finally {
@@ -33,8 +39,6 @@ function Dashboard() {
     navigate('/login')
   }
 
-  const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
-
   if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center"><p className="text-[#1A3C6E] text-xl font-bold">Loading...</p></div>
 
   return (
@@ -43,7 +47,13 @@ function Dashboard() {
         <h1 className="text-white text-xl font-bold">CareerSeal</h1>
         <div className="flex items-center gap-4">
           <button onClick={handleLogout} className="text-white/70 text-sm">Logout</button>
-          <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">{capitalize(user?.name).charAt(0)}</div>
+          {student?.photoUrl ? (
+            <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
+          ) : (
+            <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
+              {capitalize(user?.name).charAt(0)}
+            </div>
+          )}
         </div>
       </div>
       <div className="px-6 py-6">
