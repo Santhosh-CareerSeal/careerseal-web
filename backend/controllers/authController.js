@@ -16,14 +16,19 @@ const signup = async (req, res) => {
     const passwordHash = await bcrypt.hash(password, 10)
 
     const user = await prisma.user.create({
-      data: { name, email, passwordHash, role: role || 'student' }
+      data: {
+        name,
+        email,
+        passwordHash,
+        role: role || 'student',
+        student: (role === 'student' || !role) ? {
+          create: {
+            contactNumber: mobile || null,
+            profileComplete: false
+          }
+        } : undefined
+      }
     })
-
-    if (role === 'student' || !role) {
-      await prisma.student.create({
-        data: { userId: user.id, contactNumber: mobile || null, profileComplete: false }
-      })
-    }
 
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
 
