@@ -7,6 +7,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes')
 const jobRoutes = require('./routes/jobRoutes')
 const applicationRoutes = require('./routes/applicationRoutes')
 const gridRoutes = require('./routes/gridRoutes')
+const publicRoutes = require('./routes/publicRoutes')
 
 dotenv.config()
 
@@ -33,6 +34,7 @@ app.use('/api/jobs', jobRoutes)
 app.use('/api/applications', applicationRoutes)
 app.use('/api/grid', gridRoutes)
 app.use('/api/profile', profileRoutes)
+app.use('/api/public', publicRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
