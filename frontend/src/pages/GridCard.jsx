@@ -64,7 +64,9 @@ function GridCard() {
   }, [])
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
-  const skillsList = student?.technicalSkills ? student.technicalSkills.split(',').map(s => s.trim()) : student?.skills ? student.skills.split(',').map(s => s.trim()) : []
+  const skillsList = student?.technicalSkills
+    ? student.technicalSkills.split(',').map(s => s.trim())
+    : student?.skills ? student.skills.split(',').map(s => s.trim()) : []
   const profileUrl = `https://careerseal-web.vercel.app/profile/${gridCard?.gridNumber || 'GRID'}`
 
   const handleDownload = async () => {
@@ -96,61 +98,61 @@ function GridCard() {
       grad.addColorStop(1, '#0D7377')
       drawRR(0, 0, CW, CH, 40); ctx.fillStyle = grad; ctx.fill()
 
-      // Glow circle top right
       const glow = ctx.createRadialGradient(CW - 100, -80, 0, CW - 100, -80, 380)
       glow.addColorStop(0, 'rgba(13,115,119,0.25)'); glow.addColorStop(1, 'transparent')
       ctx.fillStyle = glow; ctx.fillRect(0, 0, CW, CH)
 
-      // Top row — Logo left, avatar right
-      // Logo
+      // ROW 1 — CareerSeal brand + GRID CARD
       ctx.fillStyle = '#0D7377'
-      ctx.beginPath(); ctx.arc(48, 48, 16, 0, Math.PI * 2); ctx.fill()
+      ctx.beginPath(); ctx.arc(50, 56, 18, 0, Math.PI * 2); ctx.fill()
       ctx.strokeStyle = '#1A3C6E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
-      ctx.beginPath(); ctx.moveTo(41, 49); ctx.lineTo(45, 53); ctx.lineTo(55, 43); ctx.stroke()
-      ctx.fillStyle = 'rgba(255,255,255,0.55)'; ctx.font = '500 18px system-ui'; ctx.textAlign = 'left'
-      ctx.fillText('CAREERSEAL', 72, 54)
-      ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '14px system-ui'; ctx.textAlign = 'right'
-      ctx.fillText('GRID CARD', CW - 48, 54)
+      ctx.beginPath(); ctx.moveTo(42, 57); ctx.lineTo(47, 62); ctx.lineTo(58, 50); ctx.stroke()
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '600 22px system-ui'; ctx.textAlign = 'left'
+      ctx.fillText('CAREERSEAL', 76, 63)
+      ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '16px system-ui'; ctx.textAlign = 'right'
+      ctx.fillText('GRID CARD', CW - 50, 63)
 
-      // Avatar top right
-      const avSize = 80, avX = CW - 60 - avSize / 2, avY = 48
+      // ROW 2 — Photo + Name + Contact
+      const photoSize = 110
+      const photoX = 50 + photoSize / 2
+      const photoY = CH / 2
+
       ctx.fillStyle = '#0D7377'
-      ctx.beginPath(); ctx.arc(avX, avY, avSize / 2 + 3, 0, Math.PI * 2); ctx.fill()
+      ctx.beginPath(); ctx.arc(photoX, photoY, photoSize / 2 + 4, 0, Math.PI * 2); ctx.fill()
+
       if (student?.photoUrl) {
         try {
           const img = new Image(); img.crossOrigin = 'anonymous'
           await new Promise((res, rej) => { img.onload = res; img.onerror = rej; img.src = student.photoUrl })
-          ctx.save(); ctx.beginPath(); ctx.arc(avX, avY, avSize / 2, 0, Math.PI * 2); ctx.clip()
-          ctx.drawImage(img, avX - avSize / 2, avY - avSize / 2, avSize, avSize); ctx.restore()
+          ctx.save(); ctx.beginPath(); ctx.arc(photoX, photoY, photoSize / 2, 0, Math.PI * 2); ctx.clip()
+          ctx.drawImage(img, photoX - photoSize / 2, photoY - photoSize / 2, photoSize, photoSize)
+          ctx.restore()
         } catch {
-          ctx.fillStyle = 'white'; ctx.font = 'bold 32px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-          ctx.fillText(getInitials(user?.name), avX, avY); ctx.textBaseline = 'alphabetic'
+          ctx.fillStyle = 'white'; ctx.font = 'bold 44px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+          ctx.fillText(getInitials(user?.name), photoX, photoY); ctx.textBaseline = 'alphabetic'
         }
       } else {
-        ctx.fillStyle = 'white'; ctx.font = 'bold 32px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
-        ctx.fillText(getInitials(user?.name), avX, avY); ctx.textBaseline = 'alphabetic'
+        ctx.fillStyle = 'white'; ctx.font = 'bold 44px system-ui'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'
+        ctx.fillText(getInitials(user?.name), photoX, photoY); ctx.textBaseline = 'alphabetic'
       }
 
-      // Bottom section — Name + contact + GRID
-      const bx = 48, by = CH - 200
+      const textX = 50 + photoSize + 20
       ctx.fillStyle = 'white'; ctx.font = 'bold 52px system-ui'; ctx.textAlign = 'left'
-      ctx.fillText(user?.name || '', bx, by)
-      ctx.fillStyle = '#5DCAA5'; ctx.font = '500 26px system-ui'
-      ctx.fillText(student?.contactNumber ? `+91 ${student.contactNumber}` : user?.email || '', bx, by + 46)
+      ctx.fillText(user?.name || '', textX, photoY - 10)
+      ctx.fillStyle = '#5DCAA5'; ctx.font = '500 28px system-ui'
+      ctx.fillText(student?.contactNumber ? `+91 ${student.contactNumber}` : user?.email || '', textX, photoY + 40)
 
-      // GRID number
-      ctx.fillStyle = 'rgba(255,255,255,0.3)'; ctx.font = '13px system-ui'
-      ctx.fillText('GRID NUMBER', bx, by + 100)
-      ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = 'bold 28px system-ui'
-      ctx.fillText(gridCard?.gridNumber || '', bx, by + 136)
-
-      // Verified badge bottom right
+      // ROW 3 — GRID NUMBER + Verified
+      ctx.fillStyle = 'rgba(255,255,255,0.35)'; ctx.font = '14px system-ui'; ctx.textAlign = 'left'
+      ctx.fillText('GRID NUMBER', 50, CH - 72)
+      ctx.fillStyle = 'rgba(255,255,255,0.9)'; ctx.font = 'bold 30px system-ui'
+      ctx.fillText(gridCard?.gridNumber || '', 50, CH - 38)
       ctx.fillStyle = '#5DCAA5'
-      ctx.beginPath(); ctx.arc(CW - 230, CH - 44, 9, 0, Math.PI * 2); ctx.fill()
-      ctx.fillStyle = '#5DCAA5'; ctx.font = 'bold 20px system-ui'; ctx.textAlign = 'left'
-      ctx.fillText('CareerSeal Verified', CW - 212, CH - 38)
+      ctx.beginPath(); ctx.arc(CW - 240, CH - 46, 10, 0, Math.PI * 2); ctx.fill()
+      ctx.fillStyle = '#5DCAA5'; ctx.font = 'bold 22px system-ui'
+      ctx.fillText('CareerSeal Verified', CW - 220, CH - 38)
       ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '16px system-ui'; ctx.textAlign = 'right'
-      ctx.fillText('careerseal.in', CW - 48, CH - 38)
+      ctx.fillText('careerseal.in', CW - 50, CH - 38)
 
       // Fold line
       ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '14px system-ui'; ctx.textAlign = 'center'
@@ -158,39 +160,34 @@ function GridCard() {
 
       // ── BACK ──
       const BY = CH + 40
-      const bgrad2 = ctx.createLinearGradient(0, BY, CW, BY + CH)
-      bgrad2.addColorStop(0, '#0D2A52'); bgrad2.addColorStop(1, '#1A3C6E')
-      drawRR(0, BY, CW, CH, 40); ctx.fillStyle = bgrad2; ctx.fill()
+      const bgrad = ctx.createLinearGradient(0, BY, CW, BY + CH)
+      bgrad.addColorStop(0, '#0D2A52'); bgrad.addColorStop(1, '#1A3C6E')
+      drawRR(0, BY, CW, CH, 40); ctx.fillStyle = bgrad; ctx.fill()
 
-      // Magnetic stripe
       ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0, BY, CW, 72)
 
-      // Back logo
       ctx.fillStyle = '#0D7377'
       ctx.beginPath(); ctx.arc(62, BY + 130, 16, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = '#1A3C6E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+      ctx.strokeStyle = '#1A3C6E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'
       ctx.beginPath(); ctx.moveTo(55, BY + 131); ctx.lineTo(59, BY + 135); ctx.lineTo(69, BY + 125); ctx.stroke()
-      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '500 18px system-ui'; ctx.textAlign = 'left'
+      ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '600 18px system-ui'; ctx.textAlign = 'left'
       ctx.fillText('CAREERSEAL', 86, BY + 136)
 
-      // Back text
       ctx.fillStyle = 'white'; ctx.font = 'bold 52px system-ui'
       ctx.fillText('Scan to view', 60, BY + 220)
       ctx.fillText('my resume', 60, BY + 280)
       ctx.fillStyle = 'rgba(255,255,255,0.45)'; ctx.font = '22px system-ui'
       ctx.fillText('No app needed · Opens instantly', 60, BY + 328)
 
-      // URL box
       ctx.fillStyle = 'rgba(255,255,255,0.08)'
-      drawRR(60, BY + 356, 560, 56, 10); ctx.fill()
+      drawRR(60, BY + 356, 580, 56, 10); ctx.fill()
       ctx.strokeStyle = 'rgba(13,115,119,0.5)'; ctx.lineWidth = 1
-      drawRR(60, BY + 356, 560, 56, 10); ctx.stroke()
+      drawRR(60, BY + 356, 580, 56, 10); ctx.stroke()
       ctx.fillStyle = '#5DCAA5'; ctx.font = 'bold 18px system-ui'
       ctx.fillText(`careerseal.in/profile/${gridCard?.gridNumber || ''}`, 80, BY + 390)
 
-      // Real QR code
       const qrDataUrl = await QRCode.toDataURL(profileUrl, {
-        width: 300, margin: 1,
+        width: 300, margin: 2,
         color: { dark: '#1A3C6E', light: '#ffffff' }
       })
       const qrImg = new Image()
@@ -265,37 +262,46 @@ function GridCard() {
             <span key={i} className="field-tag" style={{ ...field.pos, '--rot': field.rot, ...TAG_STYLES[field.color], animationDelay: field.delay }}>{field.label}</span>
           ))}
 
-          {/* ATM Card — landscape, no chip */}
+          {/* ATM Card — 3 row layout */}
           <div
             onClick={() => setFlipped(true)}
-            style={{ position: 'relative', zIndex: 10, width: '380px', height: '220px', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
+            style={{ position: 'relative', zIndex: 10, width: '400px', height: '240px', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
             <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(13,115,119,0.15)', transform: 'translate(40px,-40px)' }}></div>
 
-            {/* Top row */}
+            {/* Row 1 — CareerSeal brand + GRID CARD */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                <span style={{ color: 'rgba(255,255,255,0.5)', fontSize: '9px', letterSpacing: '2px', fontWeight: '600' }}>CAREERSEAL</span>
+                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '9px', letterSpacing: '2px', fontWeight: '600' }}>CAREERSEAL</span>
               </div>
+              <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '9px' }}>GRID CARD</span>
+            </div>
+
+            {/* Row 2 — Photo + Name + Contact */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative', zIndex: 1 }}>
               {student?.photoUrl ? (
-                <img src={student.photoUrl} alt="Profile" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.2)' }} />
+                <img src={student.photoUrl} alt="Profile" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }} />
               ) : (
-                <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: '#0D7377', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '16px', fontWeight: '700', border: '2px solid rgba(255,255,255,0.2)' }}>
+                <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#0D7377', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '22px', fontWeight: '700', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }}>
                   {getInitials(user?.name)}
                 </div>
               )}
+              <div>
+                <p style={{ color: 'white', fontSize: '18px', fontWeight: '700', margin: '0 0 4px', letterSpacing: '0.3px' }}>{user?.name}</p>
+                <p style={{ color: '#5DCAA5', fontSize: '11px', fontWeight: '500', margin: 0 }}>
+                  {student?.contactNumber ? `+91 ${student.contactNumber}` : user?.email || ''}
+                </p>
+              </div>
             </div>
 
-            {/* Bottom section */}
+            {/* Row 3 — GRID NUMBER + Verified */}
             <div style={{ position: 'relative', zIndex: 1 }}>
-              <p style={{ color: 'white', fontSize: '20px', fontWeight: '700', margin: '0 0 3px' }}>{user?.name}</p>
-              <p style={{ color: '#5DCAA5', fontSize: '11px', margin: '0 0 10px', fontWeight: '500' }}>{student?.contactNumber ? `+91 ${student.contactNumber}` : user?.email || ''}</p>
-              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '7px', letterSpacing: '2px', margin: '0 0 3px' }}>GRID NUMBER</p>
+              <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '7px', letterSpacing: '2px', margin: '0 0 4px' }}>GRID NUMBER</p>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '12px', fontWeight: '700', letterSpacing: '1.5px', margin: 0 }}>{gridCard?.gridNumber || 'Generating...'}</p>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', fontWeight: '700', letterSpacing: '1.5px', margin: 0 }}>{gridCard?.gridNumber || 'Generating...'}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#5DCAA5' }}></div>
                   <span style={{ color: '#5DCAA5', fontSize: '10px', fontWeight: '600' }}>Verified</span>
@@ -312,7 +318,6 @@ function GridCard() {
           </div>
         </div>
       ) : (
-        /* Full A4 Resume */
         <div style={{ minHeight: 'calc(100vh - 57px)', background: '#f4f5f7', padding: '30px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '794px', marginBottom: '16px' }}>
             <button onClick={() => setFlipped(false)} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '8px 18px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>← Back to GRID</button>
