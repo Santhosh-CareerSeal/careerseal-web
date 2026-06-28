@@ -23,7 +23,6 @@ model Student {
   gridPublished         Boolean       @default(false)
   gridUpdatesThisMonth  Int           @default(0)
   gridLastUpdatedMonth  Int?
-
   legalFullName         String?
   photoUrl              String?
   dateOfBirth           String?
@@ -33,7 +32,6 @@ model Student {
   city                  String?
   state                 String?
   pincode               String?
-
   schoolName            String?
   schoolBoard           String?
   schoolPassingYear     String?
@@ -52,7 +50,6 @@ model Student {
   pgBranch              String?
   pgPassingYear         String?
   pgCGPA                String?
-
   workStatus            String?
   currentCompany        String?
   jobTitle              String?
@@ -61,14 +58,12 @@ model Student {
   preferredWorkLocation String?
   noticePeriod          String?
   expectedSalary        String?
-
   technicalSkills       String?
   softSkills            String?
   languagesKnown        String?
   certifications        String?
   toolsAndSoftware      String?
   skills                String?
-
   hobbies               String?
   pfAccountNumber       String?
   aadhaarNumber         String?
@@ -77,11 +72,9 @@ model Student {
   aadhaarVerified       Boolean       @default(false)
   digiLockerStatus      String?
   bio                   String?
-
   gridNumber            String?       @unique
   education             String?
   schoolCollege         String?
-
   user                  User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   applications          Application[]
 }
@@ -94,14 +87,18 @@ model Company {
   jobs        Job[]
 }
 model Job {
-  id           Int           @id @default(autoincrement())
-  companyId    Int?
-  title        String
-  description  String?
-  salaryRange  String?
-  createdAt    DateTime?     @default(now()) @db.Timestamp(6)
-  applications Application[]
-  company      Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id              Int           @id @default(autoincrement())
+  companyId       Int?
+  title           String
+  description     String?
+  salaryRange     String?
+  requiredSkills  String?
+  jobType         String?
+  location        String?
+  experienceLevel String?
+  createdAt       DateTime?     @default(now()) @db.Timestamp(6)
+  applications    Application[]
+  company         Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 model Application {
   id        Int       @id @default(autoincrement())
