@@ -10,6 +10,7 @@ import JobTracker from './pages/JobTracker'
 import Jobs from './pages/Jobs'
 import CompanyPipeline from './pages/CompanyPipeline'
 import ProfileDetails from './pages/ProfileDetails'
+import PublicProfile from './pages/PublicProfile'
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
         <Route path="/jobs" element={<Jobs />} />
         <Route path="/pipeline" element={<CompanyPipeline />} />
         <Route path="/profile-details" element={<ProfileDetails />} />
+        <Route path="/profile/:gridNumber" element={<PublicProfile />} />
       </Routes>
     </BrowserRouter>
   )
