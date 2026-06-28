@@ -77,6 +77,21 @@ model Student {
   schoolCollege         String?
   user                  User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   applications          Application[]
+  roadmap               Roadmap?
+}
+model Roadmap {
+  id                    Int       @id @default(autoincrement())
+  studentId             Int       @unique
+  workStatus            String
+  answers               String
+  careerOptions         String
+  selectedCareer        String?
+  roadmapContent        String?
+  regeneratesThisMonth  Int       @default(0)
+  lastRegeneratedMonth  Int?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  student               Student   @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 }
 model Company {
   id          Int     @id @default(autoincrement())

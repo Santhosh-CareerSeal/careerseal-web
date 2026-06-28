@@ -149,6 +149,7 @@ function ProfileDetails() {
           <h1 className="text-white font-bold text-lg">CareerSeal</h1>
         </div>
         <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white">← Dashboard</button>
+          <button onClick={() => navigate('/roadmap')} className="text-[#5DCAA5] text-sm font-bold hover:text-white transition-colors">AI Roadmap →</button>
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-8">
