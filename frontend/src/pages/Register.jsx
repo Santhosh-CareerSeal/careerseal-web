@@ -14,9 +14,9 @@ function Register() {
   const [loading, setLoading] = useState(false)
 
   const statuses = [
-    { id: 'student', label: "I'm a Student", desc: 'Currently studying in school or college', icon: 'ti-school' },
-    { id: 'fresher', label: "I'm a Fresher", desc: 'Graduated, no full-time work experience yet', icon: 'ti-user-check' },
-    { id: 'experienced', label: "I'm Experienced", desc: 'Have professional work experience', icon: 'ti-briefcase' }
+    { id: 'Student', label: "I'm a Student", desc: 'Currently studying in school or college', icon: '🎓' },
+    { id: 'Fresher', label: "I'm a Fresher", desc: 'Graduated, no full-time work experience yet', icon: '🌱' },
+    { id: 'Experienced', label: "I'm Experienced", desc: 'Have professional work experience', icon: '💼' }
   ]
 
   const handleSubmit = async () => {
@@ -44,81 +44,102 @@ function Register() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+
+      {/* Left panel */}
       <div className="hidden md:flex w-80 bg-[#1A3C6E] flex-col justify-center px-10 py-12 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-12">
-            <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-            <h1 className="text-white text-xl font-bold">CareerSeal</h1>
+            <svg width="22" height="22" viewBox="0 0 22 22">
+              <circle cx="11" cy="11" r="11" fill="#0D7377"/>
+              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
+            <span className="text-white font-bold text-xl">CareerSeal</span>
           </div>
-          <h2 className="text-white text-2xl font-bold mb-4">On registering, you can</h2>
-          <div className="flex flex-col gap-4">
-            {['Build your GRID card and get discovered by top companies','Get job postings delivered right to your profile','Track all your applications in one place','Verify your identity and stand out from fake profiles'].map((item, i) => (
-              <div key={i} className="flex items-start gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#0D7377] flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <i className="ti ti-check text-white text-xs"></i>
+          <h2 className="text-white text-2xl font-bold mb-4">Your verified career identity starts here</h2>
+          <p className="text-white/60 text-sm mb-8">Join thousands of students and freshers building their career with CareerSeal</p>
+          <div className="flex flex-col gap-3">
+            {['GRID verified profile', 'AI career roadmap', 'Smart job matching', 'ATM-style GRID card'].map((f, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className="w-5 h-5 rounded-full bg-[#0D7377] flex items-center justify-center flex-shrink-0">
+                  <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L6 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
                 </div>
-                <p className="text-white/80 text-sm">{item}</p>
+                <span className="text-white/80 text-sm">{f}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 py-12 bg-white">
-        <div className="max-w-md mx-auto w-full">
-          <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">Create your CareerSeal profile</h2>
-          <p className="text-gray-500 text-sm mb-8">Search & apply to jobs from India's most trusted career platform</p>
+      {/* Right panel */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-10 md:px-16">
+        <div className="max-w-md w-full mx-auto">
 
-          {error ? <p className="text-red-500 text-sm mb-4">{error}</p> : null}
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2 mb-8 md:hidden">
+            <svg width="22" height="22" viewBox="0 0 22 22">
+              <circle cx="11" cy="11" r="11" fill="#0D7377"/>
+              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+            </svg>
+            <span className="text-[#1A3C6E] font-bold text-xl">CareerSeal</span>
+          </div>
 
-          <div className="flex flex-col gap-4 mb-6">
+          <h1 className="text-2xl font-bold text-[#1A3C6E] mb-1">Create your account</h1>
+          <p className="text-gray-400 text-sm mb-6">Student or Fresher? <span className="text-[#0D7377] font-bold cursor-pointer" onClick={() => navigate('/register-company')}>Register as a Company instead →</span></p>
+
+          {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">{error}</div>}
+
+          <div className="flex flex-col gap-4">
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Full Name <span className="text-red-400">*</span></label>
-              <input type="text" placeholder="What is your name?" value={name} onChange={e => setName(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Full Name</label>
+              <input type="text" placeholder="Your full name" value={name} onChange={e => setName(e.target.value)} onKeyDown={handleKeyDown}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Email ID <span className="text-red-400">*</span></label>
-              <input type="email" placeholder="Tell us your Email ID" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
-              <p className="text-gray-400 text-xs mt-1">We'll send relevant jobs and updates to this email</p>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Email Address</label>
+              <input type="email" placeholder="your@email.com" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Password <span className="text-red-400">*</span></label>
-              <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full" />
-              <p className="text-gray-400 text-xs mt-1">This helps your account stay protected</p>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Mobile Number</label>
+              <input type="tel" placeholder="10-digit mobile number" value={mobile} onChange={e => setMobile(e.target.value)} onKeyDown={handleKeyDown}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
             </div>
             <div>
-              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Mobile Number <span className="text-red-400">*</span></label>
-              <div className="flex gap-2">
-                <div className="border border-gray-300 rounded-xl px-4 py-3 text-sm text-gray-500 bg-gray-50">+91</div>
-                <input type="tel" placeholder="Enter your mobile number" value={mobile} onChange={e => setMobile(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm flex-1" />
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block">Password</label>
+              <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 block">I am a...</label>
+              <div className="flex flex-col gap-2">
+                {statuses.map(s => (
+                  <button key={s.id} onClick={() => setWorkStatus(s.id)}
+                    className={`flex items-center gap-3 border-2 rounded-xl px-4 py-3 text-left transition-all ${workStatus === s.id ? 'border-[#0D7377] bg-[#0D7377]/5' : 'border-gray-100 hover:border-gray-200'}`}>
+                    <span className="text-xl">{s.icon}</span>
+                    <div>
+                      <p className={`text-sm font-bold ${workStatus === s.id ? 'text-[#1A3C6E]' : 'text-gray-700'}`}>{s.label}</p>
+                      <p className="text-xs text-gray-400">{s.desc}</p>
+                    </div>
+                    {workStatus === s.id && <div className="ml-auto w-5 h-5 rounded-full bg-[#0D7377] flex items-center justify-center flex-shrink-0">
+                      <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L6 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
+                    </div>}
+                  </button>
+                ))}
               </div>
-              <p className="text-gray-400 text-xs mt-1">Recruiters will contact you on this number</p>
             </div>
+
+            <button onClick={handleSubmit} disabled={loading}
+              className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors disabled:opacity-50 mt-2">
+              {loading ? 'Creating account...' : 'Create My Account →'}
+            </button>
+
+            <p className="text-center text-sm text-gray-400">
+              Already have an account?{' '}
+              <span className="text-[#0D7377] font-bold cursor-pointer" onClick={() => navigate('/login')}>Sign in</span>
+            </p>
           </div>
-
-          <div className="mb-6">
-            <label className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3 block">Work Status <span className="text-red-400">*</span></label>
-            <div className="grid grid-cols-3 gap-3">
-              {statuses.map(s => (
-                <button key={s.id} onClick={() => setWorkStatus(s.id)} className={`border-2 rounded-xl p-4 text-left transition-all ${workStatus === s.id ? 'border-[#0D7377] bg-[#0D7377]/5' : 'border-gray-200 hover:border-gray-300'}`}>
-                  <i className={`ti ${s.icon} text-2xl mb-2 block ${workStatus === s.id ? 'text-[#0D7377]' : 'text-gray-400'}`}></i>
-                  <p className={`text-sm font-bold mb-1 ${workStatus === s.id ? 'text-[#1A3C6E]' : 'text-gray-700'}`}>{s.label}</p>
-                  <p className="text-xs text-gray-400 leading-tight">{s.desc}</p>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <button onClick={handleSubmit} disabled={loading} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mb-4">
-            {loading ? 'Creating account...' : 'Register & Continue'}
-          </button>
-
-          <p className="text-center text-sm text-gray-500">
-            Already have an account?{' '}
-            <button onClick={() => navigate('/login')} className="text-[#0D7377] font-bold">Sign in</button>
-          </p>
-          <p className="text-center text-xs text-gray-400 mt-4">By registering, you agree to CareerSeal's Terms & Privacy Policy</p>
         </div>
       </div>
     </div>

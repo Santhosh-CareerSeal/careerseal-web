@@ -12,6 +12,7 @@ import CompanyPipeline from './pages/CompanyPipeline'
 import ProfileDetails from './pages/ProfileDetails'
 import PublicProfile from './pages/PublicProfile'
 import Roadmap from './pages/Roadmap'
+import RegisterCompany from './pages/RegisterCompany'
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
         <Route path="/profile-details" element={<ProfileDetails />} />
         <Route path="/profile/:gridNumber" element={<PublicProfile />} />
         <Route path="/roadmap" element={<Roadmap />} />
+        <Route path="/register-company" element={<RegisterCompany />} />
       </Routes>
     </BrowserRouter>
   )
