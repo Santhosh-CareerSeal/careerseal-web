@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 
 function NotFound() {
   const navigate = useNavigate()
+  const isLoggedIn = !!localStorage.getItem('token')
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: '#060e1f' }}>
@@ -30,10 +31,17 @@ function NotFound() {
           Oops! The page you are looking for does not exist or has been moved.
         </p>
         <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-          <button onClick={() => navigate('/dashboard')}
-            style={{ background: '#0D7377', color: 'white', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
-            Go to Dashboard
-          </button>
+          {isLoggedIn ? (
+            <button onClick={() => navigate('/dashboard')}
+              style={{ background: '#0D7377', color: 'white', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
+              Go to Dashboard
+            </button>
+          ) : (
+            <button onClick={() => navigate('/register')}
+              style={{ background: '#0D7377', color: 'white', border: 'none', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
+              Get Started
+            </button>
+          )}
           <button onClick={() => navigate(-1)}
             style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
             Go Back
