@@ -110,7 +110,7 @@ function ProfileDetails() {
       await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl }, { headers: { Authorization: `Bearer ${token}` } })
       setSuccess('Profile saved successfully!')
       setForm(f => ({ ...f, photoUrl }))
-      setTimeout(() => setSuccess(''), 3000)
+      setTimeout(() => navigate('/dashboard'), 1500)
     } catch (e) { setError(e.response?.data?.message || 'Something went wrong') }
     finally { setSaving(false) }
   }
@@ -124,7 +124,7 @@ function ProfileDetails() {
       const res = await axios.post(`${API_URL}/api/profile/move-to-grid`, {}, { headers: { Authorization: `Bearer ${token}` } })
       setUpdatesRemaining(res.data.updatesRemaining)
       setGridMsg(`Published to GRID! ${res.data.updatesRemaining} update${res.data.updatesRemaining !== 1 ? 's' : ''} remaining this month.`)
-      setTimeout(() => setGridMsg(''), 4000)
+      setTimeout(() => navigate('/dashboard'), 1500)
     } catch (e) {
       setGridMsg(e.response?.data?.message || 'Could not publish to GRID')
       setTimeout(() => setGridMsg(''), 4000)
@@ -434,7 +434,7 @@ function ProfileDetails() {
                   <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
                     {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
                   </button>
-                  <div className="flex items-center gap-2 flex-1">
+                  <div className="relative flex-1 group">
                     <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
                       Move to GRID
                     </button>
