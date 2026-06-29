@@ -9,27 +9,18 @@ function Settings() {
   const [user, setUser] = useState(null)
   const [student, setStudent] = useState(null)
   const [loading, setLoading] = useState(true)
-
-  // Account
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [accountMsg, setAccountMsg] = useState({ type: '', text: '' })
   const [accountLoading, setAccountLoading] = useState(false)
-
-  // Notifications
   const [notifications, setNotifications] = useState({
     newJob: true, applicationUpdate: true, gridViewed: true, roadmapReminder: false, weeklyDigest: true, smsAlerts: false
   })
   const [notifMsg, setNotifMsg] = useState('')
-
-  // Privacy
   const [privacy, setPrivacy] = useState({
     profilePublic: true, showContact: true, showEmail: false, showSalary: false, allowRecruiterSearch: true
   })
   const [privacyMsg, setPrivacyMsg] = useState('')
-
-  // Subscription
-  const [currentPlan] = useState('free')
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
@@ -53,7 +44,7 @@ function Settings() {
 
   const handlePasswordChange = async () => {
     setAccountMsg({ type: '', text: '' })
-    if (!newPassword || !confirmPassword) { setAccountMsg({ type: 'error', text: 'Please fill in both password fields' }); return }
+    if (!newPassword || !confirmPassword) { setAccountMsg({ type: 'error', text: 'Please fill in both fields' }); return }
     if (newPassword.length < 6) { setAccountMsg({ type: 'error', text: 'Password must be at least 6 characters' }); return }
     if (newPassword !== confirmPassword) { setAccountMsg({ type: 'error', text: 'Passwords do not match' }); return }
     setAccountLoading(true)
@@ -69,26 +60,13 @@ function Settings() {
   }
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure? This will permanently delete your account, GRID card and all data. This cannot be undone.')) return
-    if (!window.confirm('Last warning — your CareerSeal GRID profile will be deleted forever. Continue?')) return
+    if (!window.confirm('Are you sure? This will permanently delete your CareerSeal account, GRID card and all data.')) return
+    if (!window.confirm('Final warning — this cannot be undone. Continue?')) return
     try {
       await axios.delete(`${API_URL}/api/auth/delete-account`, { headers })
-      localStorage.removeItem('token')
-      localStorage.removeItem('user')
+      localStorage.removeItem('token'); localStorage.removeItem('user')
       navigate('/register')
-    } catch (e) {
-      alert('Could not delete account. Please try again.')
-    }
-  }
-
-  const handleSaveNotifications = () => {
-    setNotifMsg('Notification preferences saved!')
-    setTimeout(() => setNotifMsg(''), 3000)
-  }
-
-  const handleSavePrivacy = () => {
-    setPrivacyMsg('Privacy settings saved!')
-    setTimeout(() => setPrivacyMsg(''), 3000)
+    } catch (e) { alert('Could not delete account. Please try again.') }
   }
 
   const tabs = [
@@ -114,13 +92,13 @@ function Settings() {
           <h1 className="text-white text-lg font-bold">CareerSeal</h1>
         </div>
         <div className="flex items-center gap-5">
-          <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white transition-colors">Dashboard</button>
-          <button onClick={() => navigate('/jobs')} className="text-white/60 text-sm hover:text-white transition-colors">Jobs</button>
-          <button onClick={() => navigate('/grid')} className="text-white/60 text-sm hover:text-white transition-colors">GRID</button>
-          <button onClick={() => navigate('/roadmap')} className="text-white/60 text-sm hover:text-white transition-colors">Roadmap</button>
+          <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white">Dashboard</button>
+          <button onClick={() => navigate('/jobs')} className="text-white/60 text-sm hover:text-white">Jobs</button>
+          <button onClick={() => navigate('/grid')} className="text-white/60 text-sm hover:text-white">GRID</button>
+          <button onClick={() => navigate('/roadmap')} className="text-white/60 text-sm hover:text-white">Roadmap</button>
           <button className="text-white text-sm font-bold border-b-2 border-[#0D7377] pb-0.5">Settings</button>
           {student?.photoUrl ? (
-            <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
+            <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
           ) : (
             <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
               {user?.name?.charAt(0)?.toUpperCase()}
@@ -129,66 +107,54 @@ function Settings() {
         </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#1A3C6E] mb-1">Settings</h1>
-          <p className="text-gray-400 text-sm">Manage your account, privacy and preferences</p>
+      <div className="max-w-2xl mx-auto px-4 py-8">
+
+        {/* Profile header */}
+        <div className="flex items-center gap-4 mb-6">
+          {student?.photoUrl ? (
+            <img src={student.photoUrl} className="w-14 h-14 rounded-full object-cover border-2 border-gray-100" />
+          ) : (
+            <div className="w-14 h-14 rounded-full bg-[#0D7377] flex items-center justify-center text-white text-2xl font-bold">
+              {user?.name?.charAt(0)?.toUpperCase()}
+            </div>
+          )}
+          <div>
+            <p className="text-lg font-bold text-[#1A3C6E]">{user?.name}</p>
+            <p className="text-gray-400 text-sm">{user?.email}</p>
+            <p className="text-[#0D7377] text-xs font-bold mt-0.5">{student?.workStatus} · {student?.gridNumber || 'No GRID yet'}</p>
+          </div>
         </div>
 
         {/* Tab bar */}
-        <div className="bg-white rounded-2xl p-1.5 border border-gray-100 flex gap-1 mb-6">
+        <div className="bg-white rounded-2xl p-1.5 border border-gray-100 flex gap-1 mb-5">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === tab.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
+              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
               <span>{tab.icon}</span>{tab.label}
             </button>
           ))}
         </div>
 
-        {/* ── ACCOUNT TAB ── */}
+        {/* ACCOUNT TAB */}
         {activeTab === 'account' && (
           <div className="flex flex-col gap-4">
-
-            {/* Profile info */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
-              <p className="text-sm font-bold text-[#1A3C6E] mb-4">Profile Information</p>
-              <div className="flex items-center gap-4 mb-4">
-                {student?.photoUrl ? (
-                  <img src={student.photoUrl} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2 border-gray-100" />
-                ) : (
-                  <div className="w-16 h-16 rounded-full bg-[#0D7377] flex items-center justify-center text-white text-2xl font-bold">
-                    {user?.name?.charAt(0)?.toUpperCase()}
-                  </div>
-                )}
-                <div>
-                  <p className="font-bold text-gray-800 text-lg">{user?.name}</p>
-                  <p className="text-gray-400 text-sm">{user?.email}</p>
-                  <p className="text-[#0D7377] text-xs font-bold mt-1">{student?.workStatus} · {student?.gridNumber || 'No GRID number yet'}</p>
-                </div>
-              </div>
-              <button onClick={() => navigate('/profile-details')} className="text-sm font-bold text-[#0D7377] hover:underline">Edit profile details →</button>
-            </div>
-
-            {/* Change password */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
               <p className="text-sm font-bold text-[#1A3C6E] mb-4">Change Password</p>
-
               {accountMsg.text && (
                 <div className={`text-sm px-4 py-3 rounded-xl mb-4 ${accountMsg.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
                   {accountMsg.text}
                 </div>
               )}
-
               <div className="flex flex-col gap-3">
                 <div>
                   <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">New Password</label>
                   <input type="password" placeholder="Minimum 6 characters" value={newPassword} onChange={e => setNewPassword(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors" />
+                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377]" />
                 </div>
                 <div>
-                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">Confirm New Password</label>
+                  <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">Confirm Password</label>
                   <input type="password" placeholder="Re-enter new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors" />
+                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377]" />
                 </div>
                 <button onClick={handlePasswordChange} disabled={accountLoading}
                   className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm disabled:opacity-50">
@@ -197,47 +163,29 @@ function Settings() {
               </div>
             </div>
 
-            {/* Linked accounts */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
               <p className="text-sm font-bold text-[#1A3C6E] mb-4">Linked Accounts</p>
-              <div className="flex flex-col gap-3">
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
+              {[
+                { icon: '🔵', label: 'Google Account', desc: 'Sign in faster with Google' },
+                { icon: '🟢', label: 'Aadhaar Verification', desc: 'Verify your identity' },
+                { icon: '🟠', label: 'DigiLocker', desc: 'Import certificates' },
+              ].map((item, i) => (
+                <div key={i} className="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
                   <div className="flex items-center gap-3">
-                    <span className="text-xl">🔵</span>
+                    <span className="text-xl">{item.icon}</span>
                     <div>
-                      <p className="text-sm font-bold text-gray-700">Google Account</p>
-                      <p className="text-xs text-gray-400">Sign in faster with Google</p>
+                      <p className="text-sm font-bold text-gray-700">{item.label}</p>
+                      <p className="text-xs text-gray-400">{item.desc}</p>
                     </div>
                   </div>
-                  <span className="text-xs text-gray-400 font-bold bg-gray-200 px-3 py-1 rounded-full">Coming soon</span>
+                  <span className="text-xs text-gray-400 font-bold bg-gray-100 px-3 py-1 rounded-full">Coming soon</span>
                 </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">🟢</span>
-                    <div>
-                      <p className="text-sm font-bold text-gray-700">Aadhaar Verification</p>
-                      <p className="text-xs text-gray-400">Verify your identity with Aadhaar</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-400 font-bold bg-gray-200 px-3 py-1 rounded-full">Coming soon</span>
-                </div>
-                <div className="flex items-center justify-between p-3 bg-gray-50 rounded-xl">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xl">🟠</span>
-                    <div>
-                      <p className="text-sm font-bold text-gray-700">DigiLocker</p>
-                      <p className="text-xs text-gray-400">Import certificates from DigiLocker</p>
-                    </div>
-                  </div>
-                  <span className="text-xs text-gray-400 font-bold bg-gray-200 px-3 py-1 rounded-full">Coming soon</span>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* Danger zone */}
-            <div className="bg-white rounded-2xl p-6 border border-red-100">
+            <div className="bg-white rounded-2xl p-5 border border-red-100">
               <p className="text-sm font-bold text-red-500 mb-2">Danger Zone</p>
-              <p className="text-xs text-gray-400 mb-4">Deleting your account will permanently remove your profile, GRID card, roadmap and all data. This action cannot be undone.</p>
+              <p className="text-xs text-gray-400 mb-4">Permanently delete your account and all CareerSeal data. This cannot be undone.</p>
               <button onClick={handleDeleteAccount} className="bg-red-50 text-red-500 border border-red-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors">
                 Delete My Account
               </button>
@@ -245,94 +193,91 @@ function Settings() {
           </div>
         )}
 
-        {/* ── NOTIFICATIONS TAB ── */}
+        {/* NOTIFICATIONS TAB */}
         {activeTab === 'notifications' && (
-          <div className="bg-white rounded-2xl p-6 border border-gray-100">
-            <p className="text-sm font-bold text-[#1A3C6E] mb-6">Notification Preferences</p>
-
+          <div className="bg-white rounded-2xl p-5 border border-gray-100">
+            <p className="text-sm font-bold text-[#1A3C6E] mb-5">Notification Preferences</p>
             {notifMsg && <div className="bg-green-50 text-green-700 border border-green-200 text-sm px-4 py-3 rounded-xl mb-4">{notifMsg}</div>}
-
-            <div className="flex flex-col gap-0">
+            <div className="flex flex-col">
               {[
-                { key: 'newJob', label: 'New job matches', desc: 'Get notified when new jobs match your skills and preferences' },
-                { key: 'applicationUpdate', label: 'Application status updates', desc: 'When a company updates your application status' },
-                { key: 'gridViewed', label: 'GRID profile viewed', desc: 'When a recruiter views your GRID profile or scans your QR code' },
-                { key: 'roadmapReminder', label: 'Roadmap reminders', desc: 'Weekly reminder to check your career roadmap progress' },
-                { key: 'weeklyDigest', label: 'Weekly digest', desc: 'Summary of new jobs, profile views and career tips every Monday' },
-                { key: 'smsAlerts', label: 'SMS alerts', desc: 'Receive important updates via SMS (requires verified mobile number)' },
+                { key: 'newJob', label: 'New job matches', desc: 'When new jobs match your skills' },
+                { key: 'applicationUpdate', label: 'Application updates', desc: 'When your application status changes' },
+                { key: 'gridViewed', label: 'GRID profile viewed', desc: 'When a recruiter views your profile' },
+                { key: 'roadmapReminder', label: 'Roadmap reminders', desc: 'Weekly reminder to check progress' },
+                { key: 'weeklyDigest', label: 'Weekly digest', desc: 'Summary every Monday morning' },
+                { key: 'smsAlerts', label: 'SMS alerts', desc: 'Important updates via SMS' },
               ].map((item, i, arr) => (
                 <div key={item.key} className={`flex items-center justify-between py-4 ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}>
                   <div className="flex-1 pr-4">
                     <p className="text-sm font-bold text-gray-700 mb-0.5">{item.label}</p>
                     <p className="text-xs text-gray-400">{item.desc}</p>
                   </div>
-                  <div onClick={() => setNotifications(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
-                    className={`w-11 h-6 rounded-full cursor-pointer transition-colors flex items-center ${notifications[item.key] ? 'bg-[#0D7377]' : 'bg-gray-200'}`}>
-                    <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mx-0.5 ${notifications[item.key] ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                  <div onClick={() => setNotifications(p => ({ ...p, [item.key]: !p[item.key] }))}
+                    className="w-11 h-6 rounded-full cursor-pointer transition-colors flex items-center"
+                    style={{ background: notifications[item.key] ? '#0D7377' : '#e5e7eb' }}>
+                    <div className="w-5 h-5 rounded-full bg-white shadow-sm transition-transform mx-0.5"
+                      style={{ transform: notifications[item.key] ? 'translateX(20px)' : 'translateX(0)' }}></div>
                   </div>
                 </div>
               ))}
             </div>
-
-            <button onClick={handleSaveNotifications} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm mt-4">
+            <button onClick={() => { setNotifMsg('Preferences saved!'); setTimeout(() => setNotifMsg(''), 3000) }}
+              className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm mt-4">
               Save Preferences
             </button>
           </div>
         )}
 
-        {/* ── PRIVACY TAB ── */}
+        {/* PRIVACY TAB */}
         {activeTab === 'privacy' && (
           <div className="flex flex-col gap-4">
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
               <p className="text-sm font-bold text-[#1A3C6E] mb-2">Profile Privacy</p>
-              <p className="text-xs text-gray-400 mb-6">Control what recruiters and the public can see on your CareerSeal profile</p>
-
+              <p className="text-xs text-gray-400 mb-5">Control what recruiters and the public can see</p>
               {privacyMsg && <div className="bg-green-50 text-green-700 border border-green-200 text-sm px-4 py-3 rounded-xl mb-4">{privacyMsg}</div>}
-
-              <div className="flex flex-col gap-0">
+              <div className="flex flex-col">
                 {[
-                  { key: 'profilePublic', label: 'Public GRID profile', desc: 'Allow anyone with your QR code or GRID number to view your profile' },
-                  { key: 'showContact', label: 'Show contact number', desc: 'Display your mobile number on your public profile' },
-                  { key: 'showEmail', label: 'Show email address', desc: 'Display your email on your public profile' },
-                  { key: 'showSalary', label: 'Show expected salary', desc: 'Show your salary expectations to recruiters' },
-                  { key: 'allowRecruiterSearch', label: 'Allow recruiter search', desc: 'Let companies find you through Search Talent feature' },
+                  { key: 'profilePublic', label: 'Public GRID profile', desc: 'Anyone with your QR code can view your profile' },
+                  { key: 'showContact', label: 'Show contact number', desc: 'Display mobile on public profile' },
+                  { key: 'showEmail', label: 'Show email address', desc: 'Display email on public profile' },
+                  { key: 'showSalary', label: 'Show expected salary', desc: 'Show salary expectations to recruiters' },
+                  { key: 'allowRecruiterSearch', label: 'Allow recruiter search', desc: 'Let companies find you in Search Talent' },
                 ].map((item, i, arr) => (
                   <div key={item.key} className={`flex items-center justify-between py-4 ${i < arr.length - 1 ? 'border-b border-gray-50' : ''}`}>
                     <div className="flex-1 pr-4">
                       <p className="text-sm font-bold text-gray-700 mb-0.5">{item.label}</p>
                       <p className="text-xs text-gray-400">{item.desc}</p>
                     </div>
-                    <div onClick={() => setPrivacy(prev => ({ ...prev, [item.key]: !prev[item.key] }))}
-                      className={`w-11 h-6 rounded-full cursor-pointer transition-colors flex items-center ${privacy[item.key] ? 'bg-[#0D7377]' : 'bg-gray-200'}`}>
-                      <div className={`w-5 h-5 rounded-full bg-white shadow-sm transition-transform mx-0.5 ${privacy[item.key] ? 'translate-x-5' : 'translate-x-0'}`}></div>
+                    <div onClick={() => setPrivacy(p => ({ ...p, [item.key]: !p[item.key] }))}
+                      className="w-11 h-6 rounded-full cursor-pointer transition-colors flex items-center"
+                      style={{ background: privacy[item.key] ? '#0D7377' : '#e5e7eb' }}>
+                      <div className="w-5 h-5 rounded-full bg-white shadow-sm transition-transform mx-0.5"
+                        style={{ transform: privacy[item.key] ? 'translateX(20px)' : 'translateX(0)' }}></div>
                     </div>
                   </div>
                 ))}
               </div>
-
-              <button onClick={handleSavePrivacy} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm mt-4">
+              <button onClick={() => { setPrivacyMsg('Privacy settings saved!'); setTimeout(() => setPrivacyMsg(''), 3000) }}
+                className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm mt-4">
                 Save Privacy Settings
               </button>
             </div>
-
-            <div className="bg-[#f0f4ff] rounded-2xl p-5 border border-blue-100">
-              <p className="text-sm font-bold text-[#1A3C6E] mb-2">🔒 Your data is safe</p>
-              <p className="text-xs text-gray-500 leading-relaxed">CareerSeal never sells your personal data to third parties. Your Aadhaar, PAN and government ID details are never shown publicly. Only the information you choose to share is visible to recruiters.</p>
+            <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
+              <p className="text-sm font-bold text-[#1A3C6E] mb-1">🔒 Your data is safe</p>
+              <p className="text-xs text-gray-500 leading-relaxed">CareerSeal never sells your data. Government IDs are never shown publicly.</p>
             </div>
           </div>
         )}
 
-        {/* ── SUBSCRIPTION TAB ── */}
+        {/* SUBSCRIPTION TAB */}
         {activeTab === 'subscription' && (
           <div className="flex flex-col gap-4">
-
-            {/* Current plan */}
-            <div className="bg-white rounded-2xl p-6 border-2 border-[#1A3C6E]">
-              <div className="flex justify-between items-center mb-3">
+            <div className="bg-white rounded-2xl p-5 border-2 border-[#1A3C6E]">
+              <div className="flex justify-between items-center mb-2">
                 <p className="text-base font-bold text-[#1A3C6E]">Free Plan</p>
-                <span className="bg-[#1A3C6E] text-white text-xs px-3 py-1 rounded-full font-bold">Current Plan</span>
+                <span className="bg-[#1A3C6E] text-white text-xs px-3 py-1 rounded-full font-bold">Current</span>
               </div>
-              <p className="text-xs text-gray-400 mb-4">You are on the free plan. Upgrade to unlock premium features.</p>
+              <p className="text-xs text-gray-400 mb-4">You are on the free plan</p>
               <div className="flex flex-col gap-2">
                 {['GRID card with QR code', 'Basic job matching', 'AI career roadmap (3 regenerations/month)', 'Public profile page', 'Apply to unlimited jobs'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
@@ -345,16 +290,14 @@ function Settings() {
               </div>
             </div>
 
-            {/* Student Pro */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100 relative overflow-hidden">
+            <div className="bg-white rounded-2xl p-5 border border-gray-100 relative overflow-hidden">
               <div className="absolute top-0 right-0 bg-[#0D7377] text-white text-xs font-bold px-3 py-1 rounded-bl-xl">Recommended</div>
               <div className="flex justify-between items-center mb-2">
                 <p className="text-base font-bold text-[#1A3C6E]">Student Pro</p>
                 <p className="text-xl font-bold text-[#0D7377]">₹499<span className="text-xs text-gray-400">/year</span></p>
               </div>
-              <p className="text-xs text-gray-400 mb-4">Everything in Free plus premium features</p>
               <div className="flex flex-col gap-2 mb-5">
-                {['Priority job matching with top companies', 'Unlimited roadmap regenerations', 'Resume builder with export', 'Interview preparation resources', 'Verified badge on profile', 'CareerSeal Pro certificate'].map((f, i) => (
+                {['Priority job matching', 'Unlimited roadmap regenerations', 'Resume builder', 'Interview prep resources', 'Verified Pro badge'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-[#0D7377] flex items-center justify-center flex-shrink-0">
                       <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
@@ -363,20 +306,18 @@ function Settings() {
                   </div>
                 ))}
               </div>
-              <button className="w-full bg-[#0D7377] text-white py-3 rounded-xl font-bold hover:bg-[#0a5f63] transition-colors text-sm">
+              <button className="w-full bg-[#0D7377] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#0a5f63] transition-colors">
                 Upgrade to Pro — ₹499/year
               </button>
             </div>
 
-            {/* Career Plus */}
-            <div className="bg-white rounded-2xl p-6 border border-gray-100">
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-base font-bold text-[#1A3C6E]">Career Plus</p>
                 <p className="text-xl font-bold text-[#1A3C6E]">₹999<span className="text-xs text-gray-400">/year</span></p>
               </div>
-              <p className="text-xs text-gray-400 mb-4">Everything in Pro plus exclusive career services</p>
               <div className="flex flex-col gap-2 mb-5">
-                {['1-on-1 mock interview session', 'Expert resume review', 'Direct recruiter introductions', 'Priority placement assistance', 'Career counselling session'].map((f, i) => (
+                {['1-on-1 mock interview', 'Expert resume review', 'Direct recruiter introductions', 'Career counselling session'].map((f, i) => (
                   <div key={i} className="flex items-center gap-2">
                     <div className="w-4 h-4 rounded-full bg-[#1A3C6E] flex items-center justify-center flex-shrink-0">
                       <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
@@ -385,14 +326,12 @@ function Settings() {
                   </div>
                 ))}
               </div>
-              <button className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm">
+              <button className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#0D7377] transition-colors">
                 Upgrade to Career Plus — ₹999/year
               </button>
             </div>
-
           </div>
         )}
-
       </div>
     </div>
   )
