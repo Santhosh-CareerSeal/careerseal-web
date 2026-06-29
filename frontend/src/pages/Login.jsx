@@ -27,9 +27,9 @@ function Login() {
       if (response.data.user.role === 'company') {
         navigate('/company')
       } else if (!response.data.profileComplete) {
-        response.data.user.role === 'company' ? navigate('/company') : navigate('/profile-details')
+        navigate('/profile-details')
       } else {
-        response.data.user.role === 'company' ? navigate('/company') : navigate('/dashboard')
+        navigate('/dashboard')
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
@@ -50,53 +50,103 @@ function Login() {
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row relative">
-      <div className="flex-1 flex flex-col justify-center px-8 md:px-20 py-12 bg-white">
+
+      {/* Left panel — form */}
+      <div className="flex-1 flex flex-col justify-center px-8 md:px-16 py-12 bg-white">
         <div className="max-w-sm mx-auto w-full">
+
+          {/* Logo */}
           <div className="flex items-center gap-2 mb-1">
             <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
             <h1 className="text-2xl font-bold text-[#1A3C6E]">CareerSeal</h1>
           </div>
           <p className="text-gray-400 text-sm mb-8">Your career journey starts here</p>
 
+          {/* Success message from register */}
           {fromRegister && (
             <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-6">
-              <p className="text-green-700 text-sm font-bold">Account created successfully!</p>
+              <p className="text-green-700 text-sm font-bold">✓ Account created successfully!</p>
               <p className="text-green-600 text-xs mt-1">Please sign in with your credentials to continue.</p>
             </div>
           )}
 
-          <div className="flex bg-gray-100 rounded-xl p-1 mb-6">
-            <button onClick={() => setRole('student')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${role === 'student' ? 'bg-white text-[#1A3C6E] shadow-sm' : 'text-gray-500'}`}>Student</button>
-            <button onClick={() => setRole('company')} className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors ${role === 'company' ? 'bg-white text-[#1A3C6E] shadow-sm' : 'text-gray-500'}`}>Company</button>
+          {/* Role selection — two big cards */}
+          <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Sign in as</p>
+          <div className="grid grid-cols-2 gap-3 mb-6">
+            <button onClick={() => setRole('student')}
+              className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${role === 'student' ? 'border-[#1A3C6E] bg-[#1A3C6E]/5' : 'border-gray-100 hover:border-gray-200'}`}>
+              <span className="text-2xl">🎓</span>
+              <div className="text-center">
+                <p className={`text-sm font-bold ${role === 'student' ? 'text-[#1A3C6E]' : 'text-gray-600'}`}>Student</p>
+                <p className="text-xs text-gray-400">or Fresher</p>
+              </div>
+              {role === 'student' && (
+                <div className="w-4 h-4 rounded-full bg-[#0D7377] flex items-center justify-center">
+                  <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
+                </div>
+              )}
+            </button>
+            <button onClick={() => setRole('company')}
+              className={`flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all ${role === 'company' ? 'border-[#0D7377] bg-[#0D7377]/5' : 'border-gray-100 hover:border-gray-200'}`}>
+              <span className="text-2xl">🏢</span>
+              <div className="text-center">
+                <p className={`text-sm font-bold ${role === 'company' ? 'text-[#0D7377]' : 'text-gray-600'}`}>Company</p>
+                <p className="text-xs text-gray-400">or Recruiter</p>
+              </div>
+              {role === 'company' && (
+                <div className="w-4 h-4 rounded-full bg-[#0D7377] flex items-center justify-center">
+                  <svg width="8" height="8" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L8 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
+                </div>
+              )}
+            </button>
           </div>
 
-          <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">Welcome back</h2>
-          <p className="text-gray-500 text-sm mb-6">{role === 'student' ? 'Sign in to continue your journey' : 'Sign in to manage your hiring pipeline'}</p>
+          <h2 className="text-xl font-bold text-[#1A3C6E] mb-1">Welcome back</h2>
+          <p className="text-gray-400 text-sm mb-5">
+            {role === 'student' ? 'Sign in to continue your career journey' : 'Sign in to manage your hiring pipeline'}
+          </p>
 
-          <button onClick={() => handleOAuthPlaceholder('Google')} disabled={connecting === 'Google'} className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-3 mb-3 font-bold text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.3 19 12 24 12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.5 0 10.5-2.1 14.2-5.6l-6.6-5.4C29.6 35 26.9 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.6 5.1C9.6 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.6 5.4C41.3 36.6 44 30.7 44 24c0-1.3-.1-2.3-.4-3.5z"/></svg>
-            {connecting === 'Google' ? 'Connecting...' : 'Continue with Google'}
-          </button>
+          {/* OAuth — only for students */}
+          {role === 'student' && (
+            <>
+              <button onClick={() => handleOAuthPlaceholder('Google')} disabled={connecting === 'Google'}
+                className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 mb-3 font-bold text-gray-700 hover:bg-gray-50 transition-colors text-sm">
+                <svg width="18" height="18" viewBox="0 0 48 48">
+                  <path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.3-.4-3.5z"/>
+                  <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.3 19 12 24 12c3.1 0 5.8 1.1 8 3l5.7-5.7C34.6 6 29.6 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/>
+                  <path fill="#4CAF50" d="M24 44c5.5 0 10.5-2.1 14.2-5.6l-6.6-5.4C29.6 35 26.9 36 24 36c-5.3 0-9.7-3.3-11.3-8l-6.6 5.1C9.6 39.6 16.2 44 24 44z"/>
+                  <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.6 5.4C41.3 36.6 44 30.7 44 24c0-1.3-.1-2.3-.4-3.5z"/>
+                </svg>
+                {connecting === 'Google' ? 'Connecting...' : 'Continue with Google'}
+              </button>
+              <button onClick={() => handleOAuthPlaceholder('Zoho')} disabled={connecting === 'Zoho'}
+                className="w-full flex items-center justify-center gap-3 border border-gray-200 rounded-xl py-3 mb-5 font-bold text-gray-700 hover:bg-gray-50 transition-colors text-sm">
+                <svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#E42527"/><text x="12" y="16" textAnchor="middle" fontSize="10" fontWeight="bold" fill="white" fontFamily="Arial">Z</text></svg>
+                {connecting === 'Zoho' ? 'Connecting...' : 'Continue with Zoho'}
+              </button>
+              <div className="flex items-center gap-3 mb-5">
+                <div className="h-px bg-gray-200 flex-1"></div>
+                <span className="text-gray-400 text-xs">OR</span>
+                <div className="h-px bg-gray-200 flex-1"></div>
+              </div>
+            </>
+          )}
 
-          <button onClick={() => handleOAuthPlaceholder('Zoho')} disabled={connecting === 'Zoho'} className="w-full flex items-center justify-center gap-3 border border-gray-300 rounded-xl py-3 mb-5 font-bold text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-            <svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#E42527"/><text x="12" y="16" textAnchor="middle" fontSize="10" fontWeight="bold" fill="white" fontFamily="Arial">Z</text></svg>
-            {connecting === 'Zoho' ? 'Connecting...' : 'Continue with Zoho'}
-          </button>
+          {/* Error */}
+          {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
-          <div className="flex items-center gap-3 mb-5">
-            <div className="h-px bg-gray-200 flex-1"></div>
-            <span className="text-gray-400 text-xs">OR</span>
-            <div className="h-px bg-gray-200 flex-1"></div>
-          </div>
-
-          {error ? <p className="text-red-500 text-sm mb-4">{error}</p> : null}
-
+          {/* Form */}
           <div className="flex flex-col gap-3">
-            <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" autoComplete="off" />
-            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" autoComplete="off" />
-            <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#0D7377] font-bold -mt-1">Forgot password?</button>
-            <button onClick={handleSubmit} disabled={loading} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-1">
-              {loading ? 'Please wait...' : 'Sign In'}
+            <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown}
+              className="border-2 border-gray-100 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm transition-colors" autoComplete="off"/>
+            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown}
+              className="border-2 border-gray-100 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm transition-colors" autoComplete="off"/>
+            <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#0D7377] font-bold -mt-1">
+              Forgot password?
+            </button>
+            <button onClick={handleSubmit} disabled={loading}
+              className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-1 disabled:opacity-50">
+              {loading ? 'Please wait...' : 'Sign In →'}
             </button>
           </div>
 
@@ -104,9 +154,18 @@ function Login() {
             New to CareerSeal?{' '}
             <button onClick={() => navigate('/register')} className="text-[#0D7377] font-bold">Join now</button>
           </p>
+
+          {/* Company register hint */}
+          {role === 'company' && (
+            <p className="text-center text-sm text-gray-400 mt-3">
+              Don't have a company account?{' '}
+              <button onClick={() => navigate('/register-company')} className="text-[#0D7377] font-bold">Register company →</button>
+            </p>
+          )}
         </div>
       </div>
 
+      {/* Right panel */}
       <div className="hidden md:flex flex-1 bg-[#1A3C6E] items-center justify-center relative overflow-hidden">
         <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
         <div className="relative z-10 text-center px-12">
@@ -121,11 +180,16 @@ function Login() {
             <circle cx="220" cy="70" r="22" fill="#0D7377"/>
             <path d="M212 70l5 5 11-11" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
-          <h2 className="text-white text-3xl font-bold mb-3">{role === 'student' ? 'Build your career identity. Get discovered.' : 'Discover verified talent. Hire with confidence.'}</h2>
-          <p className="text-white/70 text-lg">Build your GRID. Get discovered. Get hired.</p>
+          <h2 className="text-white text-2xl font-bold mb-3">
+            {role === 'student' ? 'Build your career identity. Get discovered.' : 'Discover verified talent. Hire with confidence.'}
+          </h2>
+          <p className="text-white/60 text-sm">
+            {role === 'student' ? 'Build your GRID. Get discovered. Get hired.' : 'Post jobs. Find verified students. Hire faster.'}
+          </p>
         </div>
       </div>
 
+      {/* Forgot password modal */}
       {showForgot && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center px-6 z-50">
           <div className="bg-white rounded-2xl p-8 max-w-sm w-full">
@@ -133,8 +197,12 @@ function Login() {
               <>
                 <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Reset your password</h3>
                 <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a reset link.</p>
-                <input type="email" placeholder="Email Address" value={resetEmail} onChange={e => setResetEmail(e.target.value)} onKeyDown={e => e.key === 'Enter' && setResetSent(true)} className="border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full mb-4" />
-                <button onClick={() => setResetSent(true)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">Send Reset Link</button>
+                <input type="email" placeholder="Email Address" value={resetEmail} onChange={e => setResetEmail(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && setResetSent(true)}
+                  className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full mb-4"/>
+                <button onClick={() => setResetSent(true)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">
+                  Send Reset Link
+                </button>
                 <button onClick={closeForgot} className="text-gray-400 text-sm w-full text-center">Cancel</button>
               </>
             ) : (
