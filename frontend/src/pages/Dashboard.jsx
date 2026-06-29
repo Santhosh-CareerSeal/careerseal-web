@@ -161,6 +161,7 @@ function Dashboard() {
           <button onClick={() => navigate('/jobs')} className="text-white/60 text-sm hover:text-white transition-colors">Jobs</button>
           <button onClick={() => navigate('/tracker')} className="text-white/60 text-sm hover:text-white transition-colors">Applications</button>
           <button onClick={() => navigate('/grid')} className="text-white/60 text-sm hover:text-white transition-colors">GRID</button>
+          <button onClick={() => navigate('/exams')} className="text-white/60 text-sm hover:text-white transition-colors">Skill Exams</button>
           <button onClick={() => navigate('/roadmap')} className="text-white/60 text-sm hover:text-white transition-colors">Roadmap</button>
           <button onClick={() => navigate('/settings')} className="text-white/60 text-sm hover:text-white transition-colors">Settings</button>
           <button onClick={handleLogout} className="text-white/60 text-sm hover:text-white transition-colors">Logout</button>

@@ -78,6 +78,8 @@ model Student {
   user                  User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   applications          Application[]
   roadmap               Roadmap?
+  examAttempts    StudentExamAttempt[]
+  verifiedSkills  VerifiedSkill[]
 }
 model Roadmap {
   id                    Int       @id @default(autoincrement())
@@ -135,4 +137,36 @@ model Application {
   createdAt DateTime? @default(now()) @db.Timestamp(6)
   job       Job?      @relation(fields: [jobId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student   Student?  @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model SkillExam {
+  id          Int       @id @default(autoincrement())
+  skill       String    @unique
+  level       String    @default("intermediate")
+  questions   String
+  createdAt   DateTime  @default(now())
+  attempts    StudentExamAttempt[]
+}
+
+model StudentExamAttempt {
+  id            Int       @id @default(autoincrement())
+  studentId     Int
+  skill         String
+  score         Int
+  totalQuestions Int
+  passed        Boolean   @default(false)
+  attemptNumber Int       @default(1)
+  nextRetryAt   DateTime?
+  createdAt     DateTime  @default(now())
+  student       Student   @relation(fields: [studentId], references: [id], onDelete: NoAction)
+  exam          SkillExam? @relation(fields: [skill], references: [skill])
+}
+
+model VerifiedSkill {
+  id          Int       @id @default(autoincrement())
+  studentId   Int
+  skill       String
+  verifiedAt  DateTime  @default(now())
+  expiresAt   DateTime
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: NoAction)
 }
