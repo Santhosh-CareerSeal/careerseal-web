@@ -27,9 +27,9 @@ function Login() {
       if (response.data.user.role === 'company') {
         navigate('/company')
       } else if (!response.data.profileComplete) {
-        data.role === 'company' ? navigate('/company') : navigate('/profile-details')
+        response.data.user.role === 'company' ? navigate('/company') : navigate('/profile-details')
       } else {
-        data.role === 'company' ? navigate('/company') : navigate('/dashboard')
+        response.data.user.role === 'company' ? navigate('/company') : navigate('/dashboard')
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
