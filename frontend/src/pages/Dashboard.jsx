@@ -162,6 +162,7 @@ function Dashboard() {
           <button onClick={() => navigate('/tracker')} className="text-white/60 text-sm hover:text-white transition-colors">Applications</button>
           <button onClick={() => navigate('/grid')} className="text-white/60 text-sm hover:text-white transition-colors">GRID</button>
           <button onClick={() => navigate('/roadmap')} className="text-white/60 text-sm hover:text-white transition-colors">Roadmap</button>
+          <button onClick={() => navigate('/settings')} className="text-white/60 text-sm hover:text-white transition-colors">Settings</button>
           <button onClick={handleLogout} className="text-white/60 text-sm hover:text-white transition-colors">Logout</button>
           {student?.photoUrl ? (
             <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
