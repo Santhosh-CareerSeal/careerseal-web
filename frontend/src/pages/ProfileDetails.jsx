@@ -444,7 +444,6 @@ function ProfileDetails() {
                       <p className="text-[#5DCAA5] font-bold mt-2">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
                     </div>
                   </div>
-                  </div>
                 </div>
               </div>
             </div>
