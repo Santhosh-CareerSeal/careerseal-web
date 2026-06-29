@@ -97,7 +97,16 @@ model Company {
   id          Int     @id @default(autoincrement())
   userId      Int?    @unique
   companyName String
-  mcaStatus   String?
+  mcaStatus   String? @default("pending")
+  description String?
+  industry    String?
+  companySize String?
+  website     String?
+  location    String?
+  foundedYear String?
+  linkedIn    String?
+  twitter     String?
+  logoUrl     String?
   user        User?   @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   jobs        Job[]
 }
@@ -111,6 +120,9 @@ model Job {
   jobType         String?
   location        String?
   experienceLevel String?
+  openings        Int?          @default(1)
+  deadline        String?
+  status          String?       @default("active")
   createdAt       DateTime?     @default(now()) @db.Timestamp(6)
   applications    Application[]
   company         Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -119,7 +131,7 @@ model Application {
   id        Int       @id @default(autoincrement())
   studentId Int?
   jobId     Int?
-  status    String?   @default("pending")
+  status    String?   @default("applied")
   createdAt DateTime? @default(now()) @db.Timestamp(6)
   job       Job?      @relation(fields: [jobId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student   Student?  @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction)

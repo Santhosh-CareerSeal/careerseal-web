@@ -44,7 +44,7 @@ function Splash() {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const redirectTimer = setTimeout(() => navigate('/login'), SPLASH_DURATION)
+    const redirectTimer = setTimeout(() => navigate('/register'), SPLASH_DURATION)
 
     let popTimer
     const popInterval = Math.floor((SPLASH_DURATION - 600) / fields.length)
