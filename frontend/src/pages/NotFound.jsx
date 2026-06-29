@@ -46,6 +46,12 @@ function NotFound() {
             style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
             Go Back
           </button>
+          {!isLoggedIn && (
+            <button onClick={() => navigate('/login')}
+              style={{ background: 'rgba(255,255,255,0.08)', color: 'white', border: '1px solid rgba(255,255,255,0.2)', borderRadius: '12px', padding: '12px 24px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
+              Sign In
+            </button>
+          )}
         </div>
       </div>
     </div>
