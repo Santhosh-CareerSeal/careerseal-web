@@ -13,6 +13,7 @@ import ProfileDetails from './pages/ProfileDetails'
 import PublicProfile from './pages/PublicProfile'
 import Roadmap from './pages/Roadmap'
 import Settings from './pages/Settings'
+import NotFound from './pages/NotFound'
 import RegisterCompany from './pages/RegisterCompany'
 import RegisterStudent from './pages/RegisterStudent'
 
@@ -34,6 +35,7 @@ function App() {
         <Route path="/profile/:gridNumber" element={<PublicProfile />} />
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/register-company" element={<RegisterCompany />} />
         <Route path="/register-student" element={<RegisterStudent />} />
       </Routes>

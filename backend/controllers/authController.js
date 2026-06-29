@@ -56,4 +56,32 @@ const login = async (req, res) => {
   }
 }
 
-module.exports = { signup, login }
+const changePassword = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const { newPassword } = req.body
+    const passwordHash = await bcrypt.hash(newPassword, 10)
+    await prisma.user.update({ where: { id: userId }, data: { passwordHash } })
+    res.json({ message: 'Password updated successfully' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const student = await prisma.student.findUnique({ where: { userId } })
+    if (student) {
+      await prisma.application.deleteMany({ where: { studentId: student.id } })
+      await prisma.roadmap.deleteMany({ where: { studentId: student.id } })
+      await prisma.student.delete({ where: { userId } })
+    }
+    await prisma.user.delete({ where: { id: userId } })
+    res.json({ message: 'Account deleted successfully' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { signup, login, changePassword, deleteAccount }
