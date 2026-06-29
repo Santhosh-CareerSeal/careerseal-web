@@ -435,19 +435,15 @@ function ProfileDetails() {
                     {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
                   </button>
                   <div className="relative flex-1 group">
-                    <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
+                    <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`w-full py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
                       Move to GRID
                     </button>
-                    <div className="relative">
-                      <button onClick={() => setShowGridInfo(!showGridInfo)} className="w-8 h-8 rounded-full border-2 border-gray-300 text-gray-500 text-sm font-bold hover:border-[#0D7377] hover:text-[#0D7377] transition-colors flex items-center justify-center">i</button>
-                      {showGridInfo && (
-                        <div className="absolute bottom-10 right-0 w-60 bg-[#1A3C6E] text-white text-xs rounded-xl p-3 z-10">
-                          <p className="font-bold mb-1">Move to GRID</p>
-                          <p className="text-white/80 leading-relaxed">Publishing makes your profile visible to companies globally. You can only do this <span className="font-bold text-[#5DCAA5]">3 times per month</span> — make sure your profile is complete before publishing.</p>
-                          <p className="text-[#5DCAA5] font-bold mt-2">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
-                        </div>
-                      )}
+                    <div className="absolute bottom-14 left-0 w-64 bg-[#1A3C6E] text-white text-xs rounded-xl p-3 z-50 hidden group-hover:block shadow-lg">
+                      <p className="font-bold mb-1">What is Move to GRID?</p>
+                      <p className="text-white/80 leading-relaxed">Publishing makes your profile visible to companies globally. You can only do this <span className="font-bold text-[#5DCAA5]">3 times per month</span> — make sure your profile is complete before publishing.</p>
+                      <p className="text-[#5DCAA5] font-bold mt-2">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
                     </div>
+                  </div>
                   </div>
                 </div>
               </div>
