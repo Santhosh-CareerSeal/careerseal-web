@@ -8,6 +8,7 @@ const jobRoutes = require('./routes/jobRoutes')
 const applicationRoutes = require('./routes/applicationRoutes')
 const gridRoutes = require('./routes/gridRoutes')
 const publicRoutes = require('./routes/publicRoutes')
+const companyRoutes = require('./routes/companyRoutes')
 const roadmapRoutes = require('./routes/roadmapRoutes')
 
 dotenv.config()
@@ -36,6 +37,7 @@ app.use('/api/applications', applicationRoutes)
 app.use('/api/grid', gridRoutes)
 app.use('/api/profile', profileRoutes)
 app.use('/api/public', publicRoutes)
+app.use('/api/company', companyRoutes)
 app.use('/api/roadmap', roadmapRoutes)
 
 app.listen(PORT, () => {
