@@ -15,6 +15,7 @@ function ProfileDetails() {
   const [success, setSuccess] = useState('')
   const [showGridInfo, setShowGridInfo] = useState(false)
   const [verifiedSkills, setVerifiedSkills] = useState([])
+  const [colleges, setColleges] = useState([])
   const [gridMsg, setGridMsg] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [photoFile, setPhotoFile] = useState(null)
@@ -27,7 +28,7 @@ function ProfileDetails() {
     address: '', city: '', state: '', pincode: '',
     schoolName: '', schoolBoard: '', schoolPassingYear: '', schoolPercentage: '',
     twelfthSchoolName: '', twelfthBoard: '', twelfthPassingYear: '', twelfthPercentage: '',
-    collegeName: '', degree: '', branch: '', collegePassingYear: '', collegeCGPA: '',
+    collegeName: '', collegeId: '', degree: '', branch: '', collegePassingYear: '', collegeCGPA: '',
     pgCollegeName: '', pgDegree: '', pgBranch: '', pgPassingYear: '', pgCGPA: '',
     workStatus: '', currentCompany: '', jobTitle: '', workExperience: '',
     preferredJobType: '', preferredWorkLocation: '', noticePeriod: '', expectedSalary: '',
@@ -57,7 +58,7 @@ function ProfileDetails() {
             schoolPassingYear: s.schoolPassingYear || '', schoolPercentage: s.schoolPercentage || '',
             twelfthSchoolName: s.twelfthSchoolName || '', twelfthBoard: s.twelfthBoard || '',
             twelfthPassingYear: s.twelfthPassingYear || '', twelfthPercentage: s.twelfthPercentage || '',
-            collegeName: s.collegeName || '', degree: s.degree || '',
+            collegeName: s.collegeName || '', collegeId: s.collegeId || '', degree: s.degree || '',
             branch: s.branch || '', collegePassingYear: s.collegePassingYear || '', collegeCGPA: s.collegeCGPA || '',
             pgCollegeName: s.pgCollegeName || '', pgDegree: s.pgDegree || '',
             pgBranch: s.pgBranch || '', pgPassingYear: s.pgPassingYear || '', pgCGPA: s.pgCGPA || '',
@@ -81,6 +82,10 @@ function ProfileDetails() {
         try {
           const examRes = await axios.get(`${API_URL}/api/exams`, { headers: { Authorization: `Bearer ${token}` } })
           setVerifiedSkills(examRes.data.skillStatus || [])
+        } catch (e) { console.error(e) }
+        try {
+          const collegeRes = await axios.get(`${API_URL}/api/college/list`)
+          setColleges(collegeRes.data.colleges || [])
         } catch (e) { console.error(e) }
       } catch (e) { console.error(e) }
       finally { setLoading(false) }
@@ -285,7 +290,25 @@ function ProfileDetails() {
               <div>
                 <p className={sectionTitle}>Graduation</p>
                 <div className="grid grid-cols-2 gap-4">
-                  <div><label className={labelClass}>College / University</label><input type="text" placeholder="e.g. MIT" value={form.collegeName} onChange={e => set('collegeName', e.target.value)} className={inputClass} /></div>
+                  <div>
+                    <label className={labelClass}>College / University</label>
+                    <select value={form.collegeId} onChange={e => {
+                      const selected = colleges.find(c => String(c.id) === e.target.value)
+                      set('collegeId', e.target.value)
+                      set('collegeName', selected ? selected.collegeName : form.collegeName)
+                    }} className={inputClass}>
+                      <option value="">Select your college</option>
+                      {colleges.map(c => (
+                        <option key={c.id} value={c.id}>{c.collegeName}{c.city ? ` — ${c.city}` : ''}</option>
+                      ))}
+                      <option value="other">Other / Not Listed</option>
+                    </select>
+                    {(form.collegeId === 'other' || (!form.collegeId && form.collegeName)) && (
+                      <input type="text" placeholder="Type your college name" value={form.collegeName}
+                        onChange={e => set('collegeName', e.target.value)} className={`${inputClass} mt-2`} />
+                    )}
+                    <p className="text-xs text-gray-400 mt-1">Selecting your college links your verified profile to their placement portal</p>
+                  </div>
                   <div><label className={labelClass}>Degree</label>
                     <select value={form.degree} onChange={e => set('degree', e.target.value)} className={inputClass}>
                       <option value="">Select degree</option>

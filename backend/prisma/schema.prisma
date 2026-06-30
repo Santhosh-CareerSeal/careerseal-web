@@ -15,6 +15,7 @@ model User {
   createdAt    DateTime? @default(now()) @db.Timestamp(6)
   company      Company?
   student      Student?
+  college      College?
 }
 model Student {
   id                    Int           @id @default(autoincrement())
@@ -81,6 +82,8 @@ model Student {
   examAttempts    StudentExamAttempt[]
   verifiedSkills  VerifiedSkill[]
   courseProgress  CourseProgress[]
+  collegeId       Int?
+  college         College?  @relation(fields: [collegeId], references: [id], onDelete: NoAction)
 }
 model Roadmap {
   id                    Int       @id @default(autoincrement())
@@ -178,4 +181,20 @@ model CourseProgress {
   startedAt   DateTime  @default(now())
   completedAt DateTime?
   student     Student   @relation(fields: [studentId], references: [id], onDelete: NoAction)
+}
+
+model College {
+  id          Int       @id @default(autoincrement())
+  userId      Int?      @unique
+  collegeName String
+  slug        String    @unique
+  city        String?
+  state       String?
+  logoUrl     String?
+  tpoName     String?
+  tpoEmail    String?
+  tpoPhone    String?
+  createdAt   DateTime  @default(now())
+  user        User?     @relation(fields: [userId], references: [id], onDelete: NoAction)
+  students    Student[]
 }

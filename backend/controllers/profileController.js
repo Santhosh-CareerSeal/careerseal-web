@@ -18,7 +18,7 @@ const completeProfile = async (req, res) => {
       legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
       schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
       twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
-      collegeName, degree, branch, collegePassingYear, collegeCGPA,
+      collegeName, collegeId, degree, branch, collegePassingYear, collegeCGPA,
       pgCollegeName, pgDegree, pgBranch, pgPassingYear, pgCGPA,
       workStatus, currentCompany, jobTitle, workExperience,
       preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
@@ -26,6 +26,7 @@ const completeProfile = async (req, res) => {
       hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio
     } = req.body
 
+    const parsedCollegeId = (collegeId && collegeId !== 'other' && !isNaN(parseInt(collegeId))) ? parseInt(collegeId) : null
     const education = `${degree || ''} ${branch || ''} ${collegeName || ''}`.trim()
     const schoolCollege = collegeName || schoolName || ''
     const skills = technicalSkills || ''
@@ -36,7 +37,7 @@ const completeProfile = async (req, res) => {
         legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
         schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
         twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
-        collegeName, degree, branch, collegePassingYear, collegeCGPA,
+        collegeName, collegeId: parsedCollegeId, degree, branch, collegePassingYear, collegeCGPA,
         pgCollegeName, pgDegree, pgBranch, pgPassingYear, pgCGPA,
         workStatus, currentCompany, jobTitle, workExperience,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
@@ -48,7 +49,7 @@ const completeProfile = async (req, res) => {
         userId, legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
         schoolName, schoolBoard, schoolPassingYear, schoolPercentage,
         twelfthSchoolName, twelfthBoard, twelfthPassingYear, twelfthPercentage,
-        collegeName, degree, branch, collegePassingYear, collegeCGPA,
+        collegeName, collegeId: parsedCollegeId, degree, branch, collegePassingYear, collegeCGPA,
         pgCollegeName, pgDegree, pgBranch, pgPassingYear, pgCGPA,
         workStatus, currentCompany, jobTitle, workExperience,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
