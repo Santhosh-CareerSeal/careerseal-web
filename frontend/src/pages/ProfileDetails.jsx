@@ -14,6 +14,7 @@ function ProfileDetails() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [showGridInfo, setShowGridInfo] = useState(false)
+  const [verifiedSkills, setVerifiedSkills] = useState([])
   const [gridMsg, setGridMsg] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [photoFile, setPhotoFile] = useState(null)
@@ -77,6 +78,10 @@ function ProfileDetails() {
           const used = s.gridLastUpdatedMonth === currentMonth ? s.gridUpdatesThisMonth : 0
           setUpdatesRemaining(3 - used)
         }
+        try {
+          const examRes = await axios.get(`${API_URL}/api/exams`, { headers: { Authorization: `Bearer ${token}` } })
+          setVerifiedSkills(examRes.data.skillStatus || [])
+        } catch (e) { console.error(e) }
       } catch (e) { console.error(e) }
       finally { setLoading(false) }
     }
@@ -368,6 +373,32 @@ function ProfileDetails() {
             <div className="flex flex-col gap-4">
               <p className={sectionTitle}>Skills and expertise</p>
               <div><label className={labelClass}>Technical skills</label><input type="text" placeholder="e.g. React, Node.js, Python, SQL" value={form.technicalSkills} onChange={e => set('technicalSkills', e.target.value)} className={inputClass} /><p className="text-xs text-gray-400 mt-1">Separate with commas</p></div>
+              {form.technicalSkills && (
+                <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Skill verification status</p>
+                    <button onClick={() => navigate('/exams')} className="text-xs text-[#0D7377] font-bold hover:underline">Go to Skill Exams →</button>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {form.technicalSkills.split(',').map(s => s.trim()).filter(Boolean).map((skill, i) => {
+                      const match = verifiedSkills.find(v => v.skill.toLowerCase() === skill.toLowerCase())
+                      const isVerified = match && match.status === 'verified'
+                      const isExpired = match && match.status === 'expired'
+                      const isCooldown = match && match.status === 'cooldown'
+                      return (
+                        <span key={i} onClick={() => navigate('/exams')}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-full cursor-pointer flex items-center gap-1.5 transition-all ${isVerified ? 'bg-[#E1F5EE] text-[#085041] border border-[#0D7377]' : isExpired ? 'bg-red-50 text-red-600 border border-red-200' : isCooldown ? 'bg-amber-50 text-amber-700 border border-amber-200' : 'bg-white text-gray-400 border border-gray-200 opacity-60 hover:opacity-100'}`}>
+                          {isVerified && <span>✓</span>}
+                          {isExpired && <span>⚠️</span>}
+                          {skill}
+                          {!isVerified && !isExpired && !isCooldown && <span className="text-[10px] underline ml-1">Verify</span>}
+                        </span>
+                      )
+                    })}
+                  </div>
+                  <p className="text-xs text-gray-400 mt-3">Faded skills are not shown on your GRID profile until verified. Click any skill to take its verification exam.</p>
+                </div>
+              )}
               <div><label className={labelClass}>Soft skills</label><input type="text" placeholder="e.g. Leadership, Communication, Teamwork" value={form.softSkills} onChange={e => set('softSkills', e.target.value)} className={inputClass} /></div>
               <div><label className={labelClass}>Tools and software</label><input type="text" placeholder="e.g. VS Code, Figma, Git, Postman" value={form.toolsAndSoftware} onChange={e => set('toolsAndSoftware', e.target.value)} className={inputClass} /></div>
               <div><label className={labelClass}>Languages known</label><input type="text" placeholder="e.g. English, Hindi, Telugu" value={form.languagesKnown} onChange={e => set('languagesKnown', e.target.value)} className={inputClass} /></div>
