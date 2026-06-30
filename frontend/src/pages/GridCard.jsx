@@ -40,18 +40,21 @@ function GridCard() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [downloading, setDownloading] = useState(false)
+  const [verifiedSkills, setVerifiedSkills] = useState([])
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
-        const [gridRes, profileRes] = await Promise.all([
+        const [gridRes, profileRes, examRes] = await Promise.all([
           axios.get(`${API_URL}/api/grid`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } })
+          axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
+          axios.get(`${API_URL}/api/exams`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { skillStatus: [] } }))
         ])
         setGridCard(gridRes.data.gridCard)
         setStudent(profileRes.data.student)
+        setVerifiedSkills(examRes.data.skillStatus || [])
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
         setUser(storedUser)
       } catch (err) {
@@ -64,9 +67,13 @@ function GridCard() {
   }, [])
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
-  const skillsList = student?.technicalSkills
+  const allSkills = student?.technicalSkills
     ? student.technicalSkills.split(',').map(s => s.trim())
     : student?.skills ? student.skills.split(',').map(s => s.trim()) : []
+  const skillsList = allSkills.filter(skill => {
+    const match = verifiedSkills.find(v => v.skill.toLowerCase() === skill.toLowerCase())
+    return match && match.status === 'verified'
+  })
   const profileUrl = `https://careerseal-web.vercel.app/profile/${gridCard?.gridNumber || 'GRID'}`
 
   const handleDownload = async () => {

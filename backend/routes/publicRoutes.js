@@ -13,6 +13,13 @@ router.get('/profile/:gridNumber', async (req, res) => {
     if (!student) return res.status(404).json({ message: 'Profile not found' })
     if (!student.gridPublished) return res.status(403).json({ message: 'Profile not yet published to GRID' })
 
+    const verifiedSkillRecords = await prisma.verifiedSkill.findMany({ where: { studentId: student.id } })
+    const allSkillsArr = (student.technicalSkills || '').split(',').map(s => s.trim()).filter(Boolean)
+    const verifiedOnly = allSkillsArr.filter(skill => {
+      const match = verifiedSkillRecords.find(v => v.skill.toLowerCase() === skill.toLowerCase())
+      return match && new Date(match.expiresAt) > new Date()
+    })
+
     res.json({
       name: student.user?.name,
       email: student.user?.email,
@@ -48,7 +55,7 @@ router.get('/profile/:gridNumber', async (req, res) => {
       schoolBoard: student.schoolBoard,
       schoolPassingYear: student.schoolPassingYear,
       schoolPercentage: student.schoolPercentage,
-      technicalSkills: student.technicalSkills,
+      technicalSkills: verifiedOnly.join(', '),
       softSkills: student.softSkills,
       toolsAndSoftware: student.toolsAndSoftware,
       languagesKnown: student.languagesKnown,
