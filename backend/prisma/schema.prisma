@@ -80,6 +80,7 @@ model Student {
   roadmap               Roadmap?
   examAttempts    StudentExamAttempt[]
   verifiedSkills  VerifiedSkill[]
+  courseProgress  CourseProgress[]
 }
 model Roadmap {
   id                    Int       @id @default(autoincrement())
@@ -145,7 +146,6 @@ model SkillExam {
   level       String    @default("intermediate")
   questions   String
   createdAt   DateTime  @default(now())
-  attempts    StudentExamAttempt[]
 }
 
 model StudentExamAttempt {
@@ -159,7 +159,6 @@ model StudentExamAttempt {
   nextRetryAt   DateTime?
   createdAt     DateTime  @default(now())
   student       Student   @relation(fields: [studentId], references: [id], onDelete: NoAction)
-  exam          SkillExam? @relation(fields: [skill], references: [skill])
 }
 
 model VerifiedSkill {
@@ -168,5 +167,15 @@ model VerifiedSkill {
   skill       String
   verifiedAt  DateTime  @default(now())
   expiresAt   DateTime
+  student     Student   @relation(fields: [studentId], references: [id], onDelete: NoAction)
+}
+
+model CourseProgress {
+  id          Int       @id @default(autoincrement())
+  studentId   Int
+  courseId    String
+  status      String    @default("started")
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
   student     Student   @relation(fields: [studentId], references: [id], onDelete: NoAction)
 }

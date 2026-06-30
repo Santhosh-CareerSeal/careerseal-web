@@ -428,11 +428,12 @@ const submitExam = async (req, res) => {
     if (passed) {
       const expiresAt = new Date()
       expiresAt.setMonth(expiresAt.getMonth() + 3)
-      await prisma.verifiedSkill.upsert({
-        where: { id: (await prisma.verifiedSkill.findFirst({ where: { studentId: student.id, skill: examKey } }))?.id || 0 },
-        update: { verifiedAt: new Date(), expiresAt },
-        create: { studentId: student.id, skill: examKey, expiresAt }
-      })
+      const existing = await prisma.verifiedSkill.findFirst({ where: { studentId: student.id, skill: examKey } })
+      if (existing) {
+        await prisma.verifiedSkill.update({ where: { id: existing.id }, data: { verifiedAt: new Date(), expiresAt } })
+      } else {
+        await prisma.verifiedSkill.create({ data: { studentId: student.id, skill: examKey, expiresAt } })
+      }
     }
 
     res.json({ score, passed, correct, total: exam.questions.length, attemptNumber, nextRetryAt, redirectToCourses, message: passed ? `Congratulations! You scored ${score}%. ${examKey} is now verified on your GRID!` : `You scored ${score}%. You need 70% to pass.` })

@@ -14,6 +14,7 @@ import PublicProfile from './pages/PublicProfile'
 import Roadmap from './pages/Roadmap'
 import Settings from './pages/Settings'
 import Exams from './pages/Exams'
+import Courses from './pages/Courses'
 import NotFound from './pages/NotFound'
 import RegisterCompany from './pages/RegisterCompany'
 import RegisterStudent from './pages/RegisterStudent'
@@ -37,6 +38,7 @@ function App() {
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/exams" element={<Exams />} />
+        <Route path="/courses" element={<Courses />} />
         <Route path="*" element={<NotFound />} />
         <Route path="/register-company" element={<RegisterCompany />} />
         <Route path="/register-student" element={<RegisterStudent />} />
