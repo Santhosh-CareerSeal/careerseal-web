@@ -235,7 +235,7 @@ const ROADMAPS = {
     fresher: {
       totalDuration: '6 Months', targetSalary: '3-8 LPA',
       milestones: [
-        { phase: 'Get certified and apply', duration: '3 Months', emoji: 'í¾¯', status: 'current', description: 'Complete B.Ed or TET/CTET if not done. Then apply widely to government and private schools.', actions: ['Complete B.Ed if not already done', 'Clear CTET for central government schools', 'Apply to private international schools for better pay'], skills: ['B.Ed', 'CTET', 'Lesson planning'] },
+        { phase: 'Get certified and apply', duration: '3 Months', emoji: 'ï¿½ï¿½ï¿½', status: 'current', description: 'Complete B.Ed or TET/CTET if not done. Then apply widely to government and private schools.', actions: ['Complete B.Ed if not already done', 'Clear CTET for central government schools', 'Apply to private international schools for better pay'], skills: ['B.Ed', 'CTET', 'Lesson planning'] },
         { phase: 'Build online teaching presence', duration: '2 Months', emoji: 'ğŸ’»', status: 'upcoming', description: 'Online teaching on YouTube or Unacademy can multiply your income significantly.', actions: ['Start a YouTube channel for your subject', 'Join Unacademy, Vedantu or BYJU\'s as educator', 'Create your own online course on Teachable or Udemy'], skills: ['Online teaching', 'Content creation', 'Digital tools'] },
         { phase: 'First teaching job', duration: 'Ongoing', emoji: 'ğŸ†', status: 'upcoming', description: 'Land your first teaching role. Experience grows salary rapidly in teaching.', actions: ['Apply to government schools for stability', 'Join international schools for higher pay', 'Consider teaching abroad â€” Middle East pays very well for teachers'], skills: ['Classroom management', 'Student engagement', 'Assessment'] }
       ],
@@ -390,12 +390,14 @@ const saveRoadmap = async (req, res) => {
     if (!student) return res.status(404).json({ message: 'Student not found' })
     const existing = await prisma.roadmap.findUnique({ where: { studentId: student.id } })
     const currentMonth = new Date().getMonth()
+    const isFirstSave = !existing?.roadmapContent
     const regens = existing?.lastRegeneratedMonth === currentMonth ? existing.regeneratesThisMonth : 0
-    if (regens >= 3) return res.status(400).json({ message: 'You have used all 3 regenerations this month. Commit to your current roadmap!' })
+    if (!isFirstSave && regens >= 3) return res.status(400).json({ message: 'You have used all 3 regenerations this month. Commit to your current roadmap!' })
     await prisma.roadmap.update({
       where: { studentId: student.id },
-      data: { roadmapContent, regeneratesThisMonth: regens + 1, lastRegeneratedMonth: currentMonth, updatedAt: new Date() }
+      data: { roadmapContent, regeneratesThisMonth: isFirstSave ? regens : regens + 1, lastRegeneratedMonth: currentMonth, updatedAt: new Date() }
     })
+    res.json({ message: 'Roadmap saved', regeneratesRemaining: isFirstSave ? 3 : 3 - (regens + 1) })
     res.json({ message: 'Roadmap saved', regeneratesRemaining: 3 - (regens + 1) })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })

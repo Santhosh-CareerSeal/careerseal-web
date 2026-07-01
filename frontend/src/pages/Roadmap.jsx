@@ -111,6 +111,13 @@ function Roadmap() {
           const regens = rm.lastRegeneratedMonth === currentMonth ? rm.regeneratesThisMonth : 0
           setRegeneratesRemaining(3 - regens)
           setStep('saved')
+          try {
+            if (rm.selectedCareer) {
+              const entRes = await fetch(`${API_URL}/api/college/suggestions?careerField=${encodeURIComponent(rm.selectedCareer)}`)
+              const entData = await entRes.json()
+              setCollegeSuggestions(entData.colleges || [])
+            }
+          } catch(e) { console.error(e) }
         } else {
           setStep('questions')
         }
