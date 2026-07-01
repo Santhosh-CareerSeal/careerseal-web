@@ -439,7 +439,6 @@ function Roadmap() {
                             <p className="text-xs text-gray-400 mt-2">Only CareerSeal-vetted partner colleges are shown here.</p>
                           </div>
                         )}
-                        })()}
                       </div>
                     </div>
                   ))}
