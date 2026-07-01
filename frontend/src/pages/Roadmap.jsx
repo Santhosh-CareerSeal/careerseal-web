@@ -119,7 +119,20 @@ function Roadmap() {
             }
           } catch(e) { console.error(e) }
         } else {
-          setStep('questions')
+          if (rm?.selectedCareer) {
+            setSelectedCareer({ career: rm.selectedCareer })
+            const currentMonth = new Date().getMonth()
+            const regens = rm.lastRegeneratedMonth === currentMonth ? rm.regeneratesThisMonth : 0
+            setRegeneratesRemaining(3 - regens)
+            try {
+              const entRes = await fetch(`${API_URL}/api/college/suggestions?careerField=${encodeURIComponent(rm.selectedCareer)}`)
+              const entData = await entRes.json()
+              setCollegeSuggestions(entData.colleges || [])
+            } catch(e) { console.error(e) }
+            setStep('saved')
+          } else {
+            setStep('questions')
+          }
         }
       } catch (e) {
         navigate('/login')
