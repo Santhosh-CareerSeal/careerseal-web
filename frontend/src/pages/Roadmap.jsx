@@ -91,6 +91,22 @@ function Roadmap() {
         if (rm?.roadmapContent) {
           setSavedRoadmap(JSON.parse(rm.roadmapContent))
           setSelectedCareer({ career: rm.selectedCareer })
+          try {
+            const parsed = JSON.parse(rm.roadmapContent)
+            const phases = (parsed.milestones || []).map(m => m.phase).join(' ')
+            const hasEntrance = phases.includes('Entrance') || phases.includes('JEE')
+            const hasScience = phases.includes('Choose Science')
+            const token2 = localStorage.getItem('token')
+            if (hasScience) {
+              const sciRes = await fetch(`${API_URL}/api/college/suggestions?stream=MPC`)
+              const sciData = await sciRes.json()
+              setCollegeSuggestions(sciData.colleges || [])
+            } else if (hasEntrance && rm.selectedCareer) {
+              const entRes = await fetch(`${API_URL}/api/college/suggestions?careerField=${encodeURIComponent(rm.selectedCareer)}`)
+              const entData = await entRes.json()
+              setCollegeSuggestions(entData.colleges || [])
+            }
+          } catch(e) { console.error(e) }
           const currentMonth = new Date().getMonth()
           const regens = rm.lastRegeneratedMonth === currentMonth ? rm.regeneratesThisMonth : 0
           setRegeneratesRemaining(3 - regens)
