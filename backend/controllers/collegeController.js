@@ -139,4 +139,33 @@ const getCollegeAnalytics = async (req, res) => {
   }
 }
 
-module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics }
+
+const getCollegeSuggestions = async (req, res) => {
+  try {
+    const { stream, careerField } = req.query
+    if (!stream && !careerField) return res.json({ colleges: [] })
+
+    let colleges = []
+    if (stream) {
+      const all = await prisma.college.findMany({ where: { vetted: true, collegeType: 'Intermediate' } })
+      colleges = all.filter(c => (c.streams || '').toLowerCase().split(',').map(s => s.trim()).includes(stream.toLowerCase()))
+    } else if (careerField) {
+      const all = await prisma.college.findMany({ where: { vetted: true, collegeType: 'Degree' } })
+      colleges = all.filter(c => (c.careerFields || '').toLowerCase().split(',').map(s => s.trim()).includes(careerField.toLowerCase()))
+    }
+
+    res.json({
+      colleges: colleges.map(c => ({
+        id: c.id,
+        collegeName: c.collegeName,
+        city: c.city,
+        state: c.state,
+        logoUrl: c.logoUrl
+      }))
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions }

@@ -194,6 +194,10 @@ model College {
   tpoName     String?
   tpoEmail    String?
   tpoPhone    String?
+  collegeType String    @default("Degree")
+  streams     String?
+  careerFields String?
+  vetted      Boolean   @default(false)
   createdAt   DateTime  @default(now())
   user        User?     @relation(fields: [userId], references: [id], onDelete: NoAction)
   students    Student[]

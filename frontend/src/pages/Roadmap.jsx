@@ -31,6 +31,8 @@ function Roadmap() {
   const navigate = useNavigate()
   const [user, setUser] = useState(null)
   const [student, setStudent] = useState(null)
+  const [collegeSuggestions, setCollegeSuggestions] = useState([])
+  const [loadingColleges, setLoadingColleges] = useState(false)
   const [workStatus, setWorkStatus] = useState('Student')
   const [step, setStep] = useState('loading')
   const [currentQ, setCurrentQ] = useState(0)
@@ -45,6 +47,24 @@ function Roadmap() {
   const [savedRoadmap, setSavedRoadmap] = useState(null)
   const [regeneratesRemaining, setRegeneratesRemaining] = useState(3)
   const [regenWarning, setRegenWarning] = useState(false)
+
+
+  const fetchCollegeSuggestions = async (phase, career) => {
+    setLoadingColleges(true)
+    try {
+      let params = {}
+      if (phase && phase.includes('Choose Science')) {
+        params.stream = phase.includes('Biology') ? 'BiPC' : 'MPC'
+      } else if (phase && (phase.includes('Entrance') || phase.includes('B.Tech') || phase.includes('College'))) {
+        params.careerField = career || ''
+      }
+      if (!params.stream && !params.careerField) { setLoadingColleges(false); return }
+      const res = await fetch(`${API_URL}/api/college/suggestions?${new URLSearchParams(params)}`)
+      const data = await res.json()
+      setCollegeSuggestions(data.colleges || [])
+    } catch (e) { console.error(e) }
+    finally { setLoadingColleges(false) }
+  }
 
   const questions = workStatus === 'Student' ? STUDENT_QUESTIONS
     : workStatus === 'Fresher' ? FRESHER_QUESTIONS
@@ -388,6 +408,28 @@ function Roadmap() {
                             ))}
                           </div>
                         )}
+                        {milestone.status === 'current' && (milestone.phase?.includes('Choose Science') || milestone.phase?.includes('Entrance')) && (() => {
+                          if (collegeSuggestions.length === 0 && !loadingColleges) {
+                            fetchCollegeSuggestions(milestone.phase, displayRoadmap?.selectedCareer)
+                          }
+                          return collegeSuggestions.length > 0 ? (
+                            <div className="mt-3 bg-[#f0f4ff] rounded-xl p-3 border border-[#1A3C6E]/10">
+                              <p className="text-xs font-bold text-[#1A3C6E] mb-2">🏫 CareerSeal partner colleges for this path</p>
+                              <div className="flex flex-col gap-2">
+                                {collegeSuggestions.map((college, j) => (
+                                  <div key={j} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
+                                    <div>
+                                      <p className="text-xs font-bold text-[#1A3C6E]">{college.collegeName}</p>
+                                      <p className="text-xs text-gray-400">{college.city}{college.state ? ', ' + college.state : ''}</p>
+                                    </div>
+                                    <span className="bg-[#0D7377] text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0">✓ Verified</span>
+                                  </div>
+                                ))}
+                              </div>
+                              <p className="text-xs text-gray-400 mt-2">Only CareerSeal-vetted partner colleges are shown here.</p>
+                            </div>
+                          ) : null
+                        })()}
                       </div>
                     </div>
                   ))}
