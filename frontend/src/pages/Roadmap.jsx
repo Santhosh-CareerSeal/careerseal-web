@@ -445,7 +445,7 @@ function Roadmap() {
                   </div>
                 )}
 
-                <button onClick={() => setStep('careers')} className="w-full border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-bold hover:border-[#1A3C6E] hover:text-[#1A3C6E] transition-colors text-sm">
+                <button onClick={() => { setSavedRoadmap(null); setRoadmap(null); setCareerOptions([]); setSelectedCareer(null); setAnswers({}); setCurrentQ(0); setStep('questions'); }} className="w-full border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-bold hover:border-[#1A3C6E] hover:text-[#1A3C6E] transition-colors text-sm">
                   ← Choose a different career
                 </button>
               </div>
