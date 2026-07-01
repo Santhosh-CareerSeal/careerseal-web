@@ -214,8 +214,6 @@ function Roadmap() {
           setCollegeSuggestions(entData.colleges || [])
         }
       } catch (e) { console.error(e) }
-      const saveRes = await axios.post(`${API_URL}/api/roadmap/save`, { roadmapContent: JSON.stringify(roadmapData) }, { headers })
-      setRegeneratesRemaining(saveRes.data.regeneratesRemaining)
     } catch (e) {
       console.error(e)
     } finally {
@@ -223,6 +221,22 @@ function Roadmap() {
     }
   }
 
+  const [roadmapSaved, setRoadmapSaved] = useState(false)
+  const [savingRoadmap, setSavingRoadmap] = useState(false)
+  const handleSaveRoadmap = async () => {
+    setSavingRoadmap(true)
+    try {
+      const saveRes = await axios.post(`${API_URL}/api/roadmap/save`, { roadmapContent: JSON.stringify(roadmap) }, { headers })
+      setRegeneratesRemaining(saveRes.data.regeneratesRemaining)
+      setSavedRoadmap(roadmap)
+      setRoadmapSaved(true)
+      setTimeout(() => setRoadmapSaved(false), 3000)
+    } catch (e) {
+      console.error(e)
+    } finally {
+      setSavingRoadmap(false)
+    }
+  }
   const handleRegenerate = () => {
     if (regeneratesRemaining <= 0) return
     if (!regenWarning) { setRegenWarning(true); return }
@@ -491,6 +505,21 @@ function Roadmap() {
                 )}
 
                 <button onClick={() => { setSavedRoadmap(null); setRoadmap(null); setCareerOptions([]); setSelectedCareer(null); setAnswers({}); setCurrentQ(0); setStep('questions'); }} className="w-full border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-bold hover:border-[#1A3C6E] hover:text-[#1A3C6E] transition-colors text-sm">
+                {!savedRoadmap && roadmap && (
+                  <div className="mb-3">
+                    {roadmapSaved ? (
+                      <div className="w-full bg-green-50 border border-green-200 text-green-700 py-3 rounded-xl font-bold text-sm text-center">
+                        ✓ Roadmap saved successfully!
+                      </div>
+                    ) : (
+                      <button onClick={handleSaveRoadmap} disabled={savingRoadmap}
+                        className="w-full bg-[#0D7377] text-white py-3 rounded-xl font-bold hover:bg-[#0a5f63] transition-colors text-sm disabled:opacity-50">
+                        {savingRoadmap ? 'Saving...' : '✓ Save this Roadmap'}
+                      </button>
+                    )}
+                    <p className="text-xs text-gray-400 text-center mt-1">Saving counts as 1 of your 3 monthly regenerations</p>
+                  </div>
+                )}
                   ← Choose a different career
                 </button>
               </div>
