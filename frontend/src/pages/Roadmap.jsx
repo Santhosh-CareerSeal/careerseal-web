@@ -164,6 +164,20 @@ function Roadmap() {
       const res = await axios.post(`${API_URL}/api/roadmap/generate`, { career: career.career, workStatus }, { headers })
       const roadmapData = res.data.roadmap
       setRoadmap(roadmapData)
+      try {
+        const phases = (roadmapData.milestones || []).map(m => m.phase).join(' ')
+        const hasEntrance = phases.includes('Entrance') || phases.includes('JEE')
+        const hasScience = phases.includes('Choose Science')
+        if (hasScience) {
+          const sciRes = await fetch(`${API_URL}/api/college/suggestions?stream=MPC`)
+          const sciData = await sciRes.json()
+          setCollegeSuggestions(sciData.colleges || [])
+        } else if (hasEntrance) {
+          const entRes = await fetch(`${API_URL}/api/college/suggestions?careerField=${encodeURIComponent(career.career)}`)
+          const entData = await entRes.json()
+          setCollegeSuggestions(entData.colleges || [])
+        }
+      } catch (e) { console.error(e) }
       const saveRes = await axios.post(`${API_URL}/api/roadmap/save`, { roadmapContent: JSON.stringify(roadmapData) }, { headers })
       setRegeneratesRemaining(saveRes.data.regeneratesRemaining)
     } catch (e) {
@@ -408,27 +422,23 @@ function Roadmap() {
                             ))}
                           </div>
                         )}
-                        {milestone.status === 'current' && (milestone.phase?.includes('Choose Science') || milestone.phase?.includes('Entrance')) && (() => {
-                          if (collegeSuggestions.length === 0 && !loadingColleges) {
-                            fetchCollegeSuggestions(milestone.phase, displayRoadmap?.selectedCareer)
-                          }
-                          return collegeSuggestions.length > 0 ? (
-                            <div className="mt-3 bg-[#f0f4ff] rounded-xl p-3 border border-[#1A3C6E]/10">
-                              <p className="text-xs font-bold text-[#1A3C6E] mb-2">🏫 CareerSeal partner colleges for this path</p>
-                              <div className="flex flex-col gap-2">
-                                {collegeSuggestions.map((college, j) => (
-                                  <div key={j} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
-                                    <div>
-                                      <p className="text-xs font-bold text-[#1A3C6E]">{college.collegeName}</p>
-                                      <p className="text-xs text-gray-400">{college.city}{college.state ? ', ' + college.state : ''}</p>
-                                    </div>
-                                    <span className="bg-[#0D7377] text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0">✓ Verified</span>
+                        {(milestone.phase?.includes('Choose Science') || milestone.phase?.includes('Entrance') || milestone.phase?.includes('JEE')) && collegeSuggestions.length > 0 && (
+                          <div className="mt-3 bg-[#f0f4ff] rounded-xl p-3 border border-[#1A3C6E]/10">
+                            <p className="text-xs font-bold text-[#1A3C6E] mb-2">🏫 CareerSeal partner colleges for this path</p>
+                            <div className="flex flex-col gap-2">
+                              {collegeSuggestions.map((college, j) => (
+                                <div key={j} className="flex items-center justify-between bg-white rounded-lg px-3 py-2 border border-gray-100">
+                                  <div>
+                                    <p className="text-xs font-bold text-[#1A3C6E]">{college.collegeName}</p>
+                                    <p className="text-xs text-gray-400">{college.city}{college.state ? ', ' + college.state : ''}</p>
                                   </div>
-                                ))}
-                              </div>
-                              <p className="text-xs text-gray-400 mt-2">Only CareerSeal-vetted partner colleges are shown here.</p>
+                                  <span className="bg-[#0D7377] text-white text-xs px-2 py-1 rounded-full font-bold flex-shrink-0">✓ Verified</span>
+                                </div>
+                              ))}
                             </div>
-                          ) : null
+                            <p className="text-xs text-gray-400 mt-2">Only CareerSeal-vetted partner colleges are shown here.</p>
+                          </div>
+                        )}
                         })()}
                       </div>
                     </div>
