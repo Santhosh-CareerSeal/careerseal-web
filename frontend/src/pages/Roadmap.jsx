@@ -136,7 +136,7 @@ function Roadmap() {
           }
         }
       } catch (e) {
-        navigate('/login')
+        console.error(e); setStep('questions')
       }
     }
     init()
@@ -250,8 +250,14 @@ function Roadmap() {
   const displayRoadmap = savedRoadmap || roadmap
 
   if (step === 'loading') return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <p className="text-[#1A3C6E] font-bold">Loading your roadmap...</p>
+    <div className="min-h-screen bg-gray-50">
+      <Navbar student={student} user={user} />
+      <div className="flex items-center justify-center py-20">
+        <div className="text-center">
+          <div className="w-10 h-10 border-4 border-[#0D7377] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-[#1A3C6E] font-bold">Loading your roadmap...</p>
+        </div>
+      </div>
     </div>
   )
 
