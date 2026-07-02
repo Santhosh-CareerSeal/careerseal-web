@@ -1,17 +1,4 @@
 import { useEffect, useState } from 'react'
-      {warning && (
-        <div className="bg-red-600 px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-white text-xl">⚠️</span>
-            <p className="text-white text-sm font-bold">{warning}</p>
-          </div>
-          {!isFullscreen && (
-            <button onClick={reenterFullscreen} className="bg-white text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg">
-              Return to Fullscreen
-            </button>
-          )}
-        </div>
-      )}
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
@@ -62,7 +49,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
 
   useEffect(() => {
     const onFSChange = () => {
-      if (!document.fullscreenElement && !submitted) { setIsFullscreen(false); addViolation("You exited fullscreen!") }
+      if (!document.fullscreenElement && !submitted) { setIsFullscreen(false); addViolation("You exited fullscreen! Click Return to Fullscreen to continue.", true) }
       else setIsFullscreen(true)
     }
     document.addEventListener("fullscreenchange", onFSChange)
@@ -89,7 +76,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
     }
   }, [])
 
-  const addViolation = (msg) => {
+  const addViolation = (msg, persistent = false) => {
     setViolations(prev => {
       const n = prev + 1
       if (n >= MAX_VIOLATIONS) {
@@ -97,7 +84,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
         setTimeout(() => handleSubmit(), 2000)
       } else {
         setWarning(msg + " Warning " + n + " of " + MAX_VIOLATIONS + ". Exam auto-submits on " + MAX_VIOLATIONS + " violations.")
-        setTimeout(() => setWarning(null), 4000)
+        if (!persistent) setTimeout(() => setWarning(null), 4000)
       }
       return n
     })
@@ -192,6 +179,25 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {!isFullscreen && !submitted && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
+          <div style={{ fontSize: "48px" }}>🔒</div>
+          <p style={{ color: "white", fontSize: "20px", fontWeight: "700", textAlign: "center" }}>Exam Paused</p>
+          <p style={{ color: "rgba(255,255,255,0.6)", fontSize: "14px", textAlign: "center", maxWidth: "320px" }}>
+            You must be in fullscreen mode to continue the exam.
+          </p>
+          <div style={{ background: "#dc2626", color: "white", fontSize: "13px", fontWeight: "700", padding: "4px 12px", borderRadius: "20px", marginBottom: "8px" }}>
+            ⚠️ Violation {violations} of {MAX_VIOLATIONS}
+          </div>
+          <button onClick={reenterFullscreen}
+            style={{ background: "#0D7377", color: "white", border: "none", borderRadius: "12px", padding: "14px 32px", fontSize: "16px", fontWeight: "700", cursor: "pointer" }}>
+            Return to Fullscreen →
+          </button>
+          <p style={{ color: "rgba(255,255,255,0.3)", fontSize: "11px", textAlign: "center" }}>
+            Timer is still running. Return to fullscreen immediately.
+          </p>
+        </div>
+      )}
       {/* Exam header */}
       <div className="bg-[#1A3C6E] px-6 py-4">
         <div className="max-w-2xl mx-auto flex justify-between items-center">
@@ -220,6 +226,19 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
           </div>
         </div>
       </div>
+      {warning && (
+        <div className="bg-red-600 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-white text-xl">⚠️</span>
+            <p className="text-white text-sm font-bold">{warning}</p>
+          </div>
+          {!isFullscreen && (
+            <button onClick={reenterFullscreen} className="bg-white text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg">
+              Return to Fullscreen
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="max-w-2xl mx-auto px-4 py-6">
         {/* Question */}
