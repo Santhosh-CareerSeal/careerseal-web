@@ -130,7 +130,7 @@ function Roadmap() {
               const entData = await entRes.json()
               setCollegeSuggestions(entData.colleges || [])
             } catch(e) { console.error(e) }
-            setStep('saved')
+            setStep('questions')
           } else {
             setStep('questions')
           }
