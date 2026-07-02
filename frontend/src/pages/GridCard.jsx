@@ -272,7 +272,7 @@ function GridCard() {
           {/* ATM Card — 3 row layout */}
           <div
             onClick={() => setFlipped(true)}
-            style={{ position: 'relative', zIndex: 10, width: '400px', height: '240px', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
+            style={{ position: 'relative', zIndex: 10, width: 'min(400px, 90vw)', height: 'min(240px, 54vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
@@ -330,7 +330,8 @@ function GridCard() {
             <button onClick={() => setFlipped(false)} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '8px 18px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>← Back to GRID</button>
             <p style={{ color: '#6b7280', fontSize: '12px' }}>A4 Resume View · Not editable</p>
           </div>
-          <div style={{ width: '100%', maxWidth: '794px', background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', display: 'flex', minHeight: '1000px' }}>
+          <div style={{ width: '100%', overflowX: 'auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100vw' }}>
+          <div style={{ width: '794px', background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', display: 'flex', minHeight: '1000px', transformOrigin: 'top left' }}>
             <div style={{ width: '260px', background: '#1A3C6E', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '20px', flexShrink: 0 }}>
               <div style={{ textAlign: 'center' }}>
                 {student?.photoUrl ? (
@@ -401,6 +402,7 @@ function GridCard() {
                 {student?.noticePeriod && <div style={{ background: '#f8f9fa', borderRadius: '8px', padding: '10px 12px' }}><p style={{ fontSize: '9px', fontWeight: '700', color: '#9ca3af', letterSpacing: '1px', margin: '0 0 4px' }}>NOTICE PERIOD</p><p style={{ fontSize: '12px', color: '#1A3C6E', fontWeight: '600', margin: 0 }}>{student.noticePeriod}</p></div>}
                 {student?.preferredJobType && <div style={{ background: '#f8f9fa', borderRadius: '8px', padding: '10px 12px' }}><p style={{ fontSize: '9px', fontWeight: '700', color: '#9ca3af', letterSpacing: '1px', margin: '0 0 4px' }}>JOB TYPE</p><p style={{ fontSize: '12px', color: '#1A3C6E', fontWeight: '600', margin: 0 }}>{student.preferredJobType}</p></div>}
               </div>
+          </div>
             </div>
           </div>
         </div>

@@ -170,10 +170,10 @@ function Jobs() {
       <Navbar student={student} user={user} />
 
       {/* Hero search */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%)' }} className="px-6 pt-6 pb-10">
+      <div style={{ background: 'linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%)' }} className="px-4 pt-4 pb-10">
         <p className="text-white/70 text-sm mb-1">👋 {greeting()}, {capitalize(user?.name)}</p>
         <p className="text-white text-2xl font-bold mb-5">Find your next opportunity</p>
-        <div className="flex gap-3 bg-white/15 backdrop-blur-sm rounded-2xl p-2">
+        <div className="flex flex-col sm:flex-row gap-3 bg-white/15 backdrop-blur-sm rounded-2xl p-2">
           <div className="flex-1 bg-white rounded-xl px-4 py-3 flex items-center gap-2">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
             <input
@@ -184,7 +184,7 @@ function Jobs() {
               className="border-none outline-none text-sm flex-1 bg-transparent"
             />
           </div>
-          <div className="w-44 bg-white rounded-xl px-4 py-3 flex items-center gap-2">
+          <div className="w-full sm:w-44 bg-white rounded-xl px-4 py-3 flex items-center gap-2">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" strokeWidth="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
             <input
               type="text"
@@ -213,10 +213,10 @@ function Jobs() {
         ))}
       </div>
 
-      <div className="flex gap-4 p-5 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto">
 
         {/* Filter panel */}
-        <div className="w-52 flex-shrink-0">
+        <div className="hidden md:block w-52 flex-shrink-0">
           <div className="bg-white rounded-2xl p-4 border border-gray-100 sticky top-4">
             <p className="text-sm font-bold text-[#1A3C6E] mb-4">Filters</p>
 

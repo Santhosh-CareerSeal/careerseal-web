@@ -109,8 +109,8 @@ function Settings() {
         <div className="bg-white rounded-2xl p-1.5 border border-gray-100 flex gap-1 mb-5">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
-              <span>{tab.icon}</span>{tab.label}
+              className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
+              <span>{tab.icon}</span><span className="hidden sm:inline">{tab.label}</span>
             </button>
           ))}
         </div>
