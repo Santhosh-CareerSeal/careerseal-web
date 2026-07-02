@@ -1,4 +1,17 @@
 import { useEffect, useState } from 'react'
+      {warning && (
+        <div className="bg-red-600 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <span className="text-white text-xl">⚠️</span>
+            <p className="text-white text-sm font-bold">{warning}</p>
+          </div>
+          {!isFullscreen && (
+            <button onClick={reenterFullscreen} className="bg-white text-red-600 text-xs font-bold px-3 py-1.5 rounded-lg">
+              Return to Fullscreen
+            </button>
+          )}
+        </div>
+      )}
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
@@ -27,6 +40,72 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
   const navigate = useNavigate()
 
   const token = localStorage.getItem('token')
+  const [violations, setViolations] = useState(0)
+  const [warning, setWarning] = useState(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [shuffledQuestions, setShuffledQuestions] = useState([])
+  const MAX_VIOLATIONS = 3
+
+  useEffect(() => {
+    const shuffled = [...questions].sort(() => Math.random() - 0.5).map(q => ({
+      ...q,
+      options: [...q.options].map((opt, i) => ({ opt, origIdx: i })).sort(() => Math.random() - 0.5)
+    }))
+    setShuffledQuestions(shuffled)
+  }, [])
+
+  useEffect(() => {
+    const enter = async () => { try { await document.documentElement.requestFullscreen(); setIsFullscreen(true) } catch(e) {} }
+    enter()
+    return () => { if (document.fullscreenElement) document.exitFullscreen().catch(() => {}) }
+  }, [])
+
+  useEffect(() => {
+    const onFSChange = () => {
+      if (!document.fullscreenElement && !submitted) { setIsFullscreen(false); addViolation("You exited fullscreen!") }
+      else setIsFullscreen(true)
+    }
+    document.addEventListener("fullscreenchange", onFSChange)
+    return () => document.removeEventListener("fullscreenchange", onFSChange)
+  }, [submitted, violations])
+
+  useEffect(() => {
+    const onHide = () => { if (document.hidden && !submitted) addViolation("You switched tabs!") }
+    const onBlur = () => { if (!submitted) addViolation("You left the exam window!") }
+    document.addEventListener("visibilitychange", onHide)
+    window.addEventListener("blur", onBlur)
+    return () => { document.removeEventListener("visibilitychange", onHide); window.removeEventListener("blur", onBlur) }
+  }, [submitted, violations])
+
+  useEffect(() => {
+    const prevent = (e) => e.preventDefault()
+    document.addEventListener("contextmenu", prevent)
+    document.addEventListener("copy", prevent)
+    document.addEventListener("cut", prevent)
+    return () => {
+      document.removeEventListener("contextmenu", prevent)
+      document.removeEventListener("copy", prevent)
+      document.removeEventListener("cut", prevent)
+    }
+  }, [])
+
+  const addViolation = (msg) => {
+    setViolations(prev => {
+      const n = prev + 1
+      if (n >= MAX_VIOLATIONS) {
+        setWarning("Maximum violations reached! Exam is being auto-submitted.")
+        setTimeout(() => handleSubmit(), 2000)
+      } else {
+        setWarning(msg + " Warning " + n + " of " + MAX_VIOLATIONS + ". Exam auto-submits on " + MAX_VIOLATIONS + " violations.")
+        setTimeout(() => setWarning(null), 4000)
+      }
+      return n
+    })
+  }
+
+  const reenterFullscreen = async () => {
+    try { await document.documentElement.requestFullscreen(); setIsFullscreen(true); setWarning(null) } catch(e) {}
+  }
 
   useEffect(() => {
     if (submitted) return
@@ -118,12 +197,16 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
         <div className="max-w-2xl mx-auto flex justify-between items-center">
           <div>
             <p className="text-white font-bold">{skill} Exam</p>
-            <p className="text-white/60 text-xs">Attempt {attemptNumber} · Question {current + 1} of {questions.length}</p>
+            <p className="text-white/60 text-xs">Attempt {attemptNumber} · Question {current + 1} of {shuffledQuestions.length || questions.length}</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="text-center">
               <p className="text-xs text-white/60">Answered</p>
               <p className="text-white font-bold">{answered}/{questions.length}</p>
+            </div>
+            <div className="text-center px-3 py-1 rounded-xl bg-red-500/20 border border-red-400/30">
+              <p className="text-xs text-red-300">Violations</p>
+              <p className="text-white font-bold">{violations}/{MAX_VIOLATIONS}</p>
             </div>
             <div className={`text-center px-3 py-1 rounded-xl ${timeLeft < 300 ? 'bg-red-500' : 'bg-[#0D7377]'}`}>
               <p className="text-xs text-white/80">Time left</p>
@@ -142,12 +225,12 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
         {/* Question */}
         <div className="bg-white rounded-2xl p-6 border border-gray-100 mb-4">
           <p className="text-xs font-bold text-gray-400 mb-3">QUESTION {current + 1}</p>
-          <p className="text-[#1A3C6E] font-bold text-base leading-relaxed">{questions[current].question}</p>
+          <p className="text-[#1A3C6E] font-bold text-base leading-relaxed">{(shuffledQuestions[current] || questions[current]).question}</p>
         </div>
 
         {/* Options */}
         <div className="flex flex-col gap-3 mb-6">
-          {questions[current].options.map((option, i) => (
+          {(shuffledQuestions[current]?.options?.map(o => o.opt) || questions[current].options).map((option, i) => (
             <button key={i} onClick={() => {
               const newAnswers = [...answers]
               newAnswers[current] = i
