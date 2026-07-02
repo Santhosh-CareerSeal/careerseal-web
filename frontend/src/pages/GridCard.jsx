@@ -238,7 +238,7 @@ function GridCard() {
       <div style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
           <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <span style={{ color: 'white', fontWeight: '700', fontSize: '16px' }}>CareerSeal</span>
+          <span style={{ color: 'white', fontWeight: '700', fontSize: 'clamp(12px, 3.5vw, 16px)' }}>CareerSeal</span>
         </div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <button onClick={() => navigate('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '13px' }}>Dashboard</button>
@@ -272,7 +272,7 @@ function GridCard() {
           {/* ATM Card — 3 row layout */}
           <div
             onClick={() => setFlipped(true)}
-            style={{ position: 'relative', zIndex: 10, width: 'min(400px, 90vw)', height: 'min(240px, 54vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
+            style={{ position: 'relative', zIndex: 10, width: 'min(360px, 85vw)', height: 'min(216px, 51vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
@@ -297,7 +297,7 @@ function GridCard() {
                 </div>
               )}
               <div>
-                <p style={{ color: 'white', fontSize: '18px', fontWeight: '700', margin: '0 0 4px', letterSpacing: '0.3px' }}>{user?.name}</p>
+                <p style={{ color: 'white', fontSize: 'clamp(13px, 4vw, 18px)', fontWeight: '700', margin: '0 0 4px', letterSpacing: '0.3px' }}>{user?.name}</p>
                 <p style={{ color: '#5DCAA5', fontSize: '11px', fontWeight: '500', margin: 0 }}>
                   {student?.contactNumber ? `+91 ${student.contactNumber}` : user?.email || ''}
                 </p>
@@ -341,7 +341,7 @@ function GridCard() {
                     {getInitials(user?.name)}
                   </div>
                 )}
-                <p style={{ color: 'white', fontSize: '18px', fontWeight: '700', margin: '0 0 4px' }}>{user?.name}</p>
+                <p style={{ color: 'white', fontSize: 'clamp(13px, 4vw, 18px)', fontWeight: '700', margin: '0 0 4px' }}>{user?.name}</p>
                 {student?.jobTitle && <p style={{ color: '#5DCAA5', fontSize: '12px', margin: '0 0 4px' }}>{student.jobTitle}</p>}
                 {student?.workStatus && <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '11px', margin: 0 }}>{student.workStatus}</p>}
               </div>
