@@ -148,33 +148,7 @@ function Dashboard() {
   return (
     <div className="min-h-screen bg-gray-100">
 
-      {/* Navbar */}
-      <div className="bg-[#1A3C6E] px-6 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <svg width="18" height="18" viewBox="0 0 22 22">
-            <circle cx="11" cy="11" r="11" fill="#0D7377" />
-            <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-          </svg>
-          <h1 className="text-white text-lg font-bold">CareerSeal</h1>
-        </div>
-        <div className="flex items-center gap-6">
-          <button onClick={() => navigate('/jobs')} className="text-white/60 text-sm hover:text-white transition-colors">Jobs</button>
-          <button onClick={() => navigate('/tracker')} className="text-white/60 text-sm hover:text-white transition-colors">Applications</button>
-          <button onClick={() => navigate('/grid')} className="text-white/60 text-sm hover:text-white transition-colors">GRID</button>
-          <button onClick={() => navigate('/exams')} className="text-white/60 text-sm hover:text-white transition-colors">Skill Exams</button>
-          <button onClick={() => navigate('/courses')} className="text-white/60 text-sm hover:text-white transition-colors">Courses</button>
-          <button onClick={() => navigate('/roadmap')} className="text-white/60 text-sm hover:text-white transition-colors">Roadmap</button>
-          <button onClick={() => navigate('/settings')} className="text-white/60 text-sm hover:text-white transition-colors">Settings</button>
-          <button onClick={handleLogout} className="text-white/60 text-sm hover:text-white transition-colors">Logout</button>
-          {student?.photoUrl ? (
-            <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
-          ) : (
-            <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
-              {capitalize(user?.name).charAt(0)}
-            </div>
-          )}
-        </div>
-      </div>
+      <Navbar student={student} user={user} />
 
       {/* Tip of the day — full width */}
       <div className="bg-[#0D7377] px-6 py-2.5 flex items-center gap-3">
@@ -185,10 +159,10 @@ function Dashboard() {
         </p>
       </div>
 
-      <div className="flex gap-4 p-5 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto">
 
         {/* Left sidebar */}
-        <div className="w-56 flex-shrink-0 flex flex-col gap-3">
+        <div className="hidden md:flex w-56 flex-shrink-0 flex-col gap-3">
 
           {/* Profile card */}
           <div className="bg-[#1A3C6E] rounded-2xl p-5 flex flex-col items-center gap-3">

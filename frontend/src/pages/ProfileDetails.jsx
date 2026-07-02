@@ -202,7 +202,7 @@ function ProfileDetails() {
                 <p className="text-xs text-gray-400 mt-1">Enter your name exactly as it appears on your government ID</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Date of birth</label>
                   <input type="date" value={form.dateOfBirth} onChange={e => set('dateOfBirth', e.target.value)} className={inputClass} />
@@ -232,7 +232,7 @@ function ProfileDetails() {
                 <input type="text" placeholder="House no, street name" value={form.address} onChange={e => set('address', e.target.value)} className={inputClass} />
               </div>
 
-              <div className="grid grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelClass}>City</label>
                   <input type="text" placeholder="City" value={form.city} onChange={e => set('city', e.target.value)} className={inputClass} />
@@ -259,7 +259,7 @@ function ProfileDetails() {
 
               <div>
                 <p className={sectionTitle}>10th standard</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>School name</label><input type="text" placeholder="e.g. St. Mary's High School" value={form.schoolName} onChange={e => set('schoolName', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Board</label>
                     <select value={form.schoolBoard} onChange={e => set('schoolBoard', e.target.value)} className={inputClass}>
@@ -274,7 +274,7 @@ function ProfileDetails() {
 
               <div>
                 <p className={sectionTitle}>12th standard</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>School / College name</label><input type="text" placeholder="e.g. Delhi Public School" value={form.twelfthSchoolName} onChange={e => set('twelfthSchoolName', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Board</label>
                     <select value={form.twelfthBoard} onChange={e => set('twelfthBoard', e.target.value)} className={inputClass}>
@@ -289,7 +289,7 @@ function ProfileDetails() {
 
               <div>
                 <p className={sectionTitle}>Graduation</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>College / University</label>
                     <select value={form.collegeId} onChange={e => {
@@ -323,7 +323,7 @@ function ProfileDetails() {
 
               <div>
                 <p className={sectionTitle}>Post graduation (optional)</p>
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>College / University</label><input type="text" placeholder="e.g. IIM Bangalore" value={form.pgCollegeName} onChange={e => set('pgCollegeName', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Degree</label>
                     <select value={form.pgDegree} onChange={e => set('pgDegree', e.target.value)} className={inputClass}>
@@ -351,7 +351,7 @@ function ProfileDetails() {
 
               <div>
                 <label className={labelClass}>Work status</label>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {['Student', 'Fresher', 'Experienced'].map(s => (
                     <button key={s} onClick={() => set('workStatus', s)} className={`border-2 rounded-xl p-3 text-sm font-bold transition-all ${form.workStatus === s ? 'border-[#0D7377] bg-[#0D7377]/5 text-[#1A3C6E]' : 'border-gray-200 text-gray-500'}`}>{s}</button>
                   ))}
@@ -359,7 +359,7 @@ function ProfileDetails() {
               </div>
 
               {form.workStatus === 'Experienced' && (
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>Current company</label><input type="text" placeholder="e.g. Infosys" value={form.currentCompany} onChange={e => set('currentCompany', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Job title</label><input type="text" placeholder="e.g. Software Engineer" value={form.jobTitle} onChange={e => set('jobTitle', e.target.value)} className={inputClass} /></div>
                 </div>
@@ -367,7 +367,7 @@ function ProfileDetails() {
 
               <div><label className={labelClass}>Work experience / description</label><textarea placeholder="Describe your work experience, internships, projects..." value={form.workExperience} onChange={e => set('workExperience', e.target.value)} className={`${inputClass} h-24`} /></div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><label className={labelClass}>Preferred job type</label>
                   <select value={form.preferredJobType} onChange={e => set('preferredJobType', e.target.value)} className={inputClass}>
                     <option value="">Select type</option>

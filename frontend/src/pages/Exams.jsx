@@ -396,27 +396,7 @@ function Exams() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Navbar */}
-      <div className="bg-[#1A3C6E] px-6 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
-          <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <h1 className="text-white text-lg font-bold">CareerSeal</h1>
-        </div>
-        <div className="flex items-center gap-5">
-          <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white">Dashboard</button>
-          <button onClick={() => navigate('/jobs')} className="text-white/60 text-sm hover:text-white">Jobs</button>
-          <button className="text-white text-sm font-bold border-b-2 border-[#0D7377] pb-0.5">Skill Exams</button>
-          <button onClick={() => navigate('/grid')} className="text-white/60 text-sm hover:text-white">GRID</button>
-          <button onClick={() => navigate('/roadmap')} className="text-white/60 text-sm hover:text-white">Roadmap</button>
-          {student?.photoUrl ? (
-            <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
-          ) : (
-            <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
-              {user?.name?.charAt(0)?.toUpperCase()}
-            </div>
-          )}
-        </div>
-      </div>
+      <Navbar student={student} user={user} />
 
       {/* Hero */}
       <div style={{ background: 'linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%)' }} className="px-6 py-8">
@@ -460,7 +440,7 @@ function Exams() {
               <button onClick={() => navigate('/profile-details')} className="text-xs text-[#0D7377] font-bold hover:underline">+ Add more skills</button>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 gap-4">
               {skillStatus.map((item, i) => {
                 const statusConfig = STATUS_CONFIG[item.status] || STATUS_CONFIG.not_verified
                 const levelConfig = item.level ? LEVEL_COLORS[item.level] : null
