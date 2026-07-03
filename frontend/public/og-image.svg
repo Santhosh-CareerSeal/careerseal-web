@@ -1,0 +1,23 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A3C6E"/>
+      <stop offset="100%" style="stop-color:#0D7377"/>
+    </linearGradient>
+    <linearGradient id="card" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1A3C6E"/>
+      <stop offset="100%" style="stop-color:#0D2A52"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="100" r="300" fill="rgba(13,115,119,0.15)"/>
+  <circle cx="150" cy="530" r="200" fill="rgba(26,60,110,0.2)"/>
+  <circle cx="600" cy="315" r="11" fill="#0D7377"/>
+  <path d="M594 321l5 5l11-11" stroke="#1A3C6E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <text x="626" y="326" font-family="Arial,sans-serif" font-size="36" font-weight="700" fill="white">CareerSeal</text>
+  <text x="600" y="390" font-family="Arial,sans-serif" font-size="52" font-weight="700" fill="white" text-anchor="middle">Your Career. Verified.</text>
+  <text x="600" y="450" font-family="Arial,sans-serif" font-size="52" font-weight="700" fill="white" text-anchor="middle">Transparent. Guided.</text>
+  <rect x="380" y="490" width="440" height="60" rx="30" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="600" y="528" font-family="Arial,sans-serif" font-size="22" fill="rgba(255,255,255,0.8)" text-anchor="middle">Skill-verified GRID card for every student</text>
+  <text x="600" y="598" font-family="Arial,sans-serif" font-size="18" fill="rgba(255,255,255,0.4)" text-anchor="middle">careerseal-web.vercel.app</text>
+</svg>
