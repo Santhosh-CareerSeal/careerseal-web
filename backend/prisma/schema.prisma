@@ -11,9 +11,8 @@ model User {
   name         String
   email        String    @unique
   passwordHash String
-  emailVerified Boolean   @default(false)
-  otp           String?
-  otpExpiry     DateTime?
+  otp          String?
+  otpExpiry    DateTime?
   role         String?   @default("student")
   createdAt    DateTime? @default(now()) @db.Timestamp(6)
   company      Company?
@@ -204,4 +203,16 @@ model College {
   createdAt   DateTime  @default(now())
   user        User?     @relation(fields: [userId], references: [id], onDelete: NoAction)
   students    Student[]
+}
+
+model PendingRegistration {
+  id           Int      @id @default(autoincrement())
+  name         String
+  email        String   @unique
+  passwordHash String
+  role         String   @default("student")
+  otp          String
+  otpExpiry    DateTime
+  createdAt    DateTime @default(now())
+  extraData    String?
 }

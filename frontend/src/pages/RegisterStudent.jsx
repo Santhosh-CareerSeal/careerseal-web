@@ -18,8 +18,8 @@ function RegisterStudent() {
     if (password.length < 6) { setError('Password must be at least 6 characters'); return }
     setLoading(true)
     try {
-      await axios.post(`${API_URL}/api/auth/signup`, { name, email, password, role: 'student' })
-      navigate('/verify-email', { state: { email: res.data.email } })
+      const res = await axios.post(`${API_URL}/api/auth/signup/initiate`, { name, email, password, role: 'student' })
+      navigate('/verify-email', { state: { email: res.data.email, mode: 'register' } })
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {

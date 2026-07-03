@@ -32,7 +32,11 @@ function Login() {
         navigate('/dashboard')
       }
     } catch (err) {
-      setError(err.response?.data?.message || 'Something went wrong')
+      if (err.response?.data?.requiresVerification) {
+        navigate('/verify-email', { state: { email: err.response.data.email } })
+      } else {
+        setError(err.response?.data?.message || 'Something went wrong')
+      }
     } finally {
       setLoading(false)
     }

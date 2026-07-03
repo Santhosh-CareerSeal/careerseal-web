@@ -32,7 +32,7 @@ function RegisterCompany() {
     }
     setLoading(true)
     try {
-      const res = await axios.post(`${API_URL}/api/auth/signup`, {
+      const res = const res = await axios.post(`${API_URL}/api/auth/signup/initiate`, {
         name: recruiterName, email, password,
         role: 'company', companyName, industry, companySize, website, designation
       })
