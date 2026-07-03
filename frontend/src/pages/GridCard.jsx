@@ -272,7 +272,7 @@ function GridCard() {
           {/* ATM Card — 3 row layout */}
           <div
             onClick={() => setFlipped(true)}
-            style={{ position: 'relative', zIndex: 10, width: 'min(360px, 85vw)', height: 'min(216px, 51vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: '20px 24px', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
+            style={{ position: 'relative', zIndex: 10, width: 'min(360px, 85vw)', height: 'min(216px, 51vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: 'clamp(12px, 4vw, 20px) clamp(14px, 5vw, 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
@@ -288,17 +288,17 @@ function GridCard() {
             </div>
 
             {/* Row 2 — Photo + Name + Contact */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', position: 'relative', zIndex: 1 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 'clamp(6px, 2vw, 12px)', position: 'relative', zIndex: 1 }}>
               {student?.photoUrl ? (
-                <img src={student.photoUrl} alt="Profile" style={{ width: '56px', height: '56px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }} />
+                <img src={student.photoUrl} alt="Profile" style={{ width: 'clamp(36px, 10vw, 56px)', height: 'clamp(36px, 10vw, 56px)', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }} />
               ) : (
-                <div style={{ width: '56px', height: '56px', borderRadius: '50%', background: '#0D7377', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '22px', fontWeight: '700', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }}>
+                <div style={{ width: 'clamp(36px, 10vw, 56px)', height: 'clamp(36px, 10vw, 56px)', borderRadius: '50%', background: '#0D7377', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 'clamp(14px, 5vw, 22px)', fontWeight: '700', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }}>
                   {getInitials(user?.name)}
                 </div>
               )}
               <div>
                 <p style={{ color: 'white', fontSize: 'clamp(13px, 4vw, 18px)', fontWeight: '700', margin: '0 0 4px', letterSpacing: '0.3px' }}>{user?.name}</p>
-                <p style={{ color: '#5DCAA5', fontSize: '11px', fontWeight: '500', margin: 0 }}>
+                <p style={{ color: '#5DCAA5', fontSize: 'clamp(9px, 2.5vw, 11px)', fontWeight: '500', margin: 0 }}>
                   {student?.contactNumber ? `+91 ${student.contactNumber}` : user?.email || ''}
                 </p>
               </div>
@@ -308,7 +308,7 @@ function GridCard() {
             <div style={{ position: 'relative', zIndex: 1 }}>
               <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '7px', letterSpacing: '2px', margin: '0 0 4px' }}>GRID NUMBER</p>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: '13px', fontWeight: '700', letterSpacing: '1.5px', margin: 0 }}>{gridCard?.gridNumber || 'Generating...'}</p>
+                <p style={{ color: 'rgba(255,255,255,0.9)', fontSize: 'clamp(9px, 3vw, 13px)', fontWeight: '700', letterSpacing: '1px', margin: 0 }}>{gridCard?.gridNumber || 'Generating...'}</p>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#5DCAA5' }}></div>
                   <span style={{ color: '#5DCAA5', fontSize: '10px', fontWeight: '600' }}>Verified</span>
