@@ -12,6 +12,7 @@ const companyRoutes = require('./routes/companyRoutes')
 const examRoutes = require('./routes/examRoutes')
 const courseRoutes = require('./routes/courseRoutes')
 const collegeRoutes = require('./routes/collegeRoutes')
+const otpRoutes = require('./routes/otpRoutes')
 const roadmapRoutes = require('./routes/roadmapRoutes')
 
 dotenv.config()
@@ -44,6 +45,7 @@ app.use('/api/company', companyRoutes)
 app.use('/api/exams', examRoutes)
 app.use('/api/courses', courseRoutes)
 app.use('/api/college', collegeRoutes)
+app.use('/api/otp', otpRoutes)
 app.use('/api/roadmap', roadmapRoutes)
 
 app.listen(PORT, () => {

@@ -19,7 +19,7 @@ function RegisterStudent() {
     setLoading(true)
     try {
       await axios.post(`${API_URL}/api/auth/signup`, { name, email, password, role: 'student' })
-      navigate('/login', { state: { fromRegister: true } })
+      navigate('/verify-email', { state: { email: res.data.email } })
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {

@@ -1,3 +1,4 @@
+const { sendOTPEmail } = require('../services/emailService')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { PrismaClient } = require('@prisma/client')
@@ -21,11 +22,14 @@ const signup = async (req, res) => {
         } : undefined
       }
     })
-    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000)
+    await prisma.user.update({ where: { id: user.id }, data: { otp, otpExpiry } })
+    await sendOTPEmail(email, name, otp)
     res.status(201).json({
-      message: 'Account created successfully',
-      token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      message: 'Account created! Please verify your email.',
+      requiresVerification: true,
+      email: user.email
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
