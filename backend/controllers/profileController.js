@@ -1,10 +1,17 @@
 const { PrismaClient } = require('@prisma/client')
+const { encrypt, decrypt } = require('../utils/encryption')
 const prisma = new PrismaClient()
 
 const getProfileDetails = async (req, res) => {
   try {
     const userId = req.user.userId
     const student = await prisma.student.findUnique({ where: { userId } })
+    if (student) {
+      student.aadhaarNumber = decrypt(student.aadhaarNumber)
+      student.panNumber = decrypt(student.panNumber)
+      student.passportNumber = decrypt(student.passportNumber)
+      student.contactNumber = decrypt(student.contactNumber)
+    }
     res.json({ student })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -26,6 +33,10 @@ const completeProfile = async (req, res) => {
       hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio
     } = req.body
 
+    const encryptedAadhaar = encrypt(aadhaarNumber)
+    const encryptedPan = encrypt(panNumber)
+    const encryptedPassport = encrypt(passportNumber)
+    const encryptedContact = encrypt(contactNumber)
     const parsedCollegeId = (collegeId && collegeId !== 'other' && !isNaN(parseInt(collegeId))) ? parseInt(collegeId) : null
     const education = `${degree || ''} ${branch || ''} ${collegeName || ''}`.trim()
     const schoolCollege = collegeName || schoolName || ''
@@ -42,7 +53,7 @@ const completeProfile = async (req, res) => {
         workStatus, currentCompany, jobTitle, workExperience,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-        hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio,
+        hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, panNumber: encryptedPan, passportNumber: encryptedPassport, digiLockerStatus, bio,
         education, schoolCollege, skills, profileComplete: true
       },
       create: {
@@ -54,7 +65,7 @@ const completeProfile = async (req, res) => {
         workStatus, currentCompany, jobTitle, workExperience,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-        hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio,
+        hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, panNumber: encryptedPan, passportNumber: encryptedPassport, digiLockerStatus, bio,
         education, schoolCollege, skills, profileComplete: true
       }
     })
