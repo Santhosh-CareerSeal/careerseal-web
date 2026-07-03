@@ -1,5 +1,9 @@
 const express = require('express')
 const cors = require('cors')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
+const helmet = require('helmet')
+const rateLimit = require('express-rate-limit')
 const dotenv = require('dotenv')
 const { PrismaClient } = require('@prisma/client')
 const authRoutes = require('./routes/authRoutes')
@@ -22,7 +26,25 @@ const prisma = new PrismaClient()
 const PORT = process.env.PORT || 5000
 const profileRoutes = require('./routes/profileRoutes')
 
-app.use(cors())
+app.use(helmet())
+app.use(cors({
+  origin: ['https://careerseal-web.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}))
+const generalLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 100,
+  message: { message: 'Too many requests. Please slow down.' }
+})
+app.use('/api/', generalLimiter)
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.path} ${req.ip}`)
+  next()
+})
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} ${req.method} ${req.path} ${req.ip}`)
+  next()
+})
 app.use(express.json())
 
 app.get('/', async (req, res) => {

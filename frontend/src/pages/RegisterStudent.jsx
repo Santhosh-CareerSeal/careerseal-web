@@ -19,7 +19,9 @@ function RegisterStudent() {
     setLoading(true)
     try {
       const res = await axios.post(`${API_URL}/api/auth/signup/initiate`, { name, email, password, role: 'student' })
-      navigate('/verify-email', { state: { email: res.data.email, mode: 'register' } })
+      localStorage.setItem('token', res.data.token)
+      localStorage.setItem('user', JSON.stringify(res.data.user))
+      navigate('/profile-details')
     } catch (err) {
       setError(err.response?.data?.message || 'Something went wrong')
     } finally {

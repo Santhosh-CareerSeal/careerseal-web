@@ -5,12 +5,12 @@ const { sendOTPEmail, sendPasswordResetEmail } = require('../services/emailServi
 const { validateEmail, validateIndianMobile } = require('../utils/emailValidator')
 const prisma = new PrismaClient()
 
-// STEP 1: Initiate registration — validate, send OTP, store pending
+// SIGNUP — direct account creation (email verification parked until domain verified)
 const initiateSignup = async (req, res) => {
   try {
     const { name, email, password, role, mobile, workStatus, companyName, industry, companySize, website, designation } = req.body
 
-    // Validate email
+    // Validate email format and block disposable domains
     const emailCheck = validateEmail(email)
     if (!emailCheck.valid) return res.status(400).json({ message: emailCheck.message })
 
@@ -20,27 +20,30 @@ const initiateSignup = async (req, res) => {
       if (!mobileCheck.valid) return res.status(400).json({ message: mobileCheck.message })
     }
 
-    // Check if email already exists in real users
     const existingUser = await prisma.user.findUnique({ where: { email } })
     if (existingUser) return res.status(400).json({ message: 'An account with this email already exists' })
 
     const passwordHash = await bcrypt.hash(password, 10)
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000)
-
-    // Store or update pending registration
-    const extraData = JSON.stringify({ mobile, workStatus, companyName, industry, companySize, website, designation })
-    await prisma.pendingRegistration.upsert({
-      where: { email },
-      update: { name, passwordHash, role: role || 'student', otp, otpExpiry, extraData },
-      create: { name, email, passwordHash, role: role || 'student', otp, otpExpiry, extraData }
+    const user = await prisma.user.create({
+      data: {
+        name, email, passwordHash,
+        role: role || 'student',
+        student: (role === 'student' || !role) ? {
+          create: { contactNumber: mobile || null, workStatus: workStatus || null, profileComplete: false }
+        } : undefined,
+        company: role === 'company' ? {
+          create: { companyName: companyName || name, mcaStatus: 'pending' }
+        } : undefined
+      }
     })
 
-    // Send OTP
-    const sent = await sendOTPEmail(email, name, otp)
-    if (!sent) return res.status(500).json({ message: 'Failed to send verification email. Please try again.' })
-
-    res.status(200).json({ message: 'Verification code sent to your email', email })
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    res.status(201).json({
+      message: 'Account created successfully!',
+      token,
+      email: user.email,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+    })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
