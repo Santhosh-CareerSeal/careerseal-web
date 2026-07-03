@@ -56,13 +56,35 @@ function Navbar({ student, user }) {
             </button>
           ))}
           <div className="w-px h-4 bg-white/20 mx-1"></div>
-          {student?.photoUrl ? (
-            <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377] cursor-pointer" onClick={() => navigate('/profile-details')} />
-          ) : (
-            <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm cursor-pointer" onClick={() => navigate('/profile-details')}>
-              {user?.name?.charAt(0)?.toUpperCase() || 'S'}
-            </div>
-          )}
+          <div className="relative">
+            <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-1 focus:outline-none">
+              {student?.photoUrl ? (
+                <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
+              ) : (
+                <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                </div>
+              )}
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 top-10 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-44 z-50">
+                <button onClick={() => { setShowDropdown(false); navigate('/profile-details') }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-[#f0f4ff] flex items-center justify-center text-[#1A3C6E] text-xs font-bold">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                  </div>
+                  My Profile
+                </button>
+                <div className="h-px bg-gray-100 mx-2"></div>
+                <button onClick={() => { setShowDropdown(false); handleLogout() }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
+          <div className="w-px h-4 bg-white/20 mx-1"></div>
         </div>
 
         {/* Mobile: avatar + hamburger */}
