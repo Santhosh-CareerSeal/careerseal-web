@@ -7,6 +7,7 @@ function Navbar({ student, user }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [showDropdown, setShowDropdown] = useState(false)
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard' },
