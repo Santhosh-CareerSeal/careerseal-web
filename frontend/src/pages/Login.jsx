@@ -13,6 +13,8 @@ function Login() {
   const [loading, setLoading] = useState(false)
   const [connecting, setConnecting] = useState(null)
   const [showForgot, setShowForgot] = useState(false)
+  const [resetLoading, setResetLoading] = useState(false)
+  const [resetError, setResetError] = useState('')
   const [resetEmail, setResetEmail] = useState('')
   const [resetSent, setResetSent] = useState(false)
   const fromRegister = location.state?.fromRegister || false
@@ -50,6 +52,19 @@ function Login() {
     setTimeout(() => { setConnecting(null); setError(`${provider} sign-in is coming soon`) }, 1200)
   }
 
+  const handleForgotPassword = async () => {
+    setResetError('')
+    if (!resetEmail) { setResetError('Please enter your email'); return }
+    setResetLoading(true)
+    try {
+      await axios.post(`${API_URL}/api/auth/forgot-password`, { email: resetEmail })
+      setResetSent(true)
+    } catch(e) {
+      setResetError(e.response?.data?.message || 'Something went wrong')
+    } finally {
+      setResetLoading(false)
+    }
+  }
   const closeForgot = () => { setShowForgot(false); setResetSent(false); setResetEmail('') }
 
   return (
@@ -175,22 +190,29 @@ function Login() {
             {!resetSent ? (
               <>
                 <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Reset your password</h3>
-                <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a reset link.</p>
+                <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a reset code.</p>
                 <input type="email" placeholder="Email Address" value={resetEmail} onChange={e => setResetEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && setResetSent(true)}
+                  onKeyDown={e => e.key === 'Enter' && handleForgotPassword()}
                   className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full mb-4"/>
-                <button onClick={() => setResetSent(true)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3">
-                  Send Reset Link
+                {resetError && <p className="text-red-500 text-xs mb-3">{resetError}</p>}
+                <button onClick={handleForgotPassword} disabled={resetLoading} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors w-full mb-3 disabled:opacity-50">
+                  {resetLoading ? 'Sending...' : 'Send Reset Code'}
                 </button>
                 <button onClick={closeForgot} className="text-gray-400 text-sm w-full text-center">Cancel</button>
               </>
             ) : (
               <>
-                <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Check your email</h3>
-                <p className="text-gray-500 text-sm mb-5">Password reset coming soon — this is a placeholder for now.</p>
-                <button onClick={closeForgot} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold w-full">Got it</button>
+                <h3 className="text-xl font-bold text-[#1A3C6E] mb-2">Code sent!</h3>
+                <p className="text-gray-500 text-sm mb-5">We sent a 6-digit reset code to <strong>{resetEmail}</strong>. Check your inbox.</p>
+                <button onClick={() => { closeForgot(); navigate('/verify-email', { state: { email: resetEmail, mode: 'forgot' } }) }} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold w-full mb-3">
+                  Enter Code →
+                </button>
+                <button onClick={closeForgot} className="text-gray-400 text-sm w-full text-center">Cancel</button>
               </>
             )}
+          </div>
+        </div>
+      )}
           </div>
         </div>
       )}
