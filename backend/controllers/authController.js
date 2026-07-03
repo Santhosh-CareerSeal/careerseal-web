@@ -190,4 +190,16 @@ const deleteAccount = async (req, res) => {
   }
 }
 
-module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, resetPassword, changePassword, deleteAccount }
+const logout = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1]
+    if (token) {
+      await prisma.blacklistedToken.create({ data: { token } })
+    }
+    res.json({ message: 'Logged out successfully' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, resetPassword, changePassword, deleteAccount, logout }

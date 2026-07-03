@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import axios from 'axios'
+import API_URL from '../config'
 import { useNavigate, useLocation } from 'react-router-dom'
 
 function Navbar({ student, user }) {
@@ -18,10 +20,21 @@ function Navbar({ student, user }) {
 
   const isActive = (path) => location.pathname === path
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    navigate('/login')
+  const handleLogout = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      if (token) {
+        await axios.post(`${API_URL}/api/auth/logout`, {}, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      }
+    } catch (e) { console.error(e) }
+    finally {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      localStorage.removeItem('college')
+      navigate('/login')
+    }
   }
 
   return (

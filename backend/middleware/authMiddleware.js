@@ -1,11 +1,13 @@
 const jwt = require('jsonwebtoken')
+const { PrismaClient } = require('@prisma/client')
+const prisma = new PrismaClient()
 
-const protect = (req, res, next) => {
+const protect = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1]
-    if (!token) {
-      return res.status(401).json({ message: 'No token provided' })
-    }
+    if (!token) return res.status(401).json({ message: 'No token provided' })
+    const blacklisted = await prisma.blacklistedToken.findUnique({ where: { token } })
+    if (blacklisted) return res.status(401).json({ message: 'Token has been invalidated. Please login again.' })
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
     req.user = decoded
     next()
