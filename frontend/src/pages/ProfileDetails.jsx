@@ -100,11 +100,27 @@ function ProfileDetails() {
 
   const uploadPhoto = async () => {
     if (!photoFile) return form.photoUrl
+    // Security: validate file type and size
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+    if (!allowedTypes.includes(photoFile.type)) {
+      setError('Only JPG, PNG, or WEBP images are allowed')
+      return form.photoUrl
+    }
+    const maxSize = 5 * 1024 * 1024 // 5MB
+    if (photoFile.size > maxSize) {
+      setError('Image must be smaller than 5MB')
+      return form.photoUrl
+    }
     setUploadingPhoto(true)
     try {
-      const fileExt = photoFile.name.split('.').pop()
-      const fileName = `${Date.now()}.${fileExt}`
-      const { error: uploadError } = await supabase.storage.from('profile-photos').upload(fileName, photoFile)
+      const fileExt = photoFile.name.split('.').pop().toLowerCase()
+      const userId = JSON.parse(localStorage.getItem('user') || '{}').id || 'anon'
+      const fileName = `${userId}_${Date.now()}.${fileExt}`
+      const { error: uploadError } = await supabase.storage.from('profile-photos').upload(fileName, photoFile, {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: photoFile.type
+      })
       if (uploadError) throw uploadError
       const { data } = supabase.storage.from('profile-photos').getPublicUrl(fileName)
       return data.publicUrl
