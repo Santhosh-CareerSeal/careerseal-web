@@ -134,6 +134,12 @@ function RegisterStudent() {
               Already have an account?{' '}
               <span className="text-[#0D7377] font-bold cursor-pointer" onClick={() => navigate('/login')}>Sign in</span>
             </p>
+            <p className="text-center text-xs text-gray-400 mt-4">
+              By creating an account, you agree to our{' '}
+              <span onClick={() => navigate('/terms')} className="text-[#0D7377] cursor-pointer hover:underline">Terms</span>
+              {' '}and{' '}
+              <span onClick={() => navigate('/privacy')} className="text-[#0D7377] cursor-pointer hover:underline">Privacy Policy</span>
+            </p>
           </div>
         </div>
       </div>

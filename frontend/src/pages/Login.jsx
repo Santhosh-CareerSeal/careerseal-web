@@ -1,3 +1,9 @@
+          <p className="text-center text-xs text-gray-400 mt-6">
+            By continuing, you agree to our{' '}
+            <button onClick={() => navigate('/terms')} className="text-[#0D7377] hover:underline">Terms</button>
+            {' '}and{' '}
+            <button onClick={() => navigate('/privacy')} className="text-[#0D7377] hover:underline">Privacy Policy</button>
+          </p>
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'

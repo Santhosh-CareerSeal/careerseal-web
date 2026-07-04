@@ -176,7 +176,10 @@ function RegisterCompany() {
             </button>
 
             <p className="text-center text-xs text-gray-400">
-              By registering, you agree to CareerSeal's Terms of Service and Privacy Policy
+              By registering, you agree to CareerSeal's{' '}
+              <span onClick={() => navigate('/terms')} className="text-[#0D7377] cursor-pointer hover:underline">Terms of Service</span>
+              {' '}and{' '}
+              <span onClick={() => navigate('/privacy')} className="text-[#0D7377] cursor-pointer hover:underline">Privacy Policy</span>
             </p>
           </div>
         </div>
