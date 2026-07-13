@@ -45,7 +45,7 @@ function Sidebar({ active, setActive, company, navigate }) {
     <div style={{ width: '200px', background: '#0f1e3d', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0, minHeight: '100vh' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
         <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-        <span style={{ color: 'white', fontSize: '14px', fontWeight: '700' }}>CareerSeal</span>
+        <span style={{ color: 'white', fontSize: '14px', fontWeight: '700' }}>GRID</span>
       </div>
       <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px', marginBottom: '10px', textAlign: 'center' }}>
         <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#0D7377', margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '16px' }}>
@@ -517,7 +517,7 @@ export default function CompanyDashboard() {
         {active === 'search-talent' && (
           <div>
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Search Talent</p>
-            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>Browse verified CareerSeal student profiles</p>
+            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>Browse verified GRID student profiles</p>
 
             <div style={{ background: 'white', borderRadius: '14px', padding: '16px', border: '1px solid #eee', marginBottom: '16px', display: 'flex', gap: '12px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
               <div style={{ flex: 1, minWidth: '160px' }}>
@@ -656,14 +656,14 @@ export default function CompanyDashboard() {
         {active === 'company-profile' && (
           <div style={{ maxWidth: '680px' }}>
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Company Profile</p>
-            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>This is how students see your company on CareerSeal</p>
+            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>This is how students see your company on GRID</p>
 
             {profileSuccess && <div style={{ background: '#E1F5EE', border: '1px solid #6ee7b7', color: '#065f46', fontSize: '13px', padding: '10px 16px', borderRadius: '10px', marginBottom: '16px' }}>✓ {profileSuccess}</div>}
 
             {company?.mcaStatus !== 'verified' && (
               <div style={{ background: '#FFF9C4', border: '1px solid #EF9F27', borderRadius: '10px', padding: '12px 16px', marginBottom: '16px', display: 'flex', gap: '8px' }}>
                 <span>⏳</span>
-                <p style={{ fontSize: '12px', color: '#854F0B', margin: 0 }}>Your company is pending verification. CareerSeal will verify within 1 week. You will receive an email once verified.</p>
+                <p style={{ fontSize: '12px', color: '#854F0B', margin: 0 }}>Your company is pending verification. GRID will verify within 1 week. You will receive an email once verified.</p>
               </div>
             )}
 

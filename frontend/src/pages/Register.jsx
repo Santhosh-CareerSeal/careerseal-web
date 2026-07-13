@@ -17,10 +17,10 @@ function Register() {
             <circle cx="11" cy="11" r="11" fill="#0D7377"/>
             <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
-          <span className="text-white font-bold text-xl">CareerSeal</span>
+          <span className="text-white font-bold text-xl">GRID</span>
         </div>
 
-        <h1 className="text-white text-3xl font-bold text-center mb-2">Join CareerSeal</h1>
+        <h1 className="text-white text-3xl font-bold text-center mb-2">Join GRID</h1>
         <p className="text-white/50 text-sm text-center mb-10">Your verified career identity starts here</p>
 
         {/* Two cards side by side */}

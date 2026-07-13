@@ -5,7 +5,7 @@ function Onboarding() {
 
   return (
     <div className="min-h-screen bg-[#1A3C6E] flex flex-col items-center justify-center px-8">
-      <h1 className="text-5xl font-bold text-white mb-4">CareerSeal</h1>
+      <h1 className="text-5xl font-bold text-white mb-4">GRID</h1>
       <p className="text-[#0D7377] text-lg mb-16 tracking-widest uppercase">Shape your future</p>
 
       <div className="flex flex-col gap-6 w-full max-w-sm mb-16">

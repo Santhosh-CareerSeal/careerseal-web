@@ -17,7 +17,7 @@ function Sidebar({ active, setActive, college, navigate }) {
     <div style={{ width: '200px', background: '#0f1e3d', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0, minHeight: '100vh' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
         <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-        <span style={{ color: 'white', fontSize: '13px', fontWeight: '700' }}>CareerSeal</span>
+        <span style={{ color: 'white', fontSize: '13px', fontWeight: '700' }}>GRID</span>
       </div>
       <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px', marginBottom: '10px', textAlign: 'center' }}>
         <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#0D7377', margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '16px' }}>
@@ -181,7 +181,7 @@ export default function CollegePortal() {
               <div style={{ background: 'white', borderRadius: '14px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
                 <p style={{ fontSize: '36px', marginBottom: '12px' }}>🎓</p>
                 <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', marginBottom: '6px' }}>No students found</p>
-                <p style={{ fontSize: '12px', color: '#9ca3af' }}>Students appear here once they select your college in their CareerSeal profile</p>
+                <p style={{ fontSize: '12px', color: '#9ca3af' }}>Students appear here once they select your college in their GRID profile</p>
               </div>
             ) : (
               <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #eee', overflow: 'hidden' }}>
@@ -224,10 +224,10 @@ export default function CollegePortal() {
             <div style={{ background: 'white', borderRadius: '14px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
               <p style={{ fontSize: '36px', marginBottom: '12px' }}>💼</p>
               <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', marginBottom: '6px' }}>No targeted job postings yet</p>
-              <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>Once companies post jobs targeting {college?.collegeName}, they'll appear here. Share your CareerSeal profile with companies to get noticed.</p>
+              <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>Once companies post jobs targeting {college?.collegeName}, they'll appear here. Share your GRID profile with companies to get noticed.</p>
               <div style={{ background: '#f0f4ff', borderRadius: '12px', padding: '14px', maxWidth: '360px', margin: '0 auto' }}>
                 <p style={{ fontSize: '12px', color: '#1A3C6E', fontWeight: '600', margin: '0 0 4px' }}>Coming soon</p>
-                <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Companies will be able to post jobs exclusively for your institution. Contact your CareerSeal account manager to set this up.</p>
+                <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Companies will be able to post jobs exclusively for your institution. Contact your GRID account manager to set this up.</p>
               </div>
             </div>
           </div>
@@ -351,7 +351,7 @@ export default function CollegePortal() {
                   </div>
                 ))}
               </div>
-              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '12px' }}>To update your institution profile, contact your CareerSeal account manager.</p>
+              <p style={{ fontSize: '11px', color: '#9ca3af', marginTop: '12px' }}>To update your institution profile, contact your GRID account manager.</p>
             </div>
             <div style={{ background: 'white', borderRadius: '14px', padding: '20px', border: '1px solid #eee' }}>
               <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 12px' }}>Change Password</p>

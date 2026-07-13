@@ -4,14 +4,14 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const sendOTPEmail = async (email, name, otp) => {
   try {
     await resend.emails.send({
-      from: 'CareerSeal <onboarding@resend.dev>',
+      from: 'GRID <onboarding@resend.dev>',
       to: email,
-      subject: `${otp} is your CareerSeal verification code`,
+      subject: `${otp} is your GRID verification code`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 480px; margin: 0 auto; padding: 32px; background: #f8f9fa; border-radius: 16px;">
           <div style="text-align: center; margin-bottom: 24px;">
             <div style="display: inline-flex; align-items: center; gap: 8px; background: #1A3C6E; padding: 12px 24px; border-radius: 50px;">
-              <span style="color: white; font-size: 18px; font-weight: 700;">CareerSeal</span>
+              <span style="color: white; font-size: 18px; font-weight: 700;">GRID</span>
             </div>
           </div>
           <div style="background: white; border-radius: 12px; padding: 32px; text-align: center;">
@@ -22,7 +22,7 @@ const sendOTPEmail = async (email, name, otp) => {
             </div>
             <p style="color: #9ca3af; font-size: 13px; margin: 0;">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</p>
           </div>
-          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">If you didn't create a CareerSeal account, ignore this email.</p>
+          <p style="color: #9ca3af; font-size: 12px; text-align: center; margin-top: 24px;">If you didn't create a GRID account, ignore this email.</p>
         </div>
       `
     })
@@ -38,9 +38,9 @@ module.exports = { sendOTPEmail }
 const sendPasswordResetEmail = async (email, name, otp) => {
   try {
     await resend.emails.send({
-      from: 'CareerSeal <onboarding@resend.dev>',
+      from: 'GRID <onboarding@resend.dev>',
       to: email,
-      subject: `${otp} — Reset your CareerSeal password`,
+      subject: `${otp} — Reset your GRID password`,
       html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#f8f9fa;border-radius:16px;"><div style="background:white;border-radius:12px;padding:32px;text-align:center;"><h2 style="color:#1A3C6E;margin:0 0 8px;">Reset your password</h2><p style="color:#6b7280;margin:0 0 24px;">Hi ${name}, use this code to reset your password:</p><div style="background:#fff0f0;border:2px dashed #dc2626;border-radius:12px;padding:20px;margin:0 0 24px;"><p style="font-size:40px;font-weight:700;color:#dc2626;letter-spacing:10px;margin:0;">${otp}</p></div><p style="color:#9ca3af;font-size:13px;margin:0;">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</p></div><p style="color:#9ca3af;font-size:12px;text-align:center;margin-top:24px;">If you didn't request a password reset, ignore this email.</p></div>`
     })
     return true

@@ -26,7 +26,7 @@ const profileRoutes = require('./routes/profileRoutes')
 
 app.use(helmet())
 app.use(cors({
-  origin: ['https://careerseal-web.vercel.app', 'http://localhost:5173'],
+  origin: ['https://thegridcard.com', 'https://www.thegridcard.com', 'https://gridcard.in', 'https://www.gridcard.in', 'https://careerseal-web.vercel.app', 'http://localhost:5173'],
   credentials: true
 }))
 const generalLimiter = rateLimit({
@@ -48,9 +48,9 @@ app.use(express.json())
 app.get('/', async (req, res) => {
   try {
     await prisma.$connect()
-    res.json({ message: 'CareerSeal API is running!', database: 'Connected ✅' })
+    res.json({ message: 'GRID API is running!', database: 'Connected ✅' })
   } catch (error) {
-    res.json({ message: 'CareerSeal API is running!', database: 'Failed ❌', error: error.message })
+    res.json({ message: 'GRID API is running!', database: 'Failed ❌', error: error.message })
   }
 })
 

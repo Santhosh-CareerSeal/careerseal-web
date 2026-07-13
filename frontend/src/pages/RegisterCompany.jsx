@@ -58,7 +58,7 @@ function RegisterCompany() {
               <circle cx="11" cy="11" r="11" fill="#0D7377"/>
               <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
             </svg>
-            <span className="text-white font-bold text-xl">CareerSeal</span>
+            <span className="text-white font-bold text-xl">GRID</span>
           </div>
           <h2 className="text-white text-2xl font-bold mb-4">Find verified talent for your company</h2>
           <p className="text-white/60 text-sm mb-8">Access thousands of verified student profiles with GRID cards across India</p>
@@ -74,7 +74,7 @@ function RegisterCompany() {
           </div>
           <div className="mt-10 bg-white/10 rounded-xl p-4">
             <p className="text-white/40 text-xs mb-1">VERIFICATION NOTE</p>
-            <p className="text-white/70 text-xs leading-relaxed">Your company will be verified by CareerSeal within 1 week. You can post jobs immediately. Verified companies get a trust badge visible to all students.</p>
+            <p className="text-white/70 text-xs leading-relaxed">Your company will be verified by GRID within 1 week. You can post jobs immediately. Verified companies get a trust badge visible to all students.</p>
           </div>
         </div>
       </div>
@@ -88,7 +88,7 @@ function RegisterCompany() {
               <circle cx="11" cy="11" r="11" fill="#0D7377"/>
               <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
             </svg>
-            <span className="text-[#1A3C6E] font-bold text-xl">CareerSeal</span>
+            <span className="text-[#1A3C6E] font-bold text-xl">GRID</span>
           </div>
 
           <h1 className="text-2xl font-bold text-[#1A3C6E] mb-1">Register your company</h1>
@@ -167,7 +167,7 @@ function RegisterCompany() {
             {/* Verification notice */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
               <span className="text-lg flex-shrink-0">⏳</span>
-              <p className="text-xs text-amber-800 leading-relaxed">Your company will be verified by CareerSeal within 1 week. You can post jobs immediately after registration. You will receive an email and notification once verified.</p>
+              <p className="text-xs text-amber-800 leading-relaxed">Your company will be verified by GRID within 1 week. You can post jobs immediately after registration. You will receive an email and notification once verified.</p>
             </div>
 
             <button onClick={handleSubmit} disabled={loading}
@@ -176,7 +176,7 @@ function RegisterCompany() {
             </button>
 
             <p className="text-center text-xs text-gray-400">
-              By registering, you agree to CareerSeal's{' '}
+              By registering, you agree to GRID's{' '}
               <span onClick={() => navigate('/terms')} className="text-[#0D7377] cursor-pointer hover:underline">Terms of Service</span>
               {' '}and{' '}
               <span onClick={() => navigate('/privacy')} className="text-[#0D7377] cursor-pointer hover:underline">Privacy Policy</span>

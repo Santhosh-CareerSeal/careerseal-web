@@ -25,7 +25,7 @@ function NotFound() {
       <div style={{ textAlign: 'center', maxWidth: '400px' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', marginBottom: '16px' }}>
           <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <span style={{ color: 'white', fontWeight: '700', fontSize: '18px' }}>CareerSeal</span>
+          <span style={{ color: 'white', fontWeight: '700', fontSize: '18px' }}>GRID</span>
         </div>
         <p style={{ color: 'rgba(255,255,255,0.5)', fontSize: '14px', lineHeight: '1.6', marginBottom: '28px' }}>
           Oops! The page you are looking for does not exist or has been moved.

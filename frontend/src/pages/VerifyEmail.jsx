@@ -105,7 +105,7 @@ function VerifyEmail() {
       <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-center gap-2 mb-8">
           <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <span className="text-white font-bold text-xl">CareerSeal</span>
+          <span className="text-white font-bold text-xl">GRID</span>
         </div>
         <div className="bg-white rounded-2xl p-8">
           <div className="text-center mb-6">

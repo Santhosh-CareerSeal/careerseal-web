@@ -44,7 +44,7 @@ function Navbar({ student, user }) {
       <div className="px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
           <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <h1 className="text-white text-base font-bold">CareerSeal</h1>
+          <h1 className="text-white text-base font-bold">GRID</h1>
         </div>
 
         {/* Desktop nav */}

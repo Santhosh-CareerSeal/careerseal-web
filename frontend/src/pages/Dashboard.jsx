@@ -28,7 +28,7 @@ const TIPS = [
   "Don't apply blindly — read the job description fully before applying.",
   "Your PF account number speeds up onboarding when you get hired.",
   "Add your address — some companies only hire candidates within a certain radius.",
-  "Track every application in CareerSeal — never lose sight of where you stand.",
+  "Track every application in GRID — never lose sight of where you stand.",
   "A rejection is a redirect — keep applying and the right opportunity will come.",
   "Soft skills matter as much as technical skills — mention teamwork and communication.",
   "Set a daily job search routine — consistency beats intensity.",

@@ -12,7 +12,7 @@ function Legal() {
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
             <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-            <span className="text-white font-bold text-lg">CareerSeal</span>
+            <span className="text-white font-bold text-lg">GRID</span>
           </div>
           <button onClick={() => navigate(-1)} className="text-white/60 text-sm hover:text-white">← Back</button>
         </div>
@@ -40,7 +40,7 @@ function Legal() {
               <div className="space-y-6 text-gray-600 text-sm leading-relaxed">
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">1. Who we are</h2>
-                  <p>CareerSeal is a verified career identity platform for Indian students. We help students prove their skills through exams and build a trusted career profile called a GRID card. Our platform is operated from Hyderabad, India.</p>
+                  <p>GRID is a verified career identity platform for Indian students. We help students prove their skills through exams and build a trusted career profile called a GRID card. Our platform is operated from Hyderabad, India.</p>
                 </div>
 
                 <div>
@@ -87,7 +87,7 @@ function Legal() {
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">5. Who we share your data with</h2>
                   <ul className="list-disc pl-5 space-y-1">
                     <li><strong>Companies:</strong> When you apply for a job, your public GRID profile is shared with that company. Only verified skills are shown.</li>
-                    <li><strong>Your college:</strong> If your college is a CareerSeal partner, your placement status and verified skills may be visible to your college's TPO dashboard.</li>
+                    <li><strong>Your college:</strong> If your college is a GRID partner, your placement status and verified skills may be visible to your college's TPO dashboard.</li>
                     <li><strong>Infrastructure providers:</strong> Supabase (database + storage), Render (backend hosting), Vercel (frontend hosting). All are GDPR-compliant providers.</li>
                     <li>We do not share your Aadhaar, PAN, passport, or phone number with companies or colleges.</li>
                   </ul>
@@ -101,7 +101,7 @@ function Legal() {
                     <li><strong>Correct:</strong> Update incorrect data via your Profile Details page</li>
                     <li><strong>Delete:</strong> Delete your account and all associated data via Settings → Delete Account</li>
                     <li><strong>Withdraw consent:</strong> Stop using our services at any time</li>
-                    <li><strong>Grievance:</strong> Contact our Grievance Officer at privacy@careerseal.in</li>
+                    <li><strong>Grievance:</strong> Contact our Grievance Officer at privacy@thegridcard.com</li>
                   </ul>
                 </div>
 
@@ -118,7 +118,7 @@ function Legal() {
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">9. Contact us</h2>
                   <p>For any privacy-related queries or to exercise your rights, contact us at:<br/>
-                  Email: <span className="text-[#0D7377]">privacy@careerseal.in</span><br/>
+                  Email: <span className="text-[#0D7377]">privacy@thegridcard.com</span><br/>
                   Address: Hyderabad, Telangana, India</p>
                 </div>
               </div>
@@ -131,13 +131,13 @@ function Legal() {
               <div className="space-y-6 text-gray-600 text-sm leading-relaxed">
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">1. Acceptance of terms</h2>
-                  <p>By creating an account on CareerSeal, you agree to these Terms of Service. If you do not agree, do not use our platform.</p>
+                  <p>By creating an account on GRID, you agree to these Terms of Service. If you do not agree, do not use our platform.</p>
                 </div>
 
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">2. Eligibility</h2>
                   <ul className="list-disc pl-5 space-y-1">
-                    <li>You must be at least 16 years old to use CareerSeal</li>
+                    <li>You must be at least 16 years old to use GRID</li>
                     <li>You must be a student, fresher, or working professional in India</li>
                     <li>You must provide accurate information during registration</li>
                     <li>One person may have only one account</li>
@@ -151,7 +151,7 @@ function Legal() {
                     <li>You must not upload fake or forged documents</li>
                     <li>You must not attempt to cheat during skill exams</li>
                     <li>You must not share your account credentials with others</li>
-                    <li>You must not use CareerSeal to spam companies with applications</li>
+                    <li>You must not use GRID to spam companies with applications</li>
                     <li>You must not attempt to access other users' data</li>
                   </ul>
                 </div>
@@ -160,7 +160,7 @@ function Legal() {
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">4. GRID card and verified badges</h2>
                   <ul className="list-disc pl-5 space-y-1">
                     <li>Skill badges are valid for 3 months from the date of passing the exam</li>
-                    <li>CareerSeal reserves the right to revoke badges if fraud is detected</li>
+                    <li>GRID reserves the right to revoke badges if fraud is detected</li>
                     <li>Only verified skills are shown on your public GRID profile</li>
                     <li>You may update your GRID card up to 3 times per month</li>
                   </ul>
@@ -173,19 +173,19 @@ function Legal() {
                     <li>Uploading forged marksheets, degree certificates, or any other documents</li>
                     <li>Using automated bots or scripts during skill exams</li>
                     <li>Creating fake company accounts to harvest student data</li>
-                    <li>Attempting to reverse-engineer or hack CareerSeal's systems</li>
+                    <li>Attempting to reverse-engineer or hack GRID's systems</li>
                     <li>Using disposable or fake email addresses for registration</li>
                   </ul>
                 </div>
 
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">6. Intellectual property</h2>
-                  <p>The CareerSeal name, GRID card design, and platform technology are the intellectual property of CareerSeal. You may not copy, reproduce, or distribute any part of our platform without written permission.</p>
+                  <p>The GRID name, GRID card design, and platform technology are the intellectual property of GRID. You may not copy, reproduce, or distribute any part of our platform without written permission.</p>
                 </div>
 
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">7. Limitation of liability</h2>
-                  <p>CareerSeal provides a platform to connect students with employers. We do not guarantee employment outcomes. We are not liable for any hiring decisions made by companies based on your GRID profile.</p>
+                  <p>GRID provides a platform to connect students with employers. We do not guarantee employment outcomes. We are not liable for any hiring decisions made by companies based on your GRID profile.</p>
                 </div>
 
                 <div>
@@ -195,7 +195,7 @@ function Legal() {
 
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">9. Changes to terms</h2>
-                  <p>We may update these terms from time to time. We will notify you via email when significant changes are made. Continued use of CareerSeal after changes constitutes acceptance of the new terms.</p>
+                  <p>We may update these terms from time to time. We will notify you via email when significant changes are made. Continued use of GRID after changes constitutes acceptance of the new terms.</p>
                 </div>
 
                 <div>
@@ -206,7 +206,7 @@ function Legal() {
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">11. Contact</h2>
                   <p>For any queries regarding these terms:<br/>
-                  Email: <span className="text-[#0D7377]">legal@careerseal.in</span><br/>
+                  Email: <span className="text-[#0D7377]">legal@thegridcard.com</span><br/>
                   Address: Hyderabad, Telangana, India</p>
                 </div>
               </div>

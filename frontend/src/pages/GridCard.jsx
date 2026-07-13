@@ -109,7 +109,7 @@ function GridCard() {
       glow.addColorStop(0, 'rgba(13,115,119,0.25)'); glow.addColorStop(1, 'transparent')
       ctx.fillStyle = glow; ctx.fillRect(0, 0, CW, CH)
 
-      // ROW 1 — CareerSeal brand + GRID CARD
+      // ROW 1 — GRID brand + GRID CARD
       ctx.fillStyle = '#0D7377'
       ctx.beginPath(); ctx.arc(50, 56, 18, 0, Math.PI * 2); ctx.fill()
       ctx.strokeStyle = '#1A3C6E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
@@ -157,9 +157,9 @@ function GridCard() {
       ctx.fillStyle = '#5DCAA5'
       ctx.beginPath(); ctx.arc(CW - 240, CH - 46, 10, 0, Math.PI * 2); ctx.fill()
       ctx.fillStyle = '#5DCAA5'; ctx.font = 'bold 22px system-ui'
-      ctx.fillText('CareerSeal Verified', CW - 220, CH - 38)
+      ctx.fillText('GRID Verified', CW - 220, CH - 38)
       ctx.fillStyle = 'rgba(255,255,255,0.2)'; ctx.font = '16px system-ui'; ctx.textAlign = 'right'
-      ctx.fillText('careerseal.in', CW - 50, CH - 38)
+      ctx.fillText('thegridcard.com', CW - 50, CH - 38)
 
       // Fold line
       ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.font = '14px system-ui'; ctx.textAlign = 'center'
@@ -191,7 +191,7 @@ function GridCard() {
       ctx.strokeStyle = 'rgba(13,115,119,0.5)'; ctx.lineWidth = 1
       drawRR(60, BY + 356, 580, 56, 10); ctx.stroke()
       ctx.fillStyle = '#5DCAA5'; ctx.font = 'bold 18px system-ui'
-      ctx.fillText(`careerseal.in/profile/${gridCard?.gridNumber || ''}`, 80, BY + 390)
+      ctx.fillText(`thegridcard.com/profile/${gridCard?.gridNumber || ''}`, 80, BY + 390)
 
       const qrDataUrl = await QRCode.toDataURL(profileUrl, {
         width: 300, margin: 2,
@@ -207,7 +207,7 @@ function GridCard() {
       ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize)
 
       const link = document.createElement('a')
-      link.download = `CareerSeal-GRID-${gridCard?.gridNumber || 'card'}.png`
+      link.download = `GRID-Card-${gridCard?.gridNumber || 'card'}.png`
       link.href = canvas.toDataURL('image/png', 1.0); link.click()
     } catch (err) { console.error('Download error:', err) }
     finally { setDownloading(false) }
@@ -238,7 +238,7 @@ function GridCard() {
       <div style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
           <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <span style={{ color: 'white', fontWeight: '700', fontSize: 'clamp(12px, 3.5vw, 16px)' }}>CareerSeal</span>
+          <span style={{ color: 'white', fontWeight: '700', fontSize: 'clamp(12px, 3.5vw, 16px)' }}>GRID</span>
         </div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
           <button onClick={() => navigate('/dashboard')} style={{ background: 'none', border: 'none', color: 'rgba(255,255,255,0.5)', cursor: 'pointer', fontSize: '13px' }}>Dashboard</button>
@@ -278,7 +278,7 @@ function GridCard() {
           >
             <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(13,115,119,0.15)', transform: 'translate(40px,-40px)' }}></div>
 
-            {/* Row 1 — CareerSeal brand + GRID CARD */}
+            {/* Row 1 — GRID brand + GRID CARD */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                 <svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>

@@ -172,7 +172,7 @@ function ProfileDetails() {
       <div className="bg-[#1A3C6E] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <h1 className="text-white font-bold text-lg">CareerSeal</h1>
+          <h1 className="text-white font-bold text-lg">GRID</h1>
         </div>
         <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white">← Dashboard</button>
           <button onClick={() => navigate('/roadmap')} className="text-[#5DCAA5] text-sm font-bold hover:text-white transition-colors">AI Roadmap →</button>

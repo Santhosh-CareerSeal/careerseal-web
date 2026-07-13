@@ -8,7 +8,7 @@ const rl = readline.createInterface({ input: process.stdin, output: process.stdo
 const ask = (q) => new Promise(resolve => rl.question(q, resolve))
 
 const run = async () => {
-  console.log('\n=== Add a new College to CareerSeal ===\n')
+  console.log('\n=== Add a new College to GRID ===\n')
   const collegeName = await ask('College name: ')
   const city = await ask('City: ')
   const state = await ask('State: ')

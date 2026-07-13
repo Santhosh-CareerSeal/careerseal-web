@@ -45,10 +45,10 @@ function RegisterStudent() {
         <div className="relative z-10">
           <div className="flex items-center gap-2 mb-12">
             <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-            <span className="text-white font-bold text-xl">CareerSeal</span>
+            <span className="text-white font-bold text-xl">GRID</span>
           </div>
           <h2 className="text-white text-2xl font-bold mb-4">Your verified career identity starts here</h2>
-          <p className="text-white/60 text-sm mb-8">Join thousands of students building their career with CareerSeal</p>
+          <p className="text-white/60 text-sm mb-8">Join thousands of students building their career with GRID</p>
           <div className="flex flex-col gap-3">
             {['GRID verified profile', 'AI career roadmap', 'Smart job matching', 'ATM-style GRID card'].map((f, i) => (
               <div key={i} className="flex items-center gap-3">

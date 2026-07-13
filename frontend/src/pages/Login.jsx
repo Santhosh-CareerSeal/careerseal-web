@@ -77,7 +77,7 @@ function Login() {
           {/* Logo */}
           <div className="flex items-center gap-2 mb-1">
             <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-            <h1 className="text-2xl font-bold text-[#1A3C6E]">CareerSeal</h1>
+            <h1 className="text-2xl font-bold text-[#1A3C6E]">GRID</h1>
           </div>
           <p className="text-gray-400 text-sm mb-8">Your career journey starts here</p>
 
@@ -145,7 +145,7 @@ function Login() {
           </div>
 
           <p className="text-center text-sm text-gray-500 mt-6">
-            New to CareerSeal?{' '}
+            New to GRID?{' '}
             <button onClick={() => navigate('/register')} className="text-[#0D7377] font-bold">Join now</button>
           </p>
 

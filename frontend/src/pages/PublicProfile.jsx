@@ -56,7 +56,7 @@ function PublicProfile() {
             <circle cx="11" cy="11" r="11" fill="#0D7377"/>
             <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </svg>
-          <span className="text-white font-bold text-lg">CareerSeal</span>
+          <span className="text-white font-bold text-lg">GRID</span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[#5DCAA5]"></div>
@@ -240,9 +240,9 @@ function PublicProfile() {
         <div className="bg-[#1A3C6E] rounded-2xl p-5 text-center">
           <div className="flex items-center justify-center gap-2 mb-2">
             <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-            <span className="text-white font-bold text-sm">CareerSeal</span>
+            <span className="text-white font-bold text-sm">GRID</span>
           </div>
-          <p className="text-white/50 text-xs mb-1">This profile is verified by CareerSeal</p>
+          <p className="text-white/50 text-xs mb-1">This profile is verified by GRID</p>
           <p className="text-[#5DCAA5] text-xs font-bold">{profile.gridNumber}</p>
         </div>
 

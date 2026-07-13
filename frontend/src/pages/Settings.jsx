@@ -61,7 +61,7 @@ function Settings() {
   }
 
   const handleDeleteAccount = async () => {
-    if (!window.confirm('Are you sure? This will permanently delete your CareerSeal account, GRID card and all data.')) return
+    if (!window.confirm('Are you sure? This will permanently delete your GRID account, GRID card and all data.')) return
     if (!window.confirm('Final warning — this cannot be undone. Continue?')) return
     try {
       await axios.delete(`${API_URL}/api/auth/delete-account`, { headers })
@@ -165,7 +165,7 @@ function Settings() {
 
             <div className="bg-white rounded-2xl p-5 border border-red-100">
               <p className="text-sm font-bold text-red-500 mb-2">Danger Zone</p>
-              <p className="text-xs text-gray-400 mb-4">Permanently delete your account and all CareerSeal data. This cannot be undone.</p>
+              <p className="text-xs text-gray-400 mb-4">Permanently delete your account and all GRID data. This cannot be undone.</p>
               <button onClick={handleDeleteAccount} className="bg-red-50 text-red-500 border border-red-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-red-100 transition-colors">
                 Delete My Account
               </button>
@@ -244,7 +244,7 @@ function Settings() {
             </div>
             <div className="bg-blue-50 rounded-2xl p-4 border border-blue-100">
               <p className="text-sm font-bold text-[#1A3C6E] mb-1">🔒 Your data is safe</p>
-              <p className="text-xs text-gray-500 leading-relaxed">CareerSeal never sells your data. Government IDs are never shown publicly.</p>
+              <p className="text-xs text-gray-500 leading-relaxed">GRID never sells your data. Government IDs are never shown publicly.</p>
             </div>
           </div>
         )}
