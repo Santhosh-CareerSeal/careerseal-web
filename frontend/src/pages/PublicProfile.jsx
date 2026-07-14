@@ -8,6 +8,7 @@ function PublicProfile() {
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [copied, setCopied] = useState(false)
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -22,6 +23,22 @@ function PublicProfile() {
     }
     fetchProfile()
   }, [gridNumber])
+
+  const handleShare = async () => {
+    const shareUrl = `https://thegridcard.com/api/profile-preview?gridNumber=${gridNumber}`
+    const shareData = {
+      title: `${profile?.name} — Verified GRID Profile`,
+      text: `Check out ${profile?.name}'s verified GRID profile`,
+      url: shareUrl
+    }
+    if (navigator.share) {
+      try { await navigator.share(shareData) } catch (e) {}
+    } else {
+      await navigator.clipboard.writeText(shareUrl)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
   const skillsList = profile?.technicalSkills ? profile.technicalSkills.split(',').map(s => s.trim()) : []
@@ -80,6 +97,10 @@ function PublicProfile() {
           <p className="text-white/40 text-xs mb-1">GRID NUMBER</p>
           <p className="text-white font-bold text-sm tracking-widest">{profile.gridNumber}</p>
         </div>
+        <button onClick={handleShare} className="mt-3 flex items-center gap-2 bg-[#0D7377] text-white px-5 py-2.5 rounded-xl font-bold text-sm hover:bg-[#0a5a5e] transition-colors">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M4 12v8a2 2 0 002 2h12a2 2 0 002-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          {copied ? 'Link Copied!' : 'Share Profile'}
+        </button>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-4">

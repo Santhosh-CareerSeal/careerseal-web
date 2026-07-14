@@ -74,7 +74,8 @@ function GridCard() {
     const match = verifiedSkills.find(v => v.skill.toLowerCase() === skill.toLowerCase())
     return match && match.status === 'verified'
   })
-  const profileUrl = `https://careerseal-web.vercel.app/profile/${gridCard?.gridNumber || 'GRID'}`
+  const profileUrl = `https://thegridcard.com/profile/${gridCard?.gridNumber || 'GRID'}`
+  const shareUrl = `https://thegridcard.com/api/profile-preview?gridNumber=${gridCard?.gridNumber || 'GRID'}`
 
   const handleDownload = async () => {
     setDownloading(true)
