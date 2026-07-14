@@ -25,7 +25,7 @@ function PublicProfile() {
   }, [gridNumber])
 
   const handleShare = async () => {
-    const shareUrl = `https://thegridcard.com/api/profile-preview?gridNumber=${gridNumber}`
+    const shareUrl = `${API_URL}/share/${gridNumber}`
     const shareData = {
       title: `${profile?.name} — Verified GRID Profile`,
       text: `Check out ${profile?.name}'s verified GRID profile`,
