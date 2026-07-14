@@ -151,6 +151,20 @@ const forgotPassword = async (req, res) => {
 }
 
 // RESET PASSWORD — verify OTP + set new password
+const verifyResetOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    if (!user.otp || !user.otpExpiry) return res.status(400).json({ message: 'No reset code found. Please request a new one.' })
+    if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
+    if (user.otp !== otp.toString()) return res.status(400).json({ message: 'Invalid code. Please try again.' })
+    res.json({ message: 'Code verified', valid: true })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body
@@ -244,4 +258,4 @@ const resendVerification = async (req, res) => {
   }
 }
 
-module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification }
+module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, verifyResetOtp, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification }

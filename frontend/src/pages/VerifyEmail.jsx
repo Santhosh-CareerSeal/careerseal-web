@@ -67,6 +67,8 @@ function VerifyEmail() {
         setSuccess('Email verified! Setting up your profile...')
         setTimeout(() => navigate('/profile-details'), 1500)
       } else if (mode === 'forgot') {
+        // Validate the OTP with the backend BEFORE proceeding
+        await axios.post(`${API_URL}/api/auth/verify-reset-otp`, { email, otp: code })
         setSuccess('Code verified! Set your new password.')
         setTimeout(() => navigate('/reset-password', { state: { email, otp: code } }), 1500)
       }

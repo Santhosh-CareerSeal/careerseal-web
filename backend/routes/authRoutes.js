@@ -6,7 +6,7 @@ const loginLimiter = rateLimit({
   message: { message: 'Too many login attempts. Try again in 15 minutes.' }
 })
 const router = express.Router()
-const { initiateSignup, verifyAndCreateAccount, login, forgotPassword, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification } = require('../controllers/authController')
+const { initiateSignup, verifyAndCreateAccount, login, forgotPassword, verifyResetOtp, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification } = require('../controllers/authController')
 const { protect } = require('../middleware/authMiddleware')
 
 router.post('/signup/initiate', initiateSignup)
@@ -18,6 +18,7 @@ router.put('/change-password', protect, changePassword)
 router.delete('/delete-account', protect, deleteAccount)
 router.post('/logout', protect, logout)
 
+router.post('/verify-reset-otp', verifyResetOtp)
 router.get('/verify-email-link', verifyEmailLink)
 router.post('/resend-verification', resendVerification)
 
