@@ -51,9 +51,31 @@ export default function CollegePortal() {
   const [loading, setLoading] = useState(true)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
+  const [currentPassword, setCurrentPassword] = useState('')
+  const [newPassword, setNewPassword] = useState('')
+  const [confirmPassword, setConfirmPassword] = useState('')
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwLoading, setPwLoading] = useState(false)
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
+
+  const handleChangePassword = async () => {
+    setPwMsg('')
+    if (!currentPassword || !newPassword || !confirmPassword) { setPwMsg('Please fill all fields'); return }
+    if (newPassword.length < 6) { setPwMsg('New password must be at least 6 characters'); return }
+    if (newPassword !== confirmPassword) { setPwMsg('New passwords do not match'); return }
+    setPwLoading(true)
+    try {
+      const res = await axios.post(`${API_URL}/api/college/change-password`, { currentPassword, newPassword }, { headers })
+      setPwMsg(res.data.message || 'Password updated!')
+      setCurrentPassword(''); setNewPassword(''); setConfirmPassword('')
+    } catch (err) {
+      setPwMsg(err.response?.data?.message || 'Failed to update password')
+    } finally {
+      setPwLoading(false)
+    }
+  }
 
   useEffect(() => {
     const init = async () => {
@@ -356,9 +378,11 @@ export default function CollegePortal() {
             <div style={{ background: 'white', borderRadius: '14px', padding: '20px', border: '1px solid #eee' }}>
               <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 12px' }}>Change Password</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input type="password" placeholder="New password" style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
-                <input type="password" placeholder="Confirm new password" style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
-                <button style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Update Password</button>
+                <input type="password" placeholder="Current password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                <input type="password" placeholder="New password" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                <input type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                {pwMsg && <p style={{ fontSize: '12px', color: pwMsg.includes('success') || pwMsg.includes('updated') ? '#0D7377' : '#dc2626', margin: '2px 0' }}>{pwMsg}</p>}
+                <button onClick={handleChangePassword} disabled={pwLoading} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: pwLoading ? 0.6 : 1 }}>{pwLoading ? 'Updating...' : 'Update Password'}</button>
               </div>
             </div>
           </div>

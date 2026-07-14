@@ -28,4 +28,23 @@ const collegeLogin = async (req, res) => {
   }
 }
 
-module.exports = { collegeLogin }
+const changeCollegePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    const userId = req.user.userId
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' })
+    }
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user || user.role !== 'college') return res.status(404).json({ message: 'College account not found' })
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash)
+    if (!isMatch) return res.status(400).json({ message: 'Current password is incorrect' })
+    const passwordHash = await bcrypt.hash(newPassword, 10)
+    await prisma.user.update({ where: { id: userId }, data: { passwordHash } })
+    res.json({ message: 'Password updated successfully!' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { collegeLogin, changeCollegePassword }
