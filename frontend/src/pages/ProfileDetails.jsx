@@ -1,4 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
+import Cropper from 'react-easy-crop'
+import getCroppedImg from '../utils/cropImage'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
@@ -21,6 +23,11 @@ function ProfileDetails() {
   const [emailVerified, setEmailVerified] = useState(true)
   const [resendMsg, setResendMsg] = useState('')
   const [photoFile, setPhotoFile] = useState(null)
+  const [cropModalOpen, setCropModalOpen] = useState(false)
+  const [imageToCrop, setImageToCrop] = useState(null)
+  const [crop, setCrop] = useState({ x: 0, y: 0 })
+  const [zoom, setZoom] = useState(1)
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [updatesRemaining, setUpdatesRemaining] = useState(3)
 
@@ -109,7 +116,48 @@ function ProfileDetails() {
 
   const handlePhotoChange = (e) => {
     const file = e.target.files[0]
-    if (file) { setPhotoFile(file); setPhotoPreview(URL.createObjectURL(file)) }
+    if (file) {
+      // Validate before opening cropper
+      const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+      if (!allowedTypes.includes(file.type)) {
+        setError('Only JPG, PNG, or WEBP images are allowed')
+        return
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError('Image must be smaller than 5MB')
+        return
+      }
+      setError('')
+      setImageToCrop(URL.createObjectURL(file))
+      setCropModalOpen(true)
+    }
+    e.target.value = '' // reset so same file can be re-selected
+  }
+
+  const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
+    setCroppedAreaPixels(croppedAreaPixels)
+  }, [])
+
+  const handleCropSave = async () => {
+    try {
+      const { file, url } = await getCroppedImg(imageToCrop, croppedAreaPixels)
+      setPhotoFile(file)
+      setPhotoPreview(url)
+      setCropModalOpen(false)
+      setImageToCrop(null)
+      setZoom(1)
+      setCrop({ x: 0, y: 0 })
+    } catch (e) {
+      setError('Could not crop image. Please try another.')
+      setCropModalOpen(false)
+    }
+  }
+
+  const handleCropCancel = () => {
+    setCropModalOpen(false)
+    setImageToCrop(null)
+    setZoom(1)
+    setCrop({ x: 0, y: 0 })
   }
 
   const uploadPhoto = async () => {
@@ -183,6 +231,47 @@ function ProfileDetails() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {cropModalOpen && (
+        <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden">
+            <div className="p-4 border-b border-gray-100">
+              <h3 className="font-bold text-[#1A3C6E] text-lg">Adjust your photo</h3>
+              <p className="text-xs text-gray-400">Drag to reposition, pinch or slide to zoom</p>
+            </div>
+            <div className="relative w-full" style={{ height: '320px', background: '#1a1a1a' }}>
+              <Cropper
+                image={imageToCrop}
+                crop={crop}
+                zoom={zoom}
+                aspect={1}
+                cropShape="round"
+                showGrid={false}
+                onCropChange={setCrop}
+                onZoomChange={setZoom}
+                onCropComplete={onCropComplete}
+              />
+            </div>
+            <div className="p-4">
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-xs text-gray-400">Zoom</span>
+                <input type="range" min={1} max={3} step={0.1} value={zoom}
+                  onChange={(e) => setZoom(Number(e.target.value))}
+                  className="flex-1 accent-[#0D7377]" />
+              </div>
+              <div className="flex gap-3">
+                <button onClick={handleCropCancel}
+                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 font-bold text-sm hover:bg-gray-50">
+                  Cancel
+                </button>
+                <button onClick={handleCropSave}
+                  className="flex-1 py-2.5 rounded-xl bg-[#1A3C6E] text-white font-bold text-sm hover:bg-[#0D7377]">
+                  Save Photo
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="bg-[#1A3C6E] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
