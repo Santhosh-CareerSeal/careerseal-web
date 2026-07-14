@@ -59,10 +59,10 @@ const postJob = async (req, res) => {
     const userId = req.user.userId
     const company = await prisma.company.findUnique({ where: { userId } })
     if (!company) return res.status(404).json({ message: 'Company not found' })
-    const { title, description, requiredSkills, jobType, experienceLevel, location, salaryRange, openings, deadline } = req.body
+    const { title, description, requiredSkills, jobType, experienceLevel, location, salaryRange, openings, deadline, targetCollegeId } = req.body
     if (!title) return res.status(400).json({ message: 'Job title is required' })
     const job = await prisma.job.create({
-      data: { title, description, requiredSkills, jobType, experienceLevel, location, salaryRange, openings: parseInt(openings) || 1, deadline, companyId: company.id, status: 'active' }
+      data: { title, description, requiredSkills, jobType, experienceLevel, location, salaryRange, openings: parseInt(openings) || 1, deadline, companyId: company.id, status: 'active', targetCollegeId: targetCollegeId ? parseInt(targetCollegeId) : null }
     })
     res.status(201).json({ message: 'Job posted successfully', job })
   } catch (error) {

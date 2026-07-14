@@ -25,7 +25,20 @@ const createJob = async (req, res) => {
 
 const getAllJobs = async (req, res) => {
   try {
+    // Find the student's college (if logged in as student)
+    let studentCollegeId = null
+    if (req.user && req.user.userId) {
+      const student = await prisma.student.findUnique({ where: { userId: req.user.userId }, select: { collegeId: true } })
+      studentCollegeId = student ? student.collegeId : null
+    }
+    // Show jobs that are open to all (targetCollegeId null) OR target the student's college
     const jobs = await prisma.job.findMany({
+      where: {
+        OR: [
+          { targetCollegeId: null },
+          ...(studentCollegeId ? [{ targetCollegeId: studentCollegeId }] : [])
+        ]
+      },
       include: { company: true },
       orderBy: { createdAt: 'desc' }
     })

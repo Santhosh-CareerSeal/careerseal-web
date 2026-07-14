@@ -56,6 +56,7 @@ export default function CollegePortal() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
+  const [targetedJobs, setTargetedJobs] = useState([])
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
@@ -94,6 +95,10 @@ export default function CollegePortal() {
         setStudents(studentsRes.data.students || [])
         setAnalytics(analyticsRes.data)
       } catch (e) {
+        try {
+          const jobsRes = await axios.get(`${API_URL}/api/college/jobs`, { headers })
+          setTargetedJobs(jobsRes.data.jobs || [])
+        } catch (e) { setTargetedJobs([]) }
         navigate('/college-login')
       } finally {
         setLoading(false)
@@ -243,15 +248,35 @@ export default function CollegePortal() {
           <div>
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Job Postings</p>
             <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>Jobs posted by companies specifically targeting your college students</p>
-            <div style={{ background: 'white', borderRadius: '14px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
-              <p style={{ fontSize: '36px', marginBottom: '12px' }}>💼</p>
-              <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', marginBottom: '6px' }}>No targeted job postings yet</p>
-              <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>Once companies post jobs targeting {college?.collegeName}, they'll appear here. Share your GRID profile with companies to get noticed.</p>
-              <div style={{ background: '#f0f4ff', borderRadius: '12px', padding: '14px', maxWidth: '360px', margin: '0 auto' }}>
-                <p style={{ fontSize: '12px', color: '#1A3C6E', fontWeight: '600', margin: '0 0 4px' }}>Coming soon</p>
-                <p style={{ fontSize: '11px', color: '#6b7280', margin: 0 }}>Companies will be able to post jobs exclusively for your institution. Contact your GRID account manager to set this up.</p>
+            {targetedJobs.length === 0 ? (
+              <div style={{ background: 'white', borderRadius: '14px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
+                <p style={{ fontSize: '36px', marginBottom: '12px' }}>💼</p>
+                <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', marginBottom: '6px' }}>No targeted job postings yet</p>
+                <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>Once companies post jobs targeting {college?.collegeName}, they'll appear here.</p>
               </div>
-            </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {targetedJobs.map(job => (
+                  <div key={job.id} style={{ background: 'white', borderRadius: '14px', padding: '18px', border: '1px solid #eee' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ fontSize: '15px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 3px' }}>{job.title}</p>
+                        <p style={{ fontSize: '12px', color: '#0D7377', fontWeight: '600', margin: '0 0 6px' }}>{job.company?.companyName || 'Company'}</p>
+                        <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>{job.jobType || ''}{job.location ? ' · ' + job.location : ''}{job.salaryRange ? ' · ' + job.salaryRange : ''}</p>
+                      </div>
+                      <span style={{ fontSize: '11px', fontWeight: '700', background: '#E1F5EE', color: '#085041', padding: '4px 10px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{job.applications?.length || 0} applied</span>
+                    </div>
+                    {job.requiredSkills && (
+                      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px', marginTop: '10px' }}>
+                        {job.requiredSkills.split(',').slice(0, 5).map((s, i) => (
+                          <span key={i} style={{ fontSize: '10px', background: '#f0f4ff', color: '#1A3C6E', padding: '3px 8px', borderRadius: '6px' }}>{s.trim()}</span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 

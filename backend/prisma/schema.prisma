@@ -133,6 +133,7 @@ model Job {
   openings        Int?          @default(1)
   deadline        String?
   status          String?       @default("active")
+  targetCollegeId Int?
   createdAt       DateTime?     @default(now()) @db.Timestamp(6)
   applications    Application[]
   company         Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)

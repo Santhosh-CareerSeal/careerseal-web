@@ -168,4 +168,20 @@ const getCollegeSuggestions = async (req, res) => {
   }
 }
 
-module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions }
+const getCollegeJobs = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const college = await prisma.college.findUnique({ where: { userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const jobs = await prisma.job.findMany({
+      where: { targetCollegeId: college.id },
+      include: { company: { select: { companyName: true, industry: true } }, applications: true },
+      orderBy: { createdAt: 'desc' }
+    })
+    res.json({ jobs })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs }

@@ -82,9 +82,10 @@ export default function CompanyDashboard() {
   const [analytics, setAnalytics] = useState(null)
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
+  const [colleges, setColleges] = useState([])
 
   // Post job form
-  const [jobForm, setJobForm] = useState({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '' })
+  const [jobForm, setJobForm] = useState({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '', targetCollegeId: '' })
   const [jobError, setJobError] = useState('')
   const [jobSuccess, setJobSuccess] = useState('')
   const [jobLoading, setJobLoading] = useState(false)
@@ -121,6 +122,10 @@ export default function CompanyDashboard() {
         setJobs(jobsRes.data.jobs || [])
         setCandidates(candidatesRes.data.applications || [])
         setAnalytics(analyticsRes.data)
+        try {
+          const collegeRes = await axios.get(`${API_URL}/api/college/list`)
+          setColleges(collegeRes.data.colleges || collegeRes.data || [])
+        } catch (e) { setColleges([]) }
         setProfileForm({
           companyName: profileRes.data.company.companyName || '',
           description: profileRes.data.company.description || '',
@@ -150,7 +155,7 @@ export default function CompanyDashboard() {
     try {
       await axios.post(`${API_URL}/api/company/jobs`, jobForm, { headers })
       setJobSuccess('Job posted successfully!')
-      setJobForm({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '' })
+      setJobForm({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '', targetCollegeId: '' })
       const jobsRes = await axios.get(`${API_URL}/api/company/jobs`, { headers })
       setJobs(jobsRes.data.jobs || [])
       setTimeout(() => { setActive('my-jobs'); setJobSuccess('') }, 1500)
@@ -348,6 +353,15 @@ export default function CompanyDashboard() {
                 <input value={jobForm.requiredSkills} onChange={e => setJobForm({ ...jobForm, requiredSkills: e.target.value })} placeholder="e.g. React, Node.js, Python (comma separated)"
                   style={{ width: '100%', border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
                 <p style={{ fontSize: '10px', color: '#9ca3af', margin: '4px 0 0' }}>These are used for smart candidate matching</p>
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', fontWeight: '700', color: '#6b7280', display: 'block', marginBottom: '6px' }}>TARGET COLLEGE (OPTIONAL)</label>
+                <select value={jobForm.targetCollegeId} onChange={e => setJobForm({ ...jobForm, targetCollegeId: e.target.value })}
+                  style={{ width: '100%', border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui', background: 'white' }}>
+                  <option value="">Open to all colleges</option>
+                  {colleges.map(c => <option key={c.id} value={c.id}>{c.collegeName}</option>)}
+                </select>
+                <p style={{ fontSize: '10px', color: '#9ca3af', margin: '4px 0 0' }}>Target a specific partner college, or leave open to all students</p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
