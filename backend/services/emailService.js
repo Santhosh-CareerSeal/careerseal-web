@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 const sendOTPEmail = async (email, name, otp) => {
   try {
     await resend.emails.send({
-      from: 'GRID <onboarding@resend.dev>',
+      from: 'GRID <noreply@thegridcard.com>',
       to: email,
       subject: `${otp} is your GRID verification code`,
       html: `
@@ -33,12 +33,11 @@ const sendOTPEmail = async (email, name, otp) => {
   }
 }
 
-module.exports = { sendOTPEmail }
 
 const sendPasswordResetEmail = async (email, name, otp) => {
   try {
     await resend.emails.send({
-      from: 'GRID <onboarding@resend.dev>',
+      from: 'GRID <noreply@thegridcard.com>',
       to: email,
       subject: `${otp} — Reset your GRID password`,
       html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#f8f9fa;border-radius:16px;"><div style="background:white;border-radius:12px;padding:32px;text-align:center;"><h2 style="color:#1A3C6E;margin:0 0 8px;">Reset your password</h2><p style="color:#6b7280;margin:0 0 24px;">Hi ${name}, use this code to reset your password:</p><div style="background:#fff0f0;border:2px dashed #dc2626;border-radius:12px;padding:20px;margin:0 0 24px;"><p style="font-size:40px;font-weight:700;color:#dc2626;letter-spacing:10px;margin:0;">${otp}</p></div><p style="color:#9ca3af;font-size:13px;margin:0;">This code expires in <strong>10 minutes</strong>. Do not share it with anyone.</p></div><p style="color:#9ca3af;font-size:12px;text-align:center;margin-top:24px;">If you didn't request a password reset, ignore this email.</p></div>`
@@ -50,4 +49,23 @@ const sendPasswordResetEmail = async (email, name, otp) => {
   }
 }
 
-module.exports = { sendOTPEmail, sendPasswordResetEmail }
+
+const sendVerificationEmail = async (email, name, token) => {
+  try {
+    const verifyUrl = `${process.env.FRONTEND_URL || 'https://thegridcard.com'}/verify-email-link?token=${token}`
+    await resend.emails.send({
+      from: 'GRID <noreply@thegridcard.com>',
+      to: email,
+      subject: 'Verify your GRID account',
+      html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#f8f9fa;border-radius:16px;"><div style="background:white;border-radius:12px;padding:32px;text-align:center;"><h2 style="color:#1A3C6E;margin:0 0 8px;">Welcome to GRID, ${name}!</h2><p style="color:#6b7280;margin:0 0 24px;">Click the button below to verify your email and unlock your verified badge.</p><a href="${verifyUrl}" style="display:inline-block;background:#0D7377;color:white;text-decoration:none;padding:14px 32px;border-radius:12px;font-weight:700;font-size:15px;">Verify My Email →</a><p style="color:#9ca3af;font-size:13px;margin:24px 0 0;">Or paste this link in your browser:<br><span style="color:#0D7377;word-break:break-all;">${verifyUrl}</span></p></div><p style="color:#9ca3af;font-size:12px;text-align:center;margin-top:24px;">If you didn't create a GRID account, ignore this email.</p></div>`
+    })
+    return true
+  } catch (error) {
+    console.error('Verification email error:', error)
+    return false
+  }
+}
+
+
+
+module.exports = { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail }

@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { PrismaClient } = require('@prisma/client')
-const { sendOTPEmail, sendPasswordResetEmail } = require('../services/emailService')
+const { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService')
 const { validateEmail, validateIndianMobile } = require('../utils/emailValidator')
 const prisma = new PrismaClient()
 
@@ -24,10 +24,15 @@ const initiateSignup = async (req, res) => {
     if (existingUser) return res.status(400).json({ message: 'An account with this email already exists' })
 
     const passwordHash = await bcrypt.hash(password, 10)
+    const crypto = require('crypto')
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+
     const user = await prisma.user.create({
       data: {
         name, email, passwordHash,
         role: role || 'student',
+        emailVerified: false,
+        verificationToken,
         student: (role === 'student' || !role) ? {
           create: { contactNumber: mobile || null, workStatus: workStatus || null, profileComplete: false }
         } : undefined,
@@ -37,12 +42,15 @@ const initiateSignup = async (req, res) => {
       }
     })
 
+    // Send verification link email (non-blocking - account already created)
+    await sendVerificationEmail(email, name, verificationToken)
+
     const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
     res.status(201).json({
-      message: 'Account created successfully!',
+      message: 'Account created! Please check your email to verify.',
       token,
       email: user.email,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, emailVerified: false }
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -202,4 +210,38 @@ const logout = async (req, res) => {
   }
 }
 
-module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, resetPassword, changePassword, deleteAccount, logout }
+const verifyEmailLink = async (req, res) => {
+  try {
+    const { token } = req.query
+    if (!token) return res.status(400).json({ message: 'Verification token is missing' })
+    const user = await prisma.user.findFirst({ where: { verificationToken: token } })
+    if (!user) return res.status(400).json({ message: 'Invalid or expired verification link' })
+    if (user.emailVerified) return res.json({ message: 'Email already verified!', alreadyVerified: true })
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { emailVerified: true, verificationToken: null }
+    })
+    res.json({ message: 'Email verified successfully!', verified: true })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Resend verification link
+const resendVerification = async (req, res) => {
+  try {
+    const { email } = req.body
+    const user = await prisma.user.findUnique({ where: { email } })
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    if (user.emailVerified) return res.status(400).json({ message: 'Email already verified' })
+    const crypto = require('crypto')
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    await prisma.user.update({ where: { id: user.id }, data: { verificationToken } })
+    await sendVerificationEmail(email, user.name, verificationToken)
+    res.json({ message: 'Verification email sent!' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification }

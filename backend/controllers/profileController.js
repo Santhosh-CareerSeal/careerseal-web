@@ -12,7 +12,8 @@ const getProfileDetails = async (req, res) => {
       student.passportNumber = decrypt(student.passportNumber)
       student.contactNumber = decrypt(student.contactNumber)
     }
-    res.json({ student })
+    const user = await prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true } })
+    res.json({ student, emailVerified: user?.emailVerified || false })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }

@@ -18,6 +18,8 @@ function ProfileDetails() {
   const [colleges, setColleges] = useState([])
   const [gridMsg, setGridMsg] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
+  const [emailVerified, setEmailVerified] = useState(true)
+  const [resendMsg, setResendMsg] = useState('')
   const [photoFile, setPhotoFile] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [updatesRemaining, setUpdatesRemaining] = useState(3)
@@ -39,6 +41,17 @@ function ProfileDetails() {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
+  const handleResendVerification = async () => {
+    setResendMsg('Sending...')
+    try {
+      const user = JSON.parse(localStorage.getItem('user') || '{}')
+      await axios.post(`${API_URL}/api/auth/resend-verification`, { email: user.email })
+      setResendMsg('Verification email sent! Check your inbox.')
+    } catch (err) {
+      setResendMsg(err.response?.data?.message || 'Failed to send. Try again.')
+    }
+  }
+
   useEffect(() => {
     const fetch = async () => {
       setLoading(true)
@@ -46,6 +59,7 @@ function ProfileDetails() {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
         const res = await axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } })
+        setEmailVerified(res.data.emailVerified || false)
         const s = res.data.student
         if (s) {
           setForm(f => ({
@@ -481,8 +495,19 @@ function ProfileDetails() {
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Verification status</p>
                 <div className="flex flex-col gap-3">
                   <div className="flex items-center justify-between">
-                    <div><p className="text-sm font-bold text-gray-700">Email</p><p className="text-xs text-gray-400">Verified at registration</p></div>
-                    <span className="text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-800">✓ Done</span>
+                    <div>
+                      <p className="text-sm font-bold text-gray-700">Email</p>
+                      <p className="text-xs text-gray-400">{emailVerified ? 'Your email is verified' : 'Check your inbox for the verification link'}</p>
+                      {!emailVerified && (
+                        <button onClick={handleResendVerification} className="text-xs text-[#0D7377] font-bold underline mt-1">Resend verification email</button>
+                      )}
+                      {resendMsg && <p className="text-xs text-[#0D7377] mt-1">{resendMsg}</p>}
+                    </div>
+                    {emailVerified ? (
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-800">✓ Verified</span>
+                    ) : (
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800">Pending</span>
+                    )}
                   </div>
                   <div className="flex items-center justify-between">
                     <div><p className="text-sm font-bold text-gray-700">Aadhaar eKYC</p><p className="text-xs text-gray-400">Real integration coming soon</p></div>
