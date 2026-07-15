@@ -30,6 +30,15 @@ function Onboarding() {
         <button onClick={() => navigate('/login')} className="border-2 border-white/30 text-white py-4 rounded-2xl text-lg font-bold hover:border-white transition-colors">
           I already have an account
         </button>
+        <div className="flex items-center justify-center gap-4 mt-2">
+          <button onClick={() => navigate('/college-login')} className="text-white/40 text-xs hover:text-[#0D7377] transition-colors">
+            For Colleges →
+          </button>
+          <span className="text-white/20 text-xs">·</span>
+          <button onClick={() => navigate('/register-company')} className="text-white/40 text-xs hover:text-[#0D7377] transition-colors">
+            For Companies →
+          </button>
+        </div>
       </div>
     </div>
   )

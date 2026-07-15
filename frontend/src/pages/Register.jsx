@@ -79,6 +79,10 @@ function Register() {
           Already have an account?{' '}
           <span className="text-[#5DCAA5] font-bold cursor-pointer" onClick={() => navigate('/login')}>Sign in</span>
         </p>
+        <p className="text-white/25 text-xs text-center mt-3">
+          Are you a college?{' '}
+          <span className="text-white/50 font-bold cursor-pointer hover:text-[#5DCAA5] transition-colors" onClick={() => navigate('/college-login')}>College login →</span>
+        </p>
       </div>
     </div>
   )

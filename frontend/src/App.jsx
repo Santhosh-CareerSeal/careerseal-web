@@ -20,6 +20,8 @@ import VerifyEmail from './pages/VerifyEmail'
 import ForgotPassword from './pages/ForgotPassword'
 import Legal from './pages/Legal'
 import VerifyEmailLink from './pages/VerifyEmailLink'
+import AdminLogin from './pages/AdminLogin'
+import AdminPanel from './pages/AdminPanel'
 import ResetPassword from './pages/ResetPassword'
 import CollegePortal from './pages/CollegePortal'
 import NotFound from './pages/NotFound'
@@ -51,6 +53,8 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/privacy" element={<Legal />} />
         <Route path="/verify-email-link" element={<VerifyEmailLink />} />
+        <Route path="/admin-login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminPanel />} />
         <Route path="/terms" element={<Legal />} />
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/college-portal" element={<CollegePortal />} />
