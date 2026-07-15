@@ -1,5 +1,7 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const { OAuth2Client } = require('google-auth-library')
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 const { PrismaClient } = require('@prisma/client')
 const { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService')
 const { validateEmail, validateIndianMobile } = require('../utils/emailValidator')
@@ -258,4 +260,58 @@ const resendVerification = async (req, res) => {
   }
 }
 
-module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, verifyResetOtp, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification }
+const googleAuth = async (req, res) => {
+  try {
+    const { credential, googleUser, role } = req.body
+    if (!credential) return res.status(400).json({ message: 'No Google credential provided' })
+
+    // Verify the access token by calling Google's userinfo endpoint
+    let email, name
+    try {
+      const https = require('https')
+      const verifyRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+        headers: { Authorization: 'Bearer ' + credential }
+      })
+      const gUser = await verifyRes.json()
+      if (!gUser || !gUser.email) return res.status(400).json({ message: 'Could not verify Google account' })
+      email = gUser.email
+      name = gUser.name || email.split('@')[0]
+    } catch (verifyErr) {
+      return res.status(400).json({ message: 'Google verification failed' })
+    }
+
+    // Check if user exists
+    let user = await prisma.user.findUnique({ where: { email } })
+
+    if (!user) {
+      // Create new account (Google users are auto-verified since Google verified their email)
+      const crypto = require('crypto')
+      const randomPassword = crypto.randomBytes(32).toString('hex')
+      const passwordHash = await bcrypt.hash(randomPassword, 10)
+      user = await prisma.user.create({
+        data: {
+          name, email, passwordHash,
+          role: role || 'student',
+          emailVerified: true,
+          student: (role === 'student' || !role) ? {
+            create: { profileComplete: false }
+          } : undefined,
+          company: role === 'company' ? {
+            create: { companyName: name, mcaStatus: 'pending' }
+          } : undefined
+        }
+      })
+    }
+
+    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    res.json({
+      message: 'Google sign-in successful',
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, emailVerified: user.emailVerified }
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Google authentication failed', error: error.message })
+  }
+}
+
+module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, verifyResetOtp, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification , googleAuth }

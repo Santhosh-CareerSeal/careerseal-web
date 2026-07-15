@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
@@ -29,7 +30,29 @@ function RegisterStudent() {
     }
   }
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      setConnecting('Google')
+      setError('')
+      try {
+        const res = await axios.post(`${API_URL}/api/auth/google`, {
+          credential: tokenResponse.access_token,
+          role: 'student'
+        })
+        localStorage.setItem('token', res.data.token)
+        localStorage.setItem('user', JSON.stringify(res.data.user))
+        navigate('/profile-details')
+      } catch (err) {
+        setError(err.response?.data?.message || 'Google sign-up failed')
+      } finally {
+        setConnecting(null)
+      }
+    },
+    onError: () => { setError('Google sign-up was cancelled or failed'); setConnecting(null) }
+  })
+
   const handleOAuth = (provider) => {
+    if (provider === 'Google') { googleLogin(); return }
     setConnecting(provider)
     setTimeout(() => { setConnecting(null); setError(`${provider} sign-up is coming soon`) }, 1200)
   }
