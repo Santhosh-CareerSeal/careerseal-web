@@ -64,22 +64,4 @@ const updateGridProfile = async (req, res) => {
   }
 }
 
-const mockVerifyAadhaar = async (req, res) => {
-  try {
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    res.json({ verified: true, message: 'Aadhaar verified successfully (Mock)' })
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message })
-  }
-}
-
-const mockVerifyDigiLocker = async (req, res) => {
-  try {
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    res.json({ verified: true, message: 'DigiLocker documents verified successfully (Mock)' })
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message })
-  }
-}
-
-module.exports = { getGridCard, updateGridProfile, mockVerifyAadhaar, mockVerifyDigiLocker }
+module.exports = { getGridCard, updateGridProfile }
