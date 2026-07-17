@@ -282,4 +282,30 @@ const getAdminApplications = async (req, res) => {
   }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications }
+// Admin changes their own password
+const changeAdminPassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+    const userId = req.user.userId
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current and new password are required' })
+    }
+    if (newPassword.length < 8) {
+      return res.status(400).json({ message: 'Admin password must be at least 8 characters' })
+    }
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user || user.role !== 'admin') return res.status(403).json({ message: 'Admin access required' })
+    const isMatch = await bcrypt.compare(currentPassword, user.passwordHash)
+    if (!isMatch) return res.status(400).json({ message: 'Current password is incorrect' })
+    if (currentPassword === newPassword) {
+      return res.status(400).json({ message: 'New password must be different from the current one' })
+    }
+    const passwordHash = await bcrypt.hash(newPassword, 10)
+    await prisma.user.update({ where: { id: userId }, data: { passwordHash } })
+    res.json({ message: 'Password updated successfully!' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword }

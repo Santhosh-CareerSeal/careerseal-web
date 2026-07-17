@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly } = require('../middleware/adminMiddleware')
 
@@ -15,6 +15,7 @@ router.patch('/colleges/:collegeId/vetted', protect, adminOnly, toggleCollegeVet
 router.get('/users', protect, adminOnly, getAdminUsers)
 router.get('/companies', protect, adminOnly, getAdminCompanies)
 router.get('/applications', protect, adminOnly, getAdminApplications)
+router.post('/change-password', protect, adminOnly, changeAdminPassword)
 router.patch('/companies/:companyId/verify', protect, adminOnly, toggleCompanyVerified)
 
 module.exports = router

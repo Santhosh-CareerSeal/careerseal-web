@@ -8,7 +8,8 @@ const TABS = [
   { id: 'colleges', label: 'Colleges', icon: '🎓' },
   { id: 'companies', label: 'Companies', icon: '🏢' },
   { id: 'users', label: 'Users', icon: '👥' },
-  { id: 'applications', label: 'Applications', icon: '📨' }
+  { id: 'applications', label: 'Applications', icon: '📨' },
+  { id: 'settings', label: 'Settings', icon: '⚙️' }
 ]
 
 function AdminPanel() {
@@ -25,6 +26,11 @@ function AdminPanel() {
   const [applications, setApplications] = useState([])
   const [appCounts, setAppCounts] = useState({})
   const [appFilter, setAppFilter] = useState('all')
+  const [pwCurrent, setPwCurrent] = useState('')
+  const [pwNew, setPwNew] = useState('')
+  const [pwConfirm, setPwConfirm] = useState('')
+  const [pwMsg, setPwMsg] = useState('')
+  const [pwSaving, setPwSaving] = useState(false)
   const [loading, setLoading] = useState(true)
   const [userFilter, setUserFilter] = useState('all')
   const [userSearch, setUserSearch] = useState('')
@@ -122,6 +128,24 @@ function AdminPanel() {
       await axios.patch(`${API_URL}/api/admin/companies/${companyId}/verify`, {}, { headers })
       loadAll()
     } catch (e) { setMsg('Failed to update company') }
+  }
+
+  const handleChangePassword = async () => {
+    setPwMsg('')
+    if (!pwCurrent || !pwNew || !pwConfirm) { setPwMsg('Please fill all fields'); return }
+    if (pwNew.length < 8) { setPwMsg('New password must be at least 8 characters'); return }
+    if (pwNew !== pwConfirm) { setPwMsg('New passwords do not match'); return }
+    if (pwCurrent === pwNew) { setPwMsg('New password must be different from the current one'); return }
+    setPwSaving(true)
+    try {
+      const res = await axios.post(`${API_URL}/api/admin/change-password`, { currentPassword: pwCurrent, newPassword: pwNew }, { headers })
+      setPwMsg(res.data.message || 'Password updated!')
+      setPwCurrent(''); setPwNew(''); setPwConfirm('')
+    } catch (err) {
+      setPwMsg(err.response?.data?.message || 'Failed to update password')
+    } finally {
+      setPwSaving(false)
+    }
   }
 
   const handleLogout = () => {
@@ -346,6 +370,28 @@ function AdminPanel() {
                   </button>
                 </div>
               ))}
+            </div>
+          </div>
+        )}
+
+        {active === 'settings' && (
+          <div>
+            <h1 className="text-xl font-bold text-[#1A3C6E] mb-1">Settings</h1>
+            <p className="text-xs text-gray-400 mb-4">Manage your admin account</p>
+            <div className="bg-white rounded-2xl p-5 border border-gray-100 max-w-md">
+              <p className="font-bold text-[#1A3C6E] mb-1">Change password</p>
+              <p className="text-xs text-gray-400 mb-4">This password protects every user's data on GRID. Use something long and unique.</p>
+              <div className="flex flex-col gap-3">
+                <input type="password" placeholder="Current password" value={pwCurrent} onChange={e => setPwCurrent(e.target.value)} className={inputCls} />
+                <input type="password" placeholder="New password (min 8 characters)" value={pwNew} onChange={e => setPwNew(e.target.value)} className={inputCls} />
+                <input type="password" placeholder="Confirm new password" value={pwConfirm} onChange={e => setPwConfirm(e.target.value)}
+                  onKeyDown={e => e.key === 'Enter' && handleChangePassword()} className={inputCls} />
+                {pwMsg && <p className={`text-xs ${pwMsg.includes('updated') || pwMsg.includes('success') ? 'text-[#0D7377]' : 'text-red-500'}`}>{pwMsg}</p>}
+                <button onClick={handleChangePassword} disabled={pwSaving}
+                  className="bg-[#1A3C6E] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#0D7377] disabled:opacity-50 mt-1">
+                  {pwSaving ? 'Updating...' : 'Update Password'}
+                </button>
+              </div>
             </div>
           </div>
         )}
