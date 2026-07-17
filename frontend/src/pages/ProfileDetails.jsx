@@ -215,7 +215,6 @@ function ProfileDetails() {
       setTimeout(() => navigate('/dashboard'), 1500)
     } catch (e) {
       setGridMsg(e.response?.data?.message || 'Could not publish to GRID')
-      setTimeout(() => setGridMsg(''), 4000)
     } finally { setSaving(false) }
   }
 

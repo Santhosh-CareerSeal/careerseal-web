@@ -82,6 +82,15 @@ const moveToGrid = async (req, res) => {
     const student = await prisma.student.findUnique({ where: { userId } })
     if (!student) return res.status(404).json({ message: 'Profile not found' })
 
+    // Gate: email must be verified before publishing a public GRID card
+    const gridUser = await prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true } })
+    if (!gridUser || !gridUser.emailVerified) {
+      return res.status(403).json({
+        message: 'Please verify your email before publishing your GRID card. Recruiters need to know your profile is real.',
+        needsVerification: true
+      })
+    }
+
     const currentMonth = new Date().getMonth()
     const updatesThisMonth = student.gridLastUpdatedMonth === currentMonth
       ? student.gridUpdatesThisMonth : 0

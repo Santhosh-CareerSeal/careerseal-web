@@ -6,6 +6,15 @@ const applyToJob = async (req, res) => {
     const { jobId } = req.body
     const userId = req.user.userId
 
+    // Gate: email must be verified before applying (companies need a reachable contact)
+    const applicant = await prisma.user.findUnique({ where: { id: userId }, select: { emailVerified: true } })
+    if (!applicant || !applicant.emailVerified) {
+      return res.status(403).json({
+        message: 'Please verify your email before applying. Companies need to be able to reach you.',
+        needsVerification: true
+      })
+    }
+
     let student = await prisma.student.findUnique({ where: { userId } })
     if (!student) {
       student = await prisma.student.create({ data: { userId } })

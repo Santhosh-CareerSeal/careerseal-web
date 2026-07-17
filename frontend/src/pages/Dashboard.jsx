@@ -44,6 +44,8 @@ function Dashboard() {
   const [stats, setStats] = useState({ totalApplications: 0, interviews: 0, savedJobs: 0, profileViews: 0 })
   const [applications, setApplications] = useState([])
   const [loading, setLoading] = useState(true)
+  const [emailVerified, setEmailVerified] = useState(true)
+  const [resendMsg, setResendMsg] = useState('')
 
   const today = new Date()
   const tipIndex = (today.getDate() - 1) % TIPS.length
@@ -64,6 +66,7 @@ function Dashboard() {
         setUser(dashRes.data.user)
         setStats(dashRes.data.stats)
         setStudent(profileRes.data.student)
+        setEmailVerified(profileRes.data.emailVerified !== false)
         setApplications(appRes.data.applications || [])
       } catch (error) {
         navigate('/login')
@@ -140,6 +143,17 @@ function Dashboard() {
     time: new Date(app.createdAt).toLocaleDateString('en-IN')
   }))
 
+  const handleResendVerification = async () => {
+    setResendMsg('Sending...')
+    try {
+      const u = JSON.parse(localStorage.getItem('user') || '{}')
+      await axios.post(`${API_URL}/api/auth/resend-verification`, { email: u.email })
+      setResendMsg('Sent! Check your inbox.')
+    } catch (err) {
+      setResendMsg(err.response?.data?.message || 'Failed to send')
+    }
+  }
+
   if (loading) return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center">
       <p className="text-[#1A3C6E] text-xl font-bold">Loading...</p>
@@ -150,6 +164,27 @@ function Dashboard() {
     <div className="min-h-screen bg-gray-100">
 
       <Navbar student={student} user={user} />
+
+      {!emailVerified && (
+        <div className="bg-amber-50 border-b border-amber-200 px-6 py-3">
+          <div className="max-w-5xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-3">
+              <span className="text-lg">✉️</span>
+              <div>
+                <p className="text-sm font-bold text-amber-900">Verify your email to unlock your GRID</p>
+                <p className="text-xs text-amber-700">Verified profiles can publish publicly and apply to jobs — recruiters need to know you are real.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              {resendMsg && <span className="text-xs text-amber-800">{resendMsg}</span>}
+              <button onClick={handleResendVerification}
+                className="bg-amber-600 text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-amber-700 transition-colors whitespace-nowrap">
+                Resend link
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Tip of the day — full width */}
       <div className="bg-[#0D7377] px-6 py-2.5 flex items-center gap-3">
