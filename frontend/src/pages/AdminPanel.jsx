@@ -107,10 +107,23 @@ function AdminPanel() {
   }
 
   const toggleVetted = async (collegeId) => {
+    const prev = colleges
+    // Optimistic: flip it on screen immediately
+    setColleges(cs => cs.map(c => c.id === collegeId ? { ...c, vetted: !c.vetted } : c))
     try {
       await axios.patch(`${API_URL}/api/admin/colleges/${collegeId}/vetted`, {}, { headers })
-      loadAll()
-    } catch (e) { setMsg('Failed to update') }
+      refreshStats()
+    } catch (e) {
+      setColleges(prev)
+      setMsg('Failed to update college')
+    }
+  }
+
+  const refreshStats = async () => {
+    try {
+      const r = await axios.get(`${API_URL}/api/admin/stats`, { headers })
+      setStats(r.data)
+    } catch (e) {}
   }
 
   const loadApplications = async () => {
@@ -124,10 +137,15 @@ function AdminPanel() {
   }
 
   const toggleCompanyVerify = async (companyId) => {
+    const prev = companies
+    setCompanies(cs => cs.map(c => c.id === companyId ? { ...c, mcaStatus: c.mcaStatus === 'verified' ? 'pending' : 'verified' } : c))
     try {
       await axios.patch(`${API_URL}/api/admin/companies/${companyId}/verify`, {}, { headers })
-      loadAll()
-    } catch (e) { setMsg('Failed to update company') }
+      refreshStats()
+    } catch (e) {
+      setCompanies(prev)
+      setMsg('Failed to update company')
+    }
   }
 
   const handleChangePassword = async () => {
