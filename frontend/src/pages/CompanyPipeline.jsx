@@ -38,13 +38,14 @@ function CompanyPipeline() {
     }
   }
 
-  const columns = ['pending', 'interview', 'accepted', 'rejected']
+  const columns = ['pending', 'interview', 'accepted', 'hired', 'rejected']
 
   const getColumnColor = (status) => {
     switch(status) {
       case 'pending': return 'bg-yellow-50 border-yellow-200'
       case 'interview': return 'bg-blue-50 border-blue-200'
       case 'accepted': return 'bg-green-50 border-green-200'
+      case 'hired': return 'bg-emerald-100 border-emerald-300'
       case 'rejected': return 'bg-red-50 border-red-200'
       default: return 'bg-gray-50 border-gray-200'
     }
@@ -55,6 +56,7 @@ function CompanyPipeline() {
       case 'pending': return 'text-yellow-700'
       case 'interview': return 'text-blue-700'
       case 'accepted': return 'text-green-700'
+      case 'hired': return 'text-emerald-800'
       case 'rejected': return 'text-red-700'
       default: return 'text-gray-700'
     }
@@ -89,6 +91,7 @@ function CompanyPipeline() {
                       <option value="pending">Pending</option>
                       <option value="interview">Interview</option>
                       <option value="accepted">Accepted</option>
+                      <option value="hired">Hired</option>
                       <option value="rejected">Rejected</option>
                     </select>
                   </div>

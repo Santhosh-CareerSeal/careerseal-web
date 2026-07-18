@@ -134,6 +134,15 @@ model Job {
   deadline        String?
   status          String?       @default("active")
   targetCollegeId Int?
+  isDrive         Boolean?      @default(false)
+  driveDate       String?
+  driveMode       String?
+  driveLocation   String?
+  eligBranches    String?
+  eligMinCGPA     String?
+  eligBatchYear   String?
+  allowBacklogs   Boolean?      @default(true)
+  driveCompany    String?
   createdAt       DateTime?     @default(now()) @db.Timestamp(6)
   applications    Application[]
   company         Company?      @relation(fields: [companyId], references: [id], onDelete: NoAction, onUpdate: NoAction)

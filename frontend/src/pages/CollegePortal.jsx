@@ -57,6 +57,50 @@ export default function CollegePortal() {
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
   const [targetedJobs, setTargetedJobs] = useState([])
+  const [drives, setDrives] = useState([])
+  const [driveForm, setDriveForm] = useState(null)
+  const [driveMsg, setDriveMsg] = useState('')
+  const [driveSaving, setDriveSaving] = useState(false)
+  const emptyDrive = { title: '', driveCompany: '', salaryRange: '', driveDate: '', driveMode: 'On-campus', driveLocation: '', eligBranches: '', eligMinCGPA: '', eligBatchYear: '', allowBacklogs: true, description: '' }
+
+  const fetchDrives = async () => {
+    try { const r = await axios.get(`${API_URL}/api/college/drives`, { headers }); setDrives(r.data.drives || []) } catch (e) { setDrives([]) }
+  }
+  const saveDrive = async () => {
+    setDriveMsg('')
+    if (!driveForm.title) { setDriveMsg('Drive title is required'); return }
+    setDriveSaving(true)
+    try {
+      if (driveForm.id) await axios.patch(`${API_URL}/api/college/drives/${driveForm.id}`, driveForm, { headers })
+      else await axios.post(`${API_URL}/api/college/drives`, driveForm, { headers })
+      setDriveForm(null); await fetchDrives()
+    } catch (e) { setDriveMsg(e.response?.data?.message || 'Failed to save drive') }
+    finally { setDriveSaving(false) }
+  }
+  const [reportData, setReportData] = useState(null)
+  const [reportLoading, setReportLoading] = useState(false)
+
+  const fetchReports = async () => {
+    setReportLoading(true)
+    try { const r = await axios.get(`${API_URL}/api/college/reports`, { headers }); setReportData(r.data) }
+    catch (e) { setReportData(null) }
+    finally { setReportLoading(false) }
+  }
+  const downloadCSV = (filename, rows) => {
+    if (!rows || !rows.length) { alert('No data to export'); return }
+    const headers = Object.keys(rows[0])
+    const esc = (v) => { const str = String(v ?? ''); return /[",\n]/.test(str) ? '"' + str.replace(/"/g, '""') + '"' : str }
+    const csv = [headers.join(','), ...rows.map(r => headers.map(h => esc(r[h])).join(','))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url)
+  }
+
+  const deleteDrive = async (id) => {
+    if (!window.confirm('Delete this drive? Applicants to it will also be removed.')) return
+    try { await axios.delete(`${API_URL}/api/college/drives/${id}`, { headers }); await fetchDrives() } catch (e) { alert('Failed to delete') }
+  }
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
@@ -78,6 +122,8 @@ export default function CollegePortal() {
     }
   }
 
+  useEffect(() => { if (active === 'reports' && !reportData) fetchReports() }, [active])
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -94,6 +140,7 @@ export default function CollegePortal() {
         setRecentStudents(dashRes.data.recentStudents || [])
         setStudents(studentsRes.data.students || [])
         setAnalytics(analyticsRes.data)
+        fetchDrives()
       } catch (e) {
         try {
           const jobsRes = await axios.get(`${API_URL}/api/college/jobs`, { headers })
@@ -283,16 +330,69 @@ export default function CollegePortal() {
         {/* DRIVE MANAGEMENT */}
         {active === 'drives' && (
           <div>
-            <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Drive Management</p>
-            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>Schedule and manage placement drives at your college</p>
-            <div style={{ background: 'white', borderRadius: '14px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
-              <p style={{ fontSize: '36px', marginBottom: '12px' }}>📅</p>
-              <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', marginBottom: '6px' }}>No drives scheduled</p>
-              <p style={{ fontSize: '12px', color: '#9ca3af', marginBottom: '16px' }}>Drive scheduling is coming in the next update. You'll be able to add company visits, set dates, and track attendance here.</p>
-              <div style={{ background: '#FFF9C4', borderRadius: '12px', padding: '14px', maxWidth: '360px', margin: '0 auto', border: '1px solid #EF9F27' }}>
-                <p style={{ fontSize: '11px', color: '#854F0B', margin: 0 }}>⏳ Drive management feature launching soon — your account manager will notify you when it's ready.</p>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <div>
+                <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Drive Management</p>
+                <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Schedule and manage placement drives at your college</p>
               </div>
+              {!driveForm && (
+                <button onClick={() => { setDriveMsg(''); setDriveForm({ ...emptyDrive }) }} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ New Drive</button>
+              )}
             </div>
+
+            {driveForm && (
+              <div style={{ background: 'white', borderRadius: '14px', padding: '20px', border: '1px solid #eee', marginBottom: '20px' }}>
+                <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 14px' }}>{driveForm.id ? 'Edit Drive' : 'New Drive'}</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Role / Title *</label><input value={driveForm.title} onChange={e => setDriveForm({ ...driveForm, title: e.target.value })} style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Company</label><input value={driveForm.driveCompany} onChange={e => setDriveForm({ ...driveForm, driveCompany: e.target.value })} style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Package</label><input value={driveForm.salaryRange} onChange={e => setDriveForm({ ...driveForm, salaryRange: e.target.value })} placeholder="e.g. 6-8 LPA" style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Drive Date</label><input type="date" value={driveForm.driveDate} onChange={e => setDriveForm({ ...driveForm, driveDate: e.target.value })} style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Mode</label><select value={driveForm.driveMode} onChange={e => setDriveForm({ ...driveForm, driveMode: e.target.value })} style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}}><option>On-campus</option><option>Virtual</option><option>Hybrid</option></select></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Location</label><input value={driveForm.driveLocation} onChange={e => setDriveForm({ ...driveForm, driveLocation: e.target.value })} style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Eligible Branches</label><input value={driveForm.eligBranches} onChange={e => setDriveForm({ ...driveForm, eligBranches: e.target.value })} placeholder="CSE, ECE, IT" style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Min CGPA</label><input value={driveForm.eligMinCGPA} onChange={e => setDriveForm({ ...driveForm, eligMinCGPA: e.target.value })} placeholder="e.g. 7.0" style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Batch Year</label><input value={driveForm.eligBatchYear} onChange={e => setDriveForm({ ...driveForm, eligBatchYear: e.target.value })} placeholder="e.g. 2026" style={{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}} /></div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '18px' }}><input type="checkbox" checked={driveForm.allowBacklogs} onChange={e => setDriveForm({ ...driveForm, allowBacklogs: e.target.checked })} /><label style={{ fontSize: '12px', color: '#555' }}>Allow backlogs</label></div>
+                </div>
+                <div style={{ marginTop: '12px' }}><label style={{ fontSize: '11px', color: '#9ca3af', fontWeight: '600' }}>Description</label><textarea value={driveForm.description} onChange={e => setDriveForm({ ...driveForm, description: e.target.value })} rows={3} style={{ ...{"border":"2px solid #f0f0f0","borderRadius":"10px","padding":"9px 12px","fontSize":"13px","outline":"none","fontFamily":"system-ui","width":"100%","boxSizing":"border-box"}, resize: 'vertical' }} /></div>
+                {driveMsg && <p style={{ fontSize: '12px', color: '#dc2626', margin: '10px 0 0' }}>{driveMsg}</p>}
+                <div style={{ display: 'flex', gap: '10px', marginTop: '16px' }}>
+                  <button onClick={saveDrive} disabled={driveSaving} style={{ background: '#0D7377', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: driveSaving ? 0.6 : 1 }}>{driveSaving ? 'Saving...' : 'Save Drive'}</button>
+                  <button onClick={() => { setDriveForm(null); setDriveMsg('') }} style={{ background: '#f0f0f0', color: '#555', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>Cancel</button>
+                </div>
+              </div>
+            )}
+
+            {drives.length === 0 && !driveForm ? (
+              <div style={{ background: 'white', borderRadius: '14px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
+                <p style={{ fontSize: '36px', marginBottom: '12px' }}>📅</p>
+                <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', marginBottom: '6px' }}>No drives scheduled</p>
+                <p style={{ fontSize: '12px', color: '#9ca3af' }}>Click "+ New Drive" to schedule your first placement drive.</p>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                {drives.map(d => (
+                  <div key={d.id} style={{ background: 'white', borderRadius: '14px', padding: '18px', border: '1px solid #eee' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                      <div>
+                        <p style={{ fontSize: '15px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 3px' }}>{d.title}</p>
+                        <p style={{ fontSize: '12px', color: '#0D7377', fontWeight: '600', margin: '0 0 6px' }}>{d.driveCompany || 'Company not set'}</p>
+                        <p style={{ fontSize: '11px', color: '#9ca3af', margin: 0 }}>{[d.driveDate, d.driveMode, d.driveLocation, d.salaryRange].filter(Boolean).join(' · ')}</p>
+                        <p style={{ fontSize: '11px', color: '#9ca3af', margin: '4px 0 0' }}>Eligibility: {[d.eligBranches && ('Branches ' + d.eligBranches), d.eligMinCGPA && ('CGPA ≥ ' + d.eligMinCGPA), d.eligBatchYear && ('Batch ' + d.eligBatchYear), d.allowBacklogs ? 'Backlogs OK' : 'No backlogs'].filter(Boolean).join(' · ') || 'Open to all'}</p>
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+                        <span style={{ fontSize: '11px', fontWeight: '700', background: '#E1F5EE', color: '#085041', padding: '4px 10px', borderRadius: '20px', whiteSpace: 'nowrap' }}>{d.applications?.length || 0} applied</span>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button onClick={() => { setDriveMsg(''); setDriveForm({ id: d.id, title: d.title || '', driveCompany: d.driveCompany || '', salaryRange: d.salaryRange || '', driveDate: d.driveDate || '', driveMode: d.driveMode || 'On-campus', driveLocation: d.driveLocation || '', eligBranches: d.eligBranches || '', eligMinCGPA: d.eligMinCGPA || '', eligBatchYear: d.eligBatchYear || '', allowBacklogs: d.allowBacklogs !== false, description: d.description || '' }) }} style={{ background: '#f0f4ff', color: '#1A3C6E', border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}>Edit</button>
+                          <button onClick={() => deleteDrive(d.id)} style={{ background: '#fef2f2', color: '#dc2626', border: 'none', borderRadius: '8px', padding: '6px 12px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}>Delete</button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
 
@@ -353,27 +453,53 @@ export default function CollegePortal() {
         {active === 'reports' && (
           <div>
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Reports</p>
-            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>Downloadable placement reports for NAAC/NBA accreditation</p>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              {[
-                { title: 'Placement Summary Report', desc: 'Total students, placed count, placement rate, top companies', icon: '📊' },
-                { title: 'Student GRID Status Report', desc: 'Which students have published GRID, verified skills, and applied to jobs', icon: '🪪' },
-                { title: 'Branch-wise Placement Report', desc: 'Placement breakdown by branch/department for NAAC documentation', icon: '📚' },
-                { title: 'Company Visit Report', desc: 'List of companies that visited campus and number of offers made', icon: '🏢' }
-              ].map((r, i) => (
-                <div key={i} style={{ background: 'white', borderRadius: '14px', padding: '16px', border: '1px solid #eee' }}>
-                  <p style={{ fontSize: '24px', marginBottom: '8px' }}>{r.icon}</p>
-                  <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>{r.title}</p>
-                  <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>{r.desc}</p>
-                  <button style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '8px', padding: '7px 14px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}>
-                    Download PDF
-                  </button>
+            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 20px' }}>Downloadable placement reports (CSV) for NAAC/NBA accreditation</p>
+
+            {reportLoading ? (
+              <p style={{ fontSize: '13px', color: '#9ca3af' }}>Loading reports...</p>
+            ) : !reportData ? (
+              <p style={{ fontSize: '13px', color: '#9ca3af' }}>No report data available yet.</p>
+            ) : (
+              <div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
+                  {[
+                    { label: 'TOTAL STUDENTS', value: reportData.summary.totalStudents },
+                    { label: 'PLACED', value: reportData.summary.placedCount },
+                    { label: 'PLACEMENT RATE', value: reportData.summary.placementRate + '%' }
+                  ].map((x, i) => (
+                    <div key={i} style={{"background":"white","borderRadius":"14px","padding":"16px","border":"1px solid #eee"}}>
+                      <p style={{ fontSize: '10px', color: '#9ca3af', margin: '0 0 6px', fontWeight: '600', letterSpacing: '1px' }}>{x.label}</p>
+                      <p style={{ fontSize: '28px', fontWeight: '700', color: '#1A3C6E', margin: 0 }}>{x.value}</p>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div style={{ background: '#FFF9C4', borderRadius: '12px', padding: '14px 16px', marginTop: '16px', border: '1px solid #EF9F27' }}>
-              <p style={{ fontSize: '12px', color: '#854F0B', margin: 0 }}>⏳ PDF export is coming in the next update. Reports will be downloadable with your college branding for accreditation submissions.</p>
-            </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                  <div style={{"background":"white","borderRadius":"14px","padding":"16px","border":"1px solid #eee"}}>
+                    <p style={{ fontSize: '24px', marginBottom: '8px' }}>📊</p>
+                    <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Placement Summary (Student-wise)</p>
+                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>Every student: branch, batch, CGPA, placed status, company, package</p>
+                    <button style={{"background":"#1A3C6E","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer"}} onClick={() => downloadCSV('placement-summary.csv', reportData.studentRows)}>Download CSV</button>
+                  </div>
+                  <div style={{"background":"white","borderRadius":"14px","padding":"16px","border":"1px solid #eee"}}>
+                    <p style={{ fontSize: '24px', marginBottom: '8px' }}>📚</p>
+                    <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Branch-wise Placement</p>
+                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>Placement breakdown by branch/department</p>
+                    <button style={{"background":"#1A3C6E","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer"}} onClick={() => downloadCSV('branch-wise.csv', reportData.branchRows)}>Download CSV</button>
+                  </div>
+                  <div style={{"background":"white","borderRadius":"14px","padding":"16px","border":"1px solid #eee"}}>
+                    <p style={{ fontSize: '24px', marginBottom: '8px' }}>🏢</p>
+                    <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Drive Report</p>
+                    <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>Each drive: company, date, applied count, hired count</p>
+                    <button style={{"background":"#1A3C6E","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer"}} onClick={() => downloadCSV('drive-report.csv', reportData.driveRows)}>Download CSV</button>
+                  </div>
+                </div>
+
+                <div style={{ background: '#FFF9C4', borderRadius: '12px', padding: '14px 16px', marginTop: '16px', border: '1px solid #EF9F27' }}>
+                  <p style={{ fontSize: '12px', color: '#854F0B', margin: 0 }}>📄 PDF export with college branding is planned for a future update. CSV opens directly in Excel.</p>
+                </div>
+              </div>
+            )}
           </div>
         )}
 

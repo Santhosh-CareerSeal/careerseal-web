@@ -1,7 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const { collegeLogin, changeCollegePassword } = require('../controllers/collegeAuthController')
-const { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs } = require('../controllers/collegeController')
+const { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports } = require('../controllers/collegeController')
 const { protect } = require('../middleware/authMiddleware')
 
 router.post('/login', collegeLogin)
@@ -13,5 +13,11 @@ router.get('/dashboard', protect, getCollegeDashboard)
 router.get('/students', protect, getCollegeStudents)
 router.get('/analytics', protect, getCollegeAnalytics)
 router.get('/jobs', protect, getCollegeJobs)
+router.get('/drives', protect, getCollegeDrives)
+router.post('/drives', protect, createCollegeDrive)
+router.patch('/drives/:id', protect, updateCollegeDrive)
+router.delete('/drives/:id', protect, deleteCollegeDrive)
+router.get('/drives/:id/eligible', protect, getDriveEligibleStudents)
+router.get('/reports', protect, getCollegeReports)
 
 module.exports = router

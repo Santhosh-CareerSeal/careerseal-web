@@ -174,7 +174,7 @@ const getCollegeJobs = async (req, res) => {
     const college = await prisma.college.findUnique({ where: { userId } })
     if (!college) return res.status(404).json({ message: 'College not found' })
     const jobs = await prisma.job.findMany({
-      where: { targetCollegeId: college.id },
+      where: { targetCollegeId: college.id, OR: [{ isDrive: false }, { isDrive: null }] },
       include: { company: { select: { companyName: true, industry: true } }, applications: true },
       orderBy: { createdAt: 'desc' }
     })
@@ -184,4 +184,197 @@ const getCollegeJobs = async (req, res) => {
   }
 }
 
-module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs }
+
+const getCollegeDrives = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const drives = await prisma.job.findMany({
+      where: { targetCollegeId: college.id, isDrive: true },
+      include: { applications: true },
+      orderBy: { createdAt: 'desc' }
+    })
+    res.json({ drives })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const createCollegeDrive = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const b = req.body
+    if (!b.title) return res.status(400).json({ message: 'Drive title is required' })
+    const drive = await prisma.job.create({
+      data: {
+        title: b.title,
+        description: b.description || null,
+        salaryRange: b.salaryRange || null,
+        location: b.driveLocation || null,
+        status: b.status || 'active',
+        targetCollegeId: college.id,
+        isDrive: true,
+        driveCompany: b.driveCompany || null,
+        driveDate: b.driveDate || null,
+        driveMode: b.driveMode || null,
+        driveLocation: b.driveLocation || null,
+        eligBranches: b.eligBranches || null,
+        eligMinCGPA: b.eligMinCGPA || null,
+        eligBatchYear: b.eligBatchYear || null,
+        allowBacklogs: b.allowBacklogs !== undefined ? b.allowBacklogs : true
+      }
+    })
+    res.status(201).json({ message: 'Drive created', drive })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const updateCollegeDrive = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const drive = await prisma.job.findUnique({ where: { id: parseInt(req.params.id) } })
+    if (!drive || drive.targetCollegeId !== college.id || !drive.isDrive) {
+      return res.status(404).json({ message: 'Drive not found' })
+    }
+    const b = req.body
+    const updated = await prisma.job.update({
+      where: { id: parseInt(req.params.id) },
+      data: {
+        title: b.title ?? drive.title,
+        description: b.description ?? drive.description,
+        salaryRange: b.salaryRange ?? drive.salaryRange,
+        status: b.status ?? drive.status,
+        driveCompany: b.driveCompany ?? drive.driveCompany,
+        driveDate: b.driveDate ?? drive.driveDate,
+        driveMode: b.driveMode ?? drive.driveMode,
+        driveLocation: b.driveLocation ?? drive.driveLocation,
+        eligBranches: b.eligBranches ?? drive.eligBranches,
+        eligMinCGPA: b.eligMinCGPA ?? drive.eligMinCGPA,
+        eligBatchYear: b.eligBatchYear ?? drive.eligBatchYear,
+        allowBacklogs: b.allowBacklogs ?? drive.allowBacklogs
+      }
+    })
+    res.json({ message: 'Drive updated', drive: updated })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const deleteCollegeDrive = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const drive = await prisma.job.findUnique({ where: { id: parseInt(req.params.id) } })
+    if (!drive || drive.targetCollegeId !== college.id || !drive.isDrive) {
+      return res.status(404).json({ message: 'Drive not found' })
+    }
+    await prisma.application.deleteMany({ where: { jobId: drive.id } })
+    await prisma.job.delete({ where: { id: drive.id } })
+    res.json({ message: 'Drive deleted' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const getDriveEligibleStudents = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const drive = await prisma.job.findUnique({ where: { id: parseInt(req.params.id) } })
+    if (!drive || drive.targetCollegeId !== college.id || !drive.isDrive) {
+      return res.status(404).json({ message: 'Drive not found' })
+    }
+    const students = await prisma.student.findMany({
+      where: { collegeId: college.id },
+      include: { user: { select: { name: true, email: true } } }
+    })
+    const branches = drive.eligBranches ? drive.eligBranches.toLowerCase().split(',').map(x => x.trim()).filter(Boolean) : []
+    const minCGPA = drive.eligMinCGPA ? parseFloat(drive.eligMinCGPA) : null
+    const batch = drive.eligBatchYear ? drive.eligBatchYear.trim() : null
+    const eligible = students.filter(s => {
+      if (branches.length && !branches.includes((s.branch || '').toLowerCase().trim())) return false
+      if (minCGPA !== null) { const c = parseFloat(s.collegeCGPA); if (isNaN(c) || c < minCGPA) return false }
+      if (batch && (s.collegePassingYear || '').trim() !== batch) return false
+      return true
+    }).map(s => ({ id: s.id, name: s.user?.name, email: s.user?.email, branch: s.branch, collegeCGPA: s.collegeCGPA, collegePassingYear: s.collegePassingYear }))
+    res.json({ eligible, total: eligible.length })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+
+const getCollegeReports = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+
+    const students = await prisma.student.findMany({
+      where: { collegeId: college.id },
+      include: {
+        user: { select: { name: true, email: true } },
+        applications: { include: { job: { include: { company: true } } } }
+      }
+    })
+
+    const studentRows = students.map(s => {
+      const hiredApp = s.applications.find(a => a.status === 'hired')
+      return {
+        name: s.user?.name || '',
+        email: s.user?.email || '',
+        branch: s.branch || '',
+        degree: s.degree || '',
+        batch: s.collegePassingYear || '',
+        cgpa: s.collegeCGPA || '',
+        gridPublished: s.gridPublished ? 'Yes' : 'No',
+        totalApplications: s.applications.length,
+        placed: hiredApp ? 'Yes' : 'No',
+        placedCompany: hiredApp ? (hiredApp.job?.driveCompany || hiredApp.job?.company?.companyName || '') : '',
+        placedRole: hiredApp ? (hiredApp.job?.title || '') : '',
+        package: hiredApp ? (hiredApp.job?.salaryRange || '') : ''
+      }
+    })
+
+    const totalStudents = students.length
+    const placedCount = studentRows.filter(r => r.placed === 'Yes').length
+    const placementRate = totalStudents ? Math.round((placedCount / totalStudents) * 100) : 0
+
+    const branchMap = {}
+    studentRows.forEach(r => {
+      const b = r.branch || 'Not specified'
+      if (!branchMap[b]) branchMap[b] = { branch: b, total: 0, placed: 0 }
+      branchMap[b].total++
+      if (r.placed === 'Yes') branchMap[b].placed++
+    })
+    const branchRows = Object.values(branchMap).map(b => ({ ...b, rate: b.total ? Math.round((b.placed / b.total) * 100) : 0 }))
+
+    const drives = await prisma.job.findMany({
+      where: { targetCollegeId: college.id, isDrive: true },
+      include: { applications: true }
+    })
+    const driveRows = drives.map(d => ({
+      title: d.title || '',
+      company: d.driveCompany || '',
+      date: d.driveDate || '',
+      mode: d.driveMode || '',
+      package: d.salaryRange || '',
+      applied: d.applications.length,
+      hired: d.applications.filter(a => a.status === 'hired').length
+    }))
+
+    res.json({
+      college: { name: college.collegeName, city: college.city, state: college.state },
+      summary: { totalStudents, placedCount, placementRate },
+      studentRows,
+      branchRows,
+      driveRows
+    })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }
