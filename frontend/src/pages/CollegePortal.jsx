@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import jsPDF from 'jspdf'
+import autoTable from 'jspdf-autotable'
 
 function Sidebar({ active, setActive, college, navigate }) {
   const navItems = [
@@ -95,6 +97,41 @@ export default function CollegePortal() {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url)
+  }
+
+  const downloadPDF = (reportTitle, rows) => {
+    if (!rows || !rows.length) { alert('No data to export'); return }
+    const doc = new jsPDF({ orientation: 'landscape' })
+    const pageW = doc.internal.pageSize.getWidth()
+    const cName = reportData?.college?.name || 'College'
+    const cLoc = [reportData?.college?.city, reportData?.college?.state].filter(Boolean).join(', ')
+    const today = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })
+
+    doc.setFontSize(16); doc.setTextColor(26, 60, 110); doc.setFont(undefined, 'bold')
+    doc.text(cName, pageW / 2, 16, { align: 'center' })
+    if (cLoc) { doc.setFontSize(10); doc.setTextColor(120); doc.setFont(undefined, 'normal'); doc.text(cLoc, pageW / 2, 22, { align: 'center' }) }
+    doc.setFontSize(13); doc.setTextColor(13, 115, 119); doc.setFont(undefined, 'bold')
+    doc.text(reportTitle, pageW / 2, 30, { align: 'center' })
+    doc.setFontSize(9); doc.setTextColor(150); doc.setFont(undefined, 'normal')
+    doc.text('Generated on ' + today + ' via GRID', pageW / 2, 36, { align: 'center' })
+
+    const headers = Object.keys(rows[0])
+    autoTable(doc, {
+      startY: 42,
+      head: [headers.map(h => h.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim())],
+      body: rows.map(r => headers.map(h => String(r[h] ?? ''))),
+      styles: { fontSize: 8, cellPadding: 2 },
+      headStyles: { fillColor: [26, 60, 110], textColor: 255, fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [244, 245, 247] },
+      margin: { left: 10, right: 10 },
+      didDrawPage: (data) => {
+        const h = doc.internal.pageSize.getHeight()
+        doc.setFontSize(8); doc.setTextColor(160)
+        doc.text('Page ' + doc.internal.getNumberOfPages(), pageW - 20, h - 6)
+        doc.text(cName + ' — Placement Report', 10, h - 6)
+      }
+    })
+    doc.save(reportTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '.pdf')
   }
 
   const deleteDrive = async (id) => {
@@ -480,18 +517,21 @@ export default function CollegePortal() {
                     <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Placement Summary (Student-wise)</p>
                     <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>Every student: branch, batch, CGPA, placed status, company, package</p>
                     <button style={{"background":"#1A3C6E","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer"}} onClick={() => downloadCSV('placement-summary.csv', reportData.studentRows)}>Download CSV</button>
+                    <button style={{"background":"#0D7377","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer","marginLeft":"8px"}} onClick={() => downloadPDF('Placement Summary', reportData.studentRows)}>Download PDF</button>
                   </div>
                   <div style={{"background":"white","borderRadius":"14px","padding":"16px","border":"1px solid #eee"}}>
                     <p style={{ fontSize: '24px', marginBottom: '8px' }}>📚</p>
                     <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Branch-wise Placement</p>
                     <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>Placement breakdown by branch/department</p>
                     <button style={{"background":"#1A3C6E","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer"}} onClick={() => downloadCSV('branch-wise.csv', reportData.branchRows)}>Download CSV</button>
+                    <button style={{"background":"#0D7377","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer","marginLeft":"8px"}} onClick={() => downloadPDF('Branch-wise Placement', reportData.branchRows)}>Download PDF</button>
                   </div>
                   <div style={{"background":"white","borderRadius":"14px","padding":"16px","border":"1px solid #eee"}}>
                     <p style={{ fontSize: '24px', marginBottom: '8px' }}>🏢</p>
                     <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Drive Report</p>
                     <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 12px' }}>Each drive: company, date, applied count, hired count</p>
                     <button style={{"background":"#1A3C6E","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer"}} onClick={() => downloadCSV('drive-report.csv', reportData.driveRows)}>Download CSV</button>
+                    <button style={{"background":"#0D7377","color":"white","border":"none","borderRadius":"8px","padding":"7px 14px","fontSize":"11px","fontWeight":"600","cursor":"pointer","marginLeft":"8px"}} onClick={() => downloadPDF('Drive Report', reportData.driveRows)}>Download PDF</button>
                   </div>
                 </div>
 
