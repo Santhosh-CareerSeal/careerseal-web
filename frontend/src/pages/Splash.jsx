@@ -33,7 +33,7 @@ const valueProps = [
 ]
 
 const motto = 'Your career journey starts here'
-const SPLASH_DURATION = 4000
+const SPLASH_DURATION = 3000
 
 function Splash() {
   const navigate = useNavigate()
