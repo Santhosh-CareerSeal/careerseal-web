@@ -142,6 +142,16 @@ export default function CollegePortal() {
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you sure? This will permanently delete your college account and all its data.')) return
+    if (!window.confirm('Final warning — this cannot be undone. Continue?')) return
+    try {
+      await axios.delete(`${API_URL}/api/auth/delete-account`, { headers })
+      localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('college')
+      navigate('/college-login')
+    } catch (e) { alert('Could not delete account. Please try again.') }
+  }
+
   const handleChangePassword = async () => {
     setPwMsg('')
     if (!currentPassword || !newPassword || !confirmPassword) { setPwMsg('Please fill all fields'); return }

@@ -103,6 +103,16 @@ export default function CompanyDashboard() {
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
 
+  const handleDeleteAccount = async () => {
+    if (!window.confirm('Are you sure? This will permanently delete your company account, all jobs and candidate data.')) return
+    if (!window.confirm('Final warning — this cannot be undone. Continue?')) return
+    try {
+      await axios.delete(`${API_URL}/api/auth/delete-account`, { headers })
+      localStorage.removeItem('token'); localStorage.removeItem('user')
+      navigate('/login')
+    } catch (e) { alert('Could not delete account. Please try again.') }
+  }
+
   useEffect(() => {
     const init = async () => {
       try {
@@ -742,7 +752,7 @@ export default function CompanyDashboard() {
                   <div style={{ borderTop: '1px solid #fee2e2', paddingTop: '16px' }}>
                     <p style={{ fontSize: '13px', fontWeight: '700', color: '#dc2626', margin: '0 0 6px' }}>Danger Zone</p>
                     <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 10px' }}>Deleting your account will remove all jobs, candidates and data permanently.</p>
-                    <button style={{ background: '#FEE2E2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Delete Account</button>
+                    <button onClick={handleDeleteAccount} style={{ background: '#FEE2E2', color: '#dc2626', border: '1px solid #fca5a5', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Delete Account</button>
                   </div>
                 </div>
               )}
