@@ -500,7 +500,6 @@ function Roadmap() {
                   </div>
                 )}
 
-                <button onClick={() => { setSavedRoadmap(null); setRoadmap(null); setCareerOptions([]); setSelectedCareer(null); setAnswers({}); setCurrentQ(0); setStep('questions'); }} className="w-full border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-bold hover:border-[#1A3C6E] hover:text-[#1A3C6E] transition-colors text-sm">
                 {!savedRoadmap && roadmap && (
                   <div className="mb-3">
                     {roadmapSaved ? (
@@ -516,6 +515,7 @@ function Roadmap() {
                     <p className="text-xs text-gray-400 text-center mt-1">Saving counts as 1 of your 3 monthly regenerations</p>
                   </div>
                 )}
+                <button onClick={() => { setSavedRoadmap(null); setRoadmap(null); setCareerOptions([]); setSelectedCareer(null); setAnswers({}); setCurrentQ(0); setStep('questions'); }} className="w-full border-2 border-gray-200 text-gray-500 py-3 rounded-xl font-bold hover:border-[#1A3C6E] hover:text-[#1A3C6E] transition-colors text-sm">
                   ← Choose a different career
                 </button>
               </div>

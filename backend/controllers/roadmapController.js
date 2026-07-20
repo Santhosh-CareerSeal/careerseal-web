@@ -1,7 +1,80 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
-const USE_AI = false // Change to true when Gemini API is ready
+const GEMINI_MODEL = 'gemini-flash-lite-latest'
+async function callGemini(career, workStatus) {
+  const key = process.env.GEMINI_API_KEY
+  if (!key) throw new Error('No GEMINI_API_KEY')
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`
+  const prompt = `You are a career mentor for Indian students on a platform called GRID.
+Create a practical, honest career roadmap for someone whose goal is "${career}" and whose current stage is "${workStatus || 'Student'}".
+Respond ONLY with valid JSON (no markdown, no backticks) in exactly this shape:
+{
+  "totalDuration": "e.g. 4-6 Years",
+  "targetSalary": "e.g. 6-15 LPA",
+  "milestones": [
+    { "phase": "short title", "duration": "e.g. 2 Years", "emoji": "one emoji", "status": "current or upcoming", "description": "2-3 sentences, specific to India", "actions": ["action 1", "action 2", "action 3"], "skills": ["skill 1", "skill 2"] }
+  ],
+  "aiInsight": "one motivating, specific paragraph"
+}
+Give 4-5 milestones. First milestone status must be "current", rest "upcoming". Keep it India-focused and realistic.`
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 20000)
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      signal: controller.signal
+    })
+    if (!resp.ok) throw new Error('Gemini HTTP ' + resp.status)
+    const data = await resp.json()
+    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    text = text.replace(/\`\`\`json/gi, '').replace(/\`\`\`/g, '').trim()
+    const parsed = JSON.parse(text)
+    if (!parsed.milestones || !Array.isArray(parsed.milestones) || !parsed.milestones.length) throw new Error('Bad AI shape')
+    return parsed
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+async function callGeminiCareers(answers, workStatus) {
+  const key = process.env.GEMINI_API_KEY
+  if (!key) throw new Error('No GEMINI_API_KEY')
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${key}`
+  const prompt = `You are a career counsellor for Indian students on a platform called GRID.
+A ${workStatus || 'Student'} answered a career quiz. Their answers (as JSON): ${JSON.stringify(answers)}.
+Based ONLY on these answers, suggest the 5 best-matching careers for the Indian job market.
+Respond ONLY with valid JSON (no markdown, no backticks) as an array of exactly 5 objects, best match first:
+[
+  { "career": "role name", "emoji": "one emoji", "match": 92, "indiaSalary": "e.g. 6-15 LPA", "abroadSalary": "e.g. $80k-150k", "demand": "Very High | High | Steady | Growing", "demandReason": "short reason", "description": "one honest sentence" }
+]
+Make match scores realistic (55-97), decreasing down the list. Base every suggestion on their actual answers.`
+
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), 20000)
+  try {
+    const resp = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      signal: controller.signal
+    })
+    if (!resp.ok) throw new Error('Gemini HTTP ' + resp.status)
+    const data = await resp.json()
+    let text = data?.candidates?.[0]?.content?.parts?.[0]?.text || ''
+    text = text.replace(/\`\`\`json/gi, '').replace(/\`\`\`/g, '').trim()
+    const parsed = JSON.parse(text)
+    if (!Array.isArray(parsed) || !parsed.length) throw new Error('Bad AI careers shape')
+    return parsed.slice(0, 5)
+  } finally {
+    clearTimeout(timeout)
+  }
+}
+
+const USE_AI = true // Gemini live; falls back to hardcoded ROADMAPS on any failure
 
 // ── CAREER DATABASE ──
 const CAREERS = {
@@ -349,8 +422,19 @@ const getLocationAdvice = async (req, res) => {
 const getCareers = async (req, res) => {
   try {
     const { answers, workStatus } = req.body
-    const careers = getCareerMatches(answers, workStatus)
-    res.json({ careers })
+    let careers, source = 'hardcoded'
+    if (USE_AI) {
+      try {
+        careers = await callGeminiCareers(answers, workStatus)
+        source = 'ai'
+      } catch (e) {
+        console.error('Gemini careers failed, using fallback:', e.message)
+        careers = getCareerMatches(answers, workStatus)
+      }
+    } else {
+      careers = getCareerMatches(answers, workStatus)
+    }
+    res.json({ careers, source })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -375,8 +459,19 @@ const selectCareer = async (req, res) => {
 const generateRoadmap = async (req, res) => {
   try {
     const { career, workStatus } = req.body
-    const roadmap = getDefaultRoadmap(career, workStatus)
-    res.json({ roadmap })
+    let roadmap, source = 'hardcoded'
+    if (USE_AI) {
+      try {
+        roadmap = await callGemini(career, workStatus)
+        source = 'ai'
+      } catch (e) {
+        console.error('Gemini failed, using fallback:', e.message)
+        roadmap = getDefaultRoadmap(career, workStatus)
+      }
+    } else {
+      roadmap = getDefaultRoadmap(career, workStatus)
+    }
+    res.json({ roadmap, source })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -398,7 +493,6 @@ const saveRoadmap = async (req, res) => {
       data: { roadmapContent, regeneratesThisMonth: isFirstSave ? regens : regens + 1, lastRegeneratedMonth: currentMonth, updatedAt: new Date() }
     })
     res.json({ message: 'Roadmap saved', regeneratesRemaining: isFirstSave ? 3 : 3 - (regens + 1) })
-    res.json({ message: 'Roadmap saved', regeneratesRemaining: 3 - (regens + 1) })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
