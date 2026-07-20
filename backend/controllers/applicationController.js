@@ -56,7 +56,6 @@ const getMyApplications = async (req, res) => {
   }
 }
 
-module.exports = { applyToJob, getMyApplications }
 
 const getCompanyApplications = async (req, res) => {
   try {
