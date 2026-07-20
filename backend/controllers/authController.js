@@ -113,6 +113,7 @@ const login = async (req, res) => {
       include: { student: true, company: true }
     })
     if (!user) return res.status(400).json({ message: 'Invalid email or password' })
+    if (user.deletedAt) return res.status(403).json({ message: 'This account has been deleted' })
     const isMatch = await bcrypt.compare(password, user.passwordHash)
     if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' })
 
@@ -207,7 +208,9 @@ const changePassword = async (req, res) => {
 const deleteAccount = async (req, res) => {
   try {
     const userId = req.user.userId
-    await prisma.user.delete({ where: { id: userId } })
+    await prisma.user.update({ where: { id: userId }, data: { deletedAt: new Date() } })
+    const token = req.headers.authorization?.split(' ')[1]
+    if (token) { try { await prisma.blacklistedToken.create({ data: { token } }) } catch (e) {} }
     res.json({ message: 'Account deleted successfully' })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -282,6 +285,7 @@ const googleAuth = async (req, res) => {
 
     // Check if user exists
     let user = await prisma.user.findUnique({ where: { email } })
+    if (user && user.deletedAt) return res.status(403).json({ message: 'This account has been deleted' })
 
     if (!user) {
       // Create new account (Google users are auto-verified since Google verified their email)

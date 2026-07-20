@@ -17,6 +17,7 @@ model User {
   otpExpiry    DateTime?
   role         String?   @default("student")
   createdAt    DateTime? @default(now()) @db.Timestamp(6)
+  deletedAt    DateTime?
   company      Company?
   student      Student?
   college      College?
