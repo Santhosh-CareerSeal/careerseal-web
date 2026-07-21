@@ -37,6 +37,15 @@ const generalLimiter = rateLimit({
   message: { message: 'Too many requests. Please slow down.' }
 })
 app.use('/api/', generalLimiter)
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: { message: 'Too many attempts. Please try again in 15 minutes.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: true
+})
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.path} ${req.ip}`)
   next()
@@ -56,7 +65,7 @@ app.get('/', async (req, res) => {
   }
 })
 
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', authLimiter, authRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/jobs', jobRoutes)
 app.use('/api/applications', applicationRoutes)
