@@ -10,6 +10,12 @@ function AskGrid() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [nudged, setNudged] = useState(false)
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 640)
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 640)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
   const endRef = useRef(null)
 
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [messages, open])
@@ -67,14 +73,15 @@ function AskGrid() {
       )}
       <style>{`
         @keyframes agThink { 0%,84%,100% { transform: rotate(0) } 88% { transform: rotate(-7deg) } 92% { transform: rotate(5deg) } 96% { transform: rotate(-3deg) } }
+        @keyframes agBounce { 0%,20%,50%,80%,100% { transform: translateY(0) } 40% { transform: translateY(-12px) } 60% { transform: translateY(-6px) } }
       `}</style>
       <button onClick={() => { setOpen(o => !o); setNudged(true) }} aria-label="Ask GRID"
-        style={{ position: 'fixed', bottom: '20px', right: '20px', height: '52px', padding: open ? '0 18px' : '0 20px 0 7px', borderRadius: '26px', background: '#0D7377', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.22)', cursor: 'pointer', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '10px' }}>
+        style={{ position: 'fixed', bottom: '20px', right: '20px', height: isMobile ? '56px' : '52px', width: isMobile ? '56px' : 'auto', padding: isMobile ? '0' : (open ? '0 18px' : '0 20px 0 7px'), borderRadius: isMobile ? '50%' : '26px', background: '#0D7377', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.22)', cursor: 'pointer', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '0' : '10px', animation: (isMobile && !open && !nudged) ? 'agBounce 2s ease-in-out infinite' : 'none' }}>
         {open ? (
           <span style={{ fontSize: '15px', fontWeight: 700 }}>Close</span>
         ) : (
           <>
-            <span style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
+            <span style={{ width: isMobile ? '44px' : '40px', height: isMobile ? '44px' : '40px', borderRadius: '50%', background: 'white', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', overflow: 'hidden', flexShrink: 0 }}>
               <svg width="30" height="32" viewBox="0 0 30 32" aria-hidden="true" style={{ animation: nudged ? 'none' : 'agThink 5s ease-in-out infinite', transformOrigin: 'bottom center' }}>
                 <circle cx="13" cy="12" r="8.5" fill="#EF9F27" />
                 <path d="M4.5 9 A8.5 8.5 0 0 1 21.5 9 Z" fill="#1A3C6E" />
@@ -86,7 +93,7 @@ function AskGrid() {
                 <circle cx="23.5" cy="18" r="2.5" fill="#EF9F27" />
               </svg>
             </span>
-            <span style={{ fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>Ask GRID</span>
+            {!isMobile && <span style={{ fontSize: '14px', fontWeight: 600, whiteSpace: 'nowrap' }}>Ask GRID</span>}
           </>
         )}
       </button>
