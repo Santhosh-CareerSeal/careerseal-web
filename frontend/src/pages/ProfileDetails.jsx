@@ -315,7 +315,7 @@ function ProfileDetails() {
 
   const inputClass = "border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full"
   const labelClass = "text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block"
-  const sectionTitle = "text-sm font-bold text-[#1A3C6E] mb-4 pb-2 border-b border-gray-100"
+  const sectionTitle = "text-base font-bold text-[#1A3C6E] mb-4 pl-3 border-l-4 border-[#0D7377] leading-tight"
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -426,7 +426,7 @@ function ProfileDetails() {
           {/* PERSONAL */}
           {activeTab === 0 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>Personal details</p>
+              <p className={sectionTitle}>👤 Personal details</p>
 
               <div className="flex flex-col items-center mb-2">
                 <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden mb-3">
@@ -500,7 +500,7 @@ function ProfileDetails() {
             <div className="flex flex-col gap-6">
 
               <div>
-                <p className={sectionTitle}>10th standard</p>
+                <p className={sectionTitle}>📘 10th standard</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>School name</label><input type="text" placeholder="e.g. St. Mary's High School" value={form.schoolName} onChange={e => set('schoolName', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Board</label>
@@ -515,7 +515,7 @@ function ProfileDetails() {
               </div>
 
               <div>
-                <p className={sectionTitle}>12th standard</p>
+                <p className={sectionTitle}>📗 12th standard</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>School / College name</label><input type="text" placeholder="e.g. Delhi Public School" value={form.twelfthSchoolName} onChange={e => set('twelfthSchoolName', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Board</label>
@@ -530,7 +530,7 @@ function ProfileDetails() {
               </div>
 
               <div>
-                <p className={sectionTitle}>Graduation</p>
+                <p className={sectionTitle}>🎓 Graduation</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>College / University</label>
@@ -564,7 +564,7 @@ function ProfileDetails() {
               </div>
 
               <div>
-                <p className={sectionTitle}>Post graduation (optional)</p>
+                <p className={sectionTitle}>🎖️ Post graduation (optional)</p>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div><label className={labelClass}>College / University</label><input type="text" placeholder="e.g. IIM Bangalore" value={form.pgCollegeName} onChange={e => set('pgCollegeName', e.target.value)} className={inputClass} /></div>
                   <div><label className={labelClass}>Degree</label>
@@ -589,7 +589,7 @@ function ProfileDetails() {
           {/* PROFESSION */}
           {activeTab === 2 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>Profession details</p>
+              <p className={sectionTitle}>💼 Profession details</p>
 
               <div>
                 <label className={labelClass}>Work status</label>
@@ -636,7 +636,7 @@ function ProfileDetails() {
           {/* SKILLS */}
           {activeTab === 3 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>Skills and expertise</p>
+              <p className={sectionTitle}>⚡ Skills and expertise</p>
               <div><label className={labelClass}>Technical skills</label><input type="text" placeholder="e.g. React, Node.js, Python, SQL" value={form.technicalSkills} onChange={e => set('technicalSkills', e.target.value)} className={inputClass} /><p className="text-xs text-gray-400 mt-1">Separate with commas</p></div>
               {form.technicalSkills && (
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -678,7 +678,7 @@ function ProfileDetails() {
           {/* OTHERS */}
           {activeTab === 4 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>Other details</p>
+              <p className={sectionTitle}>📌 Other details</p>
               <div><label className={labelClass}>Bio / Summary</label><textarea placeholder="Write 2-3 lines about yourself, your goals and what you bring to the table..." value={form.bio} onChange={e => set('bio', e.target.value)} className={`${inputClass} h-24`} /></div>
               <div><label className={labelClass}>Hobbies</label><input type="text" placeholder="e.g. Chess, Photography, Reading" value={form.hobbies} onChange={e => set('hobbies', e.target.value)} className={inputClass} /></div>
               <div><label className={labelClass}>PF account number</label><input type="text" placeholder="e.g. KA/BNG/1234567/000/0000000" value={form.pfAccountNumber} onChange={e => set('pfAccountNumber', e.target.value)} className={inputClass} /></div>
