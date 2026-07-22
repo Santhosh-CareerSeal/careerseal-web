@@ -11,6 +11,7 @@ const TABS = [
   { id: 'applications', label: 'Applications', icon: '📨' },
   { id: 'documents', label: 'Documents', icon: '📄' },
   { id: 'fraud', label: 'Fraud Flags', icon: '🚩' },
+  { id: 'ask', label: 'Ask GRID', icon: '💬' },
   { id: 'settings', label: 'Settings', icon: '⚙️' }
 ]
 
@@ -86,6 +87,22 @@ function AdminPanel() {
   const [flags, setFlags] = useState([])
   const [flagFilter, setFlagFilter] = useState('open')
   const [flagBusy, setFlagBusy] = useState(null)
+  const [askQs, setAskQs] = useState([])
+  const [askTop, setAskTop] = useState([])
+  const [askFilter, setAskFilter] = useState('unanswered')
+  const loadAskQs = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/ask-questions`, { headers, params: { filter: askFilter } })
+      setAskQs(res.data.questions || [])
+      setAskTop(res.data.top || [])
+    } catch (e) { setAskQs([]); setAskTop([]) }
+  }
+  const markAskDone = async (id) => {
+    try {
+      await axios.patch(`${API_URL}/api/admin/ask-questions/${id}`, { status: 'done' }, { headers })
+      await loadAskQs()
+    } catch (e) { alert('Could not update') }
+  }
   const loadFlags = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/admin/fraud-flags`, { headers, params: { status: flagFilter } })
@@ -130,6 +147,9 @@ function AdminPanel() {
   useEffect(() => {
     if (active === 'fraud') loadFlags()
   }, [active, flagFilter])
+  useEffect(() => {
+    if (active === 'ask') loadAskQs()
+  }, [active, askFilter])
 
   useEffect(() => {
     if (active === 'applications') loadApplications()
@@ -244,15 +264,16 @@ function AdminPanel() {
         <button onClick={handleLogout} className="text-white/50 text-sm hover:text-white">Logout</button>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <div className="flex gap-2 mb-6 bg-white rounded-2xl p-1.5 border border-gray-100 w-fit">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 items-start">
+        <div className="adminSidebar bg-white rounded-2xl p-2 border border-gray-100 flex-shrink-0 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible md:w-52 w-full md:sticky md:top-6">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setActive(t.id)}
-              className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${active === t.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
-              {t.icon} {t.label}
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap flex items-center gap-2 md:w-full ${active === t.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E] hover:bg-gray-50'}`}>
+              <span>{t.icon}</span> <span>{t.label}</span>
             </button>
           ))}
         </div>
+        <div className="flex-1 min-w-0">
 
         {msg && <p className={`text-sm mb-4 ${msg.includes('success') ? 'text-[#0D7377]' : 'text-red-500'}`}>{msg}</p>}
 
@@ -572,6 +593,60 @@ function AdminPanel() {
             </div>
           </div>
         )}
+        {active === 'ask' && (
+          <div>
+            <h1 className="text-xl font-bold text-[#1A3C6E] mb-1">Ask GRID questions</h1>
+            <p className="text-xs text-gray-400 mb-4">Every question users ask. "Needs answer" means the assistant could not answer it from the knowledge base — add those answers to grid-knowledge.md.</p>
+
+            {askTop.length > 0 && (
+              <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
+                <p className="text-sm font-bold text-[#1A3C6E] mb-2">Most asked</p>
+                {askTop.map((t, i) => (
+                  <div key={i} className="flex items-center justify-between py-1">
+                    <p className="text-xs text-gray-600 truncate flex-1">{t.question}</p>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E1F5EE] text-[#085041] ml-2 flex-shrink-0">{t.count}×</span>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {[['unanswered','Needs answer'],['answered','Answered'],['offtopic','Off-topic'],['all','All']].map(([k, lbl]) => (
+                <button key={k} onClick={() => setAskFilter(k)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${askFilter === k ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  {lbl}
+                </button>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              {askQs.length === 0 ? (
+                <p className="text-sm text-gray-400 p-6 text-center">No questions yet</p>
+              ) : askQs.map(q => (
+                <div key={q.id} className="px-4 py-3 border-b border-gray-50 last:border-0">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-bold text-[#1A3C6E]">{q.question}</p>
+                      <p className="text-xs text-gray-400 mt-1 line-clamp-2">{q.answer}</p>
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.offTopic ? 'bg-gray-100 text-gray-600' : q.answered ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                          {q.offTopic ? 'Off-topic' : q.answered ? 'Answered' : 'Needs answer'}
+                        </span>
+                        <span className="text-[10px] text-gray-400">{q.userRole || 'guest'}</span>
+                        <span className="text-[10px] text-gray-400">{new Date(q.createdAt).toLocaleDateString()}</span>
+                        {q.status === 'done' && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E1F5EE] text-[#085041]">Added to KB</span>}
+                      </div>
+                    </div>
+                    {!q.answered && !q.offTopic && q.status !== 'done' && (
+                      <button onClick={() => markAskDone(q.id)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63] whitespace-nowrap flex-shrink-0">Mark added</button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {active === 'users' && (
           <div>
             <h1 className="text-xl font-bold text-[#1A3C6E] mb-4">Users</h1>
@@ -612,6 +687,7 @@ function AdminPanel() {
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   )

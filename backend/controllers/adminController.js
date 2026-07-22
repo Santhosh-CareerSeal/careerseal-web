@@ -289,6 +289,43 @@ const viewAdminDocument = async (req, res) => {
   }
 }
 
+// Ask GRID — logged questions
+const getAskQuestions = async (req, res) => {
+  try {
+    const { filter } = req.query
+    let where = {}
+    if (filter === 'unanswered') where = { answered: false, offTopic: false }
+    else if (filter === 'answered') where = { answered: true }
+    else if (filter === 'offtopic') where = { offTopic: true }
+    const questions = await prisma.askQuestion.findMany({ where, orderBy: { createdAt: 'desc' }, take: 300 })
+
+    const counts = {}
+    questions.forEach(q => {
+      const k = q.question.toLowerCase().trim()
+      counts[k] = (counts[k] || 0) + 1
+    })
+    const top = Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 10).map(([question, count]) => ({ question, count }))
+
+    res.json({ questions, top })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const updateAskQuestion = async (req, res) => {
+  try {
+    const { questionId } = req.params
+    const { status } = req.body
+    const updated = await prisma.askQuestion.update({
+      where: { id: parseInt(questionId) },
+      data: { status: status || 'done' }
+    })
+    res.json({ message: 'Updated', question: updated })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 // Fraud flags for review
 const getFraudFlags = async (req, res) => {
   try {
@@ -408,4 +445,4 @@ const changeAdminPassword = async (req, res) => {
   }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag }
+module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion }
