@@ -9,6 +9,7 @@ const TABS = [
   { id: 'companies', label: 'Companies', icon: '🏢' },
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'applications', label: 'Applications', icon: '📨' },
+  { id: 'documents', label: 'Documents', icon: '📄' },
   { id: 'settings', label: 'Settings', icon: '⚙️' }
 ]
 
@@ -78,10 +79,36 @@ function AdminPanel() {
       setUsers(res.data.users || [])
     } catch (e) { setUsers([]) }
   }
+  const [docs, setDocs] = useState([])
+  const [docFilter, setDocFilter] = useState('all')
+  const [docBusy, setDocBusy] = useState(null)
+  const loadDocs = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/documents`, { headers })
+      setDocs(res.data.documents || [])
+    } catch (e) { setDocs([]) }
+  }
+  const verifyDoc = async (id) => {
+    setDocBusy(id)
+    try {
+      await axios.patch(`${API_URL}/api/admin/documents/${id}/verify`, {}, { headers })
+      await loadDocs()
+    } catch (e) { alert('Could not update verification') }
+    finally { setDocBusy(null) }
+  }
+  const viewDoc = async (id) => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/documents/${id}/view`, { headers })
+      window.open(res.data.url, '_blank')
+    } catch (e) { alert('Could not open document') }
+  }
 
   useEffect(() => {
     if (active === 'users') loadUsers()
   }, [active, userFilter])
+  useEffect(() => {
+    if (active === 'documents') loadDocs()
+  }, [active])
 
   useEffect(() => {
     if (active === 'applications') loadApplications()
@@ -450,6 +477,39 @@ function AdminPanel() {
           </div>
         )}
 
+        {active === 'documents' && (
+          <div>
+            <h1 className="text-xl font-bold text-[#1A3C6E] mb-4">Student Documents</h1>
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {['all', 'self_uploaded', 'verified'].map(f => (
+                <button key={f} onClick={() => setDocFilter(f)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${docFilter === f ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  {f === 'all' ? 'All' : f === 'verified' ? 'Verified' : 'Pending'}
+                </button>
+              ))}
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              {docs.filter(d => docFilter === 'all' || d.trustStatus === docFilter).length === 0 ? (
+                <p className="text-sm text-gray-400 p-6 text-center">No documents found</p>
+              ) : docs.filter(d => docFilter === 'all' || d.trustStatus === docFilter).map(d => (
+                <div key={d.id} className="flex items-center justify-between gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold text-[#1A3C6E] truncate">{d.studentName}</p>
+                    <p className="text-xs text-gray-400 truncate">{d.docType}{d.label ? ' · ' + d.label : ''} · {d.fileName}</p>
+                  </div>
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${d.trustStatus === 'verified' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                    {d.trustStatus === 'verified' ? 'Verified' : 'Pending'}
+                  </span>
+                  <button onClick={() => viewDoc(d.id)} className="text-xs font-bold text-[#1A3C6E] hover:underline whitespace-nowrap">View</button>
+                  <button onClick={() => verifyDoc(d.id)} disabled={docBusy === d.id}
+                    className={`text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap ${d.trustStatus === 'verified' ? 'bg-gray-100 text-gray-500' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
+                    {docBusy === d.id ? '...' : d.trustStatus === 'verified' ? 'Unverify' : 'Verify'}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
         {active === 'users' && (
           <div>
             <h1 className="text-xl font-bold text-[#1A3C6E] mb-4">Users</h1>

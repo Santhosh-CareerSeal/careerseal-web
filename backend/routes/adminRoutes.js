@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly } = require('../middleware/adminMiddleware')
 
@@ -17,5 +17,8 @@ router.get('/companies', protect, adminOnly, getAdminCompanies)
 router.get('/applications', protect, adminOnly, getAdminApplications)
 router.post('/change-password', protect, adminOnly, changeAdminPassword)
 router.patch('/companies/:companyId/verify', protect, adminOnly, toggleCompanyVerified)
+router.get('/documents', protect, adminOnly, getAdminDocuments)
+router.patch('/documents/:documentId/verify', protect, adminOnly, toggleDocumentVerified)
+router.get('/documents/:documentId/view', protect, adminOnly, viewAdminDocument)
 
 module.exports = router

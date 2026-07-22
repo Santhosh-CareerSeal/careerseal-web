@@ -231,6 +231,64 @@ const toggleCompanyVerified = async (req, res) => {
   }
 }
 
+// List all student documents (for verification)
+const getAdminDocuments = async (req, res) => {
+  try {
+    const docs = await prisma.document.findMany({
+      orderBy: { createdAt: 'desc' },
+      include: { student: { include: { user: { select: { name: true, email: true } } } } }
+    })
+    const out = docs.map(d => ({
+      id: d.id,
+      docType: d.docType,
+      label: d.label,
+      fileName: d.fileName,
+      trustStatus: d.trustStatus,
+      verifiedBy: d.verifiedBy,
+      verifiedAt: d.verifiedAt,
+      createdAt: d.createdAt,
+      studentName: d.student?.user?.name || 'Unknown',
+      studentEmail: d.student?.user?.email || '',
+      studentId: d.studentId
+    }))
+    res.json({ documents: out })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Admin verifies / unverifies a document
+const toggleDocumentVerified = async (req, res) => {
+  try {
+    const { documentId } = req.params
+    const doc = await prisma.document.findUnique({ where: { id: parseInt(documentId) } })
+    if (!doc) return res.status(404).json({ message: 'Document not found' })
+    const isVerified = doc.trustStatus === 'verified'
+    const updated = await prisma.document.update({
+      where: { id: parseInt(documentId) },
+      data: isVerified
+        ? { trustStatus: 'self_uploaded', verifiedBy: null, verifiedById: null, verifiedAt: null }
+        : { trustStatus: 'verified', verifiedBy: 'GRID Admin', verifiedById: req.user.userId, verifiedAt: new Date() }
+    })
+    res.json({ message: isVerified ? 'Verification removed' : 'Document verified', document: updated })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Admin views a document (secure temporary link)
+const viewAdminDocument = async (req, res) => {
+  try {
+    const { getSignedUrl } = require('../utils/supabaseStorage')
+    const doc = await prisma.document.findUnique({ where: { id: parseInt(req.params.documentId) } })
+    if (!doc) return res.status(404).json({ message: 'Document not found' })
+    const url = await getSignedUrl(doc.filePath)
+    res.json({ url })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 // List all applications
 const getAdminApplications = async (req, res) => {
   try {
@@ -308,4 +366,4 @@ const changeAdminPassword = async (req, res) => {
   }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword }
+module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument }
