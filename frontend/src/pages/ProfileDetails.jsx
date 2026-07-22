@@ -48,7 +48,20 @@ function ProfileDetails() {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
+  const REQUIRED_FIELDS = [
+    'legalFullName', 'photoUrl', 'dateOfBirth', 'gender', 'contactNumber', 'city',
+    'schoolName', 'schoolPassingYear', 'schoolPercentage',
+    'twelfthSchoolName', 'twelfthPassingYear', 'twelfthPercentage',
+    'collegeName', 'degree', 'branch', 'collegePassingYear',
+    'workStatus', 'technicalSkills'
+  ]
   const [documents, setDocuments] = useState([])
+  const filledCount = REQUIRED_FIELDS.filter(f => (form[f] || '').toString().trim() !== '').length
+  const hasVerifiedSkill = Array.isArray(verifiedSkills) && verifiedSkills.some(s => s && (s.passed || s.status === 'passed' || s.verified))
+  const hasDocument = documents.length > 0
+  const fieldsPct = (filledCount / REQUIRED_FIELDS.length) * 95
+  const completionPct = Math.round(fieldsPct + (hasVerifiedSkill ? 2.5 : 0) + (hasDocument ? 2.5 : 0))
+
   const [docUploading, setDocUploading] = useState('')
   const [docMsg, setDocMsg] = useState('')
   const [docErrors, setDocErrors] = useState({})
@@ -348,7 +361,19 @@ function ProfileDetails() {
 
       <div className="max-w-3xl mx-auto px-6 py-8">
         <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">My Profile</h2>
-        <p className="text-gray-400 text-sm mb-6">Complete all sections and publish to your GRID card</p>
+        <p className="text-gray-400 text-sm mb-4">Complete your profile to get discovered by companies on GRID</p>
+        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
+          <div className="flex items-center justify-between mb-2">
+            <p className="text-sm font-bold text-[#1A3C6E]">Profile {completionPct}% complete</p>
+            <p className="text-xs text-gray-400">{filledCount}/{REQUIRED_FIELDS.length} details{!hasVerifiedSkill ? ' · skill pending' : ''}{!hasDocument ? ' · document pending' : ''}</p>
+          </div>
+          <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
+            <div className="h-2 rounded-full transition-all duration-500" style={{ width: completionPct + '%', background: completionPct === 100 ? '#0D7377' : 'linear-gradient(90deg, #1A3C6E, #5DCAA5)' }}></div>
+          </div>
+          <p className="text-xs mt-2 font-medium" style={{ color: completionPct === 100 ? '#0D7377' : '#9ca3af' }}>
+            {completionPct === 100 ? 'Your profile is complete — publish it to GRID!' : completionPct >= 60 ? 'Almost there — verified profiles get noticed faster.' : 'A complete profile is 3x more likely to be discovered by recruiters.'}
+          </p>
+        </div>
 
         <div className="flex bg-white rounded-2xl border border-gray-100 p-1 mb-6 overflow-x-auto">
           {TABS.map((tab, i) => (
