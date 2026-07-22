@@ -6,7 +6,7 @@ import axios from 'axios'
 import API_URL from '../config'
 import { supabase } from '../supabaseClient'
 
-const TABS = ['Personal', 'Education', 'Profession', 'Skills', 'Others']
+const TABS = ['Personal', 'Education', 'Profession', 'Skills', 'Others', 'Documents']
 
 function ProfileDetails() {
   const navigate = useNavigate()
@@ -47,6 +47,71 @@ function ProfileDetails() {
   })
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
+
+  const [documents, setDocuments] = useState([])
+  const [docUploading, setDocUploading] = useState('')
+  const [docMsg, setDocMsg] = useState('')
+  const [docErrors, setDocErrors] = useState({})
+  const setDocError = (type, msg) => setDocErrors(prev => ({ ...prev, [type]: msg }))
+  const [docLabels, setDocLabels] = useState({})
+
+  const DOC_TYPES = [
+    { key: 'tenth', label: '10th Marksheet', multiple: false },
+    { key: 'twelfth', label: '12th Marksheet', multiple: false },
+    { key: 'degree', label: 'Degree Marksheet / Certificate', multiple: false },
+    { key: 'pg', label: 'Post-Graduate Documents', multiple: false },
+    { key: 'experience', label: 'Experience Letter', multiple: true },
+    { key: 'epfo', label: 'EPFO / EPF Passbook', multiple: true },
+    { key: 'id_proof', label: 'ID Proof', multiple: false },
+    { key: 'other', label: 'Other', multiple: true }
+  ]
+  const ALLOWED_EXT = ['pdf', 'jpg', 'jpeg', 'png']
+
+  const fetchDocuments = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const res = await axios.get(`${API_URL}/api/documents/my`, { headers: { Authorization: `Bearer ${token}` } })
+      setDocuments(res.data.documents || [])
+    } catch (e) { setDocuments([]) }
+  }
+
+  const handleDocUpload = async (docType, file, label) => {
+    if (!file) return
+    setDocMsg('')
+    const ext = file.name.split('.').pop().toLowerCase()
+    if (!ALLOWED_EXT.includes(ext)) { setDocError(docType, 'Only PDF, JPG, or PNG files are allowed'); return }
+    if (file.size > 5 * 1024 * 1024) { setDocError(docType, 'File must be under 5 MB'); return }
+    setDocUploading(docType)
+    try {
+      const token = localStorage.getItem('token')
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('docType', docType)
+      if (label) fd.append('label', label)
+      await axios.post(`${API_URL}/api/documents/upload`, fd, { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } })
+      await fetchDocuments()
+      setDocErrors(prev => ({ ...prev, [docType]: '' }))
+      setDocMsg('Uploaded successfully')
+    } catch (e) { setDocError(docType, e.response?.data?.message || 'Upload failed') }
+    finally { setDocUploading('') }
+  }
+
+  const handleDocView = async (id) => {
+    try {
+      const token = localStorage.getItem('token')
+      const res = await axios.get(`${API_URL}/api/documents/${id}/view`, { headers: { Authorization: `Bearer ${token}` } })
+      window.open(res.data.url, '_blank')
+    } catch (e) { setDocMsg('Could not open document') }
+  }
+
+  const handleDocDelete = async (id) => {
+    if (!window.confirm('Delete this document?')) return
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`${API_URL}/api/documents/${id}`, { headers: { Authorization: `Bearer ${token}` } })
+      await fetchDocuments()
+    } catch (e) { setDocMsg('Could not delete') }
+  }
 
   const handleResendVerification = async () => {
     setResendMsg('Sending...')
@@ -104,6 +169,7 @@ function ProfileDetails() {
           const examRes = await axios.get(`${API_URL}/api/exams`, { headers: { Authorization: `Bearer ${token}` } })
           setVerifiedSkills(examRes.data.skillStatus || [])
         } catch (e) { console.error(e) }
+        try { await fetchDocuments() } catch (e) { console.error(e) }
         try {
           const collegeRes = await axios.get(`${API_URL}/api/college/list`)
           setColleges(collegeRes.data.colleges || [])
@@ -612,25 +678,86 @@ function ProfileDetails() {
                 <button onClick={() => setActiveTab(3)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Skills</button>
               </div>
 
-              <div className="border-t border-gray-100 pt-4 mt-2">
-                <div className="flex gap-3 items-center">
-                  <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
-                    {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
-                  </button>
-                  <div className="relative flex-1 group">
-                    <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`w-full py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
-                      Move to GRID
-                    </button>
-                    <div className="absolute bottom-14 left-0 w-64 bg-[#1A3C6E] text-white text-xs rounded-xl p-3 z-50 hidden group-hover:block shadow-lg">
-                      <p className="font-bold mb-1">What is Move to GRID?</p>
-                      <p className="text-white/80 leading-relaxed">Publishing makes your profile visible to companies globally. You can only do this <span className="font-bold text-[#5DCAA5]">3 times per month</span> — make sure your profile is complete before publishing.</p>
-                      <p className="text-[#5DCAA5] font-bold mt-2">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
+              
+            </div>
+          )}
+          {activeTab === 5 && (
+            <div className="space-y-4">
+              <div>
+                <p className="text-lg font-bold text-[#1A3C6E] mb-1">Documents</p>
+                <p className="text-xs text-gray-400 mb-3">Upload your certificates for verification. PDF, JPG or PNG, max 5MB each. Your documents are private and only shared when you apply to a company.</p>
+              </div>
+              {docMsg && <p className="text-xs font-bold text-[#0D7377]">{docMsg}</p>}
+              <div className="space-y-3">
+                {DOC_TYPES.map(dt => {
+                  const uploaded = documents.filter(d => d.docType === dt.key)
+                  const canUpload = dt.multiple || uploaded.length === 0
+                  return (
+                    <div key={dt.key} className="border border-gray-100 rounded-2xl p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <p className="text-sm font-bold text-gray-700">{dt.label}{dt.multiple && <span className="text-[10px] font-normal text-gray-400 ml-1">(you can add more than one)</span>}</p>
+                        {canUpload ? (
+                          <label className="text-xs font-bold text-[#0D7377] cursor-pointer hover:underline whitespace-nowrap">
+                            {docUploading === dt.key ? 'Uploading...' : (uploaded.length > 0 && dt.multiple ? '+ Add another' : '+ Upload')}
+                            <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" disabled={docUploading === dt.key}
+                              onChange={e => { if (e.target.files[0]) handleDocUpload(dt.key, e.target.files[0], docLabels[dt.key]); e.target.value = ''; setDocLabels(p => ({ ...p, [dt.key]: '' })) }} />
+                          </label>
+                        ) : null}
+                      </div>
+                      {dt.multiple && canUpload && (
+                        <input value={docLabels[dt.key] || ''} onChange={e => setDocLabels(p => ({ ...p, [dt.key]: e.target.value }))}
+                          placeholder="Optional label (e.g. TCS 2020-22)"
+                          className="w-full mb-2 border border-gray-200 rounded-xl px-3 py-2 text-xs outline-none focus:border-[#0D7377]" />
+                      )}
+                      {docErrors[dt.key] && <p className="text-xs font-bold text-red-500 mb-2">{docErrors[dt.key]}</p>}
+                      {uploaded.length === 0 ? (
+                        <p className="text-xs text-gray-300">No document uploaded</p>
+                      ) : (
+                        <div className="space-y-2">
+                          {uploaded.map(d => (
+                            <div key={d.id} className="flex items-center justify-between bg-gray-50 rounded-xl px-3 py-2">
+                              <div className="flex items-center gap-2 min-w-0">
+                                <span className="text-xs text-gray-600 truncate">{d.label ? d.label + ' — ' : ''}{d.fileName}</span>
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap ${d.trustStatus === 'verified' || d.trustStatus === 'college_verified' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                                  {d.trustStatus === 'verified' || d.trustStatus === 'college_verified' ? 'Verified' : 'Self-uploaded'}
+                                </span>
+                              </div>
+                              <div className="flex gap-2 flex-shrink-0">
+                                <button onClick={() => handleDocView(d.id)} className="text-xs font-bold text-[#1A3C6E] hover:underline">View</button>
+                                <button onClick={() => handleDocDelete(d.id)} className="text-xs font-bold text-red-500 hover:underline">Delete</button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  </div>
-                </div>
+                  )
+                })}
+              </div>
+              <div className="flex gap-3 mt-2">
+                <button onClick={() => setActiveTab(4)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Others</button>
               </div>
             </div>
           )}
+          <div className="border-t border-gray-100 pt-4 mt-4">
+            <div className="flex gap-3 items-center">
+              <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
+                {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
+              </button>
+              {activeTab === 5 && (
+                <div className="relative flex-1 group">
+                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`w-full py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
+                    Move to GRID
+                  </button>
+                  <div className="absolute bottom-14 right-0 w-64 bg-[#1A3C6E] text-white text-xs rounded-xl p-3 z-50 hidden group-hover:block shadow-lg">
+                    <p className="font-bold mb-1">What is Move to GRID?</p>
+                    <p className="text-white/80 leading-relaxed">Publishing makes your profile visible to companies globally. You can only do this <span className="font-bold text-[#5DCAA5]">3 times per month</span> — make sure your profile is complete before publishing.</p>
+                    <p className="text-[#5DCAA5] font-bold mt-2">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
         </div>
       </div>

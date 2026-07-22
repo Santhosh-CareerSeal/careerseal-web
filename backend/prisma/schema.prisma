@@ -89,6 +89,7 @@ model Student {
   courseProgress  CourseProgress[]
   collegeId       Int?
   college         College?  @relation(fields: [collegeId], references: [id], onDelete: NoAction)
+  documents             Document[]
 }
 model Roadmap {
   id                    Int       @id @default(autoincrement())
@@ -235,3 +236,23 @@ model BlacklistedToken {
   token     String   @unique
   createdAt DateTime @default(now())
 }
+
+model Document {
+  id           Int      @id @default(autoincrement())
+  studentId    Int
+  docType      String
+  label        String?
+  filePath     String
+  fileName     String?
+  fileSize     Int?
+  mimeType     String?
+  trustStatus  String   @default("self_uploaded")
+  verifiedBy   String?
+  verifiedById Int?
+  verifiedAt   DateTime?
+  createdAt    DateTime @default(now())
+  student      Student  @relation(fields: [studentId], references: [id])
+
+  @@index([studentId])
+}
+
