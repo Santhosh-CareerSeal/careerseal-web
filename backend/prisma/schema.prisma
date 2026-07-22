@@ -275,3 +275,18 @@ model FraudFlag {
   @@index([studentId])
 }
 
+model AskQuestion {
+  id         Int      @id @default(autoincrement())
+  question   String
+  answer     String?
+  answered   Boolean  @default(true)
+  offTopic   Boolean  @default(false)
+  userId     Int?
+  userRole   String?
+  status     String   @default("new")
+  createdAt  DateTime @default(now())
+
+  @@index([answered])
+  @@index([status])
+}
+

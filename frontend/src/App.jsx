@@ -27,6 +27,7 @@ import CollegePortal from './pages/CollegePortal'
 import NotFound from './pages/NotFound'
 import RegisterCompany from './pages/RegisterCompany'
 import RegisterStudent from './pages/RegisterStudent'
+import AskGrid from './components/AskGrid'
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
         <Route path="/register-company" element={<RegisterCompany />} />
         <Route path="/register-student" element={<RegisterStudent />} />
       </Routes>
+      <AskGrid />
     </BrowserRouter>
   )
 }
