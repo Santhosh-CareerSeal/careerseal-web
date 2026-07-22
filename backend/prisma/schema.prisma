@@ -154,6 +154,9 @@ model Application {
   studentId Int?
   jobId     Int?
   status    String?   @default("applied")
+  rejectionReason String?
+  rejectionNote   String?
+  feedbackAt      DateTime?
   createdAt DateTime? @default(now()) @db.Timestamp(6)
   job       Job?      @relation(fields: [jobId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   student   Student?  @relation(fields: [studentId], references: [id], onDelete: NoAction, onUpdate: NoAction)

@@ -156,6 +156,20 @@ function JobTracker() {
                       <span className="text-xs font-bold text-[#0D7377]">📅 Interview scheduled</span>
                     )}
                   </div>
+                  {app.status === 'rejected' && app.rejectionReason && (
+                    <div className="mt-3 bg-red-50 border border-red-100 rounded-xl p-3">
+                      <p className="text-xs font-bold text-red-700 mb-1">Feedback from the company</p>
+                      <p className="text-xs text-red-800">
+                        {app.rejectionReason === 'skills_mismatch' ? 'Skills did not match the role' :
+                         app.rejectionReason === 'experience_gap' ? 'Not enough relevant experience' :
+                         app.rejectionReason === 'position_filled' ? 'The position was already filled' :
+                         app.rejectionReason === 'better_candidate' ? 'Another candidate was a closer fit' :
+                         'Other reason'}
+                      </p>
+                      {app.rejectionNote && <p className="text-xs text-gray-600 mt-2 leading-relaxed">{app.rejectionNote}</p>}
+                      <p className="text-[10px] text-gray-400 mt-2">Every GRID company must give a reason — so you always know where you stand.</p>
+                    </div>
+                  )}
                 </div>
               )
             })}

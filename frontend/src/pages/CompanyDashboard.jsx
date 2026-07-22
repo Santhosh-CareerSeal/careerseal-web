@@ -176,11 +176,39 @@ export default function CompanyDashboard() {
     }
   }
 
+  const REJECT_REASONS = [
+    { key: 'skills_mismatch', label: 'Skills do not match the role' },
+    { key: 'experience_gap', label: 'Not enough relevant experience' },
+    { key: 'position_filled', label: 'Position already filled' },
+    { key: 'better_candidate', label: 'Another candidate was a closer fit' },
+    { key: 'other', label: 'Other' }
+  ]
+  const [rejectModal, setRejectModal] = useState(null)
+  const [rejectReason, setRejectReason] = useState('')
+  const [rejectNote, setRejectNote] = useState('')
+  const [rejectError, setRejectError] = useState('')
+  const [rejectSaving, setRejectSaving] = useState(false)
+
   const handleUpdateStatus = async (applicationId, status) => {
+    if (status === 'rejected') {
+      setRejectModal(applicationId); setRejectReason(''); setRejectNote(''); setRejectError('')
+      return
+    }
     try {
       await axios.put(`${API_URL}/api/company/applications/${applicationId}`, { status }, { headers })
       setCandidates(prev => prev.map(a => a.id === applicationId ? { ...a, status } : a))
     } catch (e) { console.error(e) }
+  }
+
+  const submitRejection = async () => {
+    if (!rejectReason) { setRejectError('Please select a reason — candidates deserve to know why.'); return }
+    setRejectSaving(true)
+    try {
+      await axios.put(`${API_URL}/api/company/applications/${rejectModal}`, { status: 'rejected', rejectionReason: rejectReason, rejectionNote: rejectNote }, { headers })
+      setCandidates(prev => prev.map(a => a.id === rejectModal ? { ...a, status: 'rejected', rejectionReason: rejectReason, rejectionNote: rejectNote } : a))
+      setRejectModal(null)
+    } catch (e) { setRejectError(e.response?.data?.message || 'Could not save. Try again.') }
+    finally { setRejectSaving(false) }
   }
 
   const handleDeleteJob = async (jobId) => {
@@ -228,6 +256,33 @@ export default function CompanyDashboard() {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', background: '#f4f5f7' }}>
       <Sidebar active={active} setActive={setActive} company={company} navigate={navigate} />
+
+      {rejectModal && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div style={{ background: 'white', borderRadius: '16px', padding: '24px', width: '440px', maxWidth: '90vw' }}>
+            <p style={{ fontSize: '16px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Why are you rejecting this candidate?</p>
+            <p style={{ fontSize: '12px', color: '#9ca3af', margin: '0 0 16px' }}>GRID requires feedback so students know where they stand. This is shared with the candidate.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginBottom: '14px' }}>
+              {REJECT_REASONS.map(r => (
+                <label key={r.key} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: '#333', cursor: 'pointer' }}>
+                  <input type="radio" name="rejectReason" checked={rejectReason === r.key} onChange={() => { setRejectReason(r.key); setRejectError('') }} />
+                  {r.label}
+                </label>
+              ))}
+            </div>
+            <textarea value={rejectNote} onChange={e => setRejectNote(e.target.value)} rows={3} maxLength={500}
+              placeholder="Add a short note to help them improve (optional)"
+              style={{ width: '100%', border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 12px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui', resize: 'vertical', marginBottom: '10px' }} />
+            {rejectError && <p style={{ fontSize: '12px', color: '#dc2626', fontWeight: '600', margin: '0 0 10px' }}>{rejectError}</p>}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setRejectModal(null)} style={{ flex: 1, background: '#f8f9fa', color: '#6b7280', border: '1px solid #eee', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
+              <button onClick={submitRejection} disabled={rejectSaving} style={{ flex: 1, background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: rejectSaving ? 0.7 : 1 }}>
+                {rejectSaving ? 'Saving...' : 'Confirm rejection'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
 

@@ -138,13 +138,24 @@ const updateApplicationStatus = async (req, res) => {
   try {
     const userId = req.user.userId
     const { applicationId } = req.params
-    const { status } = req.body
+    const { status, rejectionReason, rejectionNote } = req.body
     const company = await prisma.company.findUnique({ where: { userId } })
     const application = await prisma.application.findFirst({
       where: { id: parseInt(applicationId), job: { companyId: company.id } }
     })
     if (!application) return res.status(404).json({ message: 'Application not found' })
-    const updated = await prisma.application.update({ where: { id: parseInt(applicationId) }, data: { status } })
+
+    const VALID_REASONS = ['skills_mismatch', 'experience_gap', 'position_filled', 'better_candidate', 'other']
+    const data = { status }
+    if (status === 'rejected') {
+      if (!rejectionReason || !VALID_REASONS.includes(rejectionReason)) {
+        return res.status(400).json({ message: 'A rejection reason is required. Candidates deserve to know why.' })
+      }
+      data.rejectionReason = rejectionReason
+      data.rejectionNote = (rejectionNote || '').toString().slice(0, 500) || null
+      data.feedbackAt = new Date()
+    }
+    const updated = await prisma.application.update({ where: { id: parseInt(applicationId) }, data })
     res.json({ message: 'Status updated', application: updated })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
