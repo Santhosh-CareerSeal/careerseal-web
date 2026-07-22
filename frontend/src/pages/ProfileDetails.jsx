@@ -62,6 +62,22 @@ function ProfileDetails() {
   const fieldsPct = (filledCount / REQUIRED_FIELDS.length) * 95
   const completionPct = Math.round(fieldsPct + (hasVerifiedSkill ? 2.5 : 0) + (hasDocument ? 2.5 : 0))
 
+  const TAB_FIELDS = [
+    ['legalFullName', 'photoUrl', 'dateOfBirth', 'gender', 'contactNumber', 'city'],
+    ['schoolName', 'schoolPassingYear', 'schoolPercentage', 'twelfthSchoolName', 'twelfthPassingYear', 'twelfthPercentage', 'collegeName', 'degree', 'branch', 'collegePassingYear'],
+    ['workStatus'],
+    ['technicalSkills'],
+    [],
+    []
+  ]
+  const tabComplete = (i) => {
+    if (i === 4) return true
+    if (i === 5) return documents.length > 0
+    const fields = TAB_FIELDS[i] || []
+    if (!fields.length) return false
+    return fields.every(f => (form[f] || '').toString().trim() !== '')
+  }
+
   const [docUploading, setDocUploading] = useState('')
   const [docMsg, setDocMsg] = useState('')
   const [docErrors, setDocErrors] = useState({})
@@ -378,8 +394,9 @@ function ProfileDetails() {
         <div className="flex bg-white rounded-2xl border border-gray-100 p-1 mb-6 overflow-x-auto">
           {TABS.map((tab, i) => (
             <button key={tab} onClick={() => setActiveTab(i)}
-              className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap ${activeTab === i ? 'bg-[#1A3C6E] text-white' : 'text-gray-400 hover:text-gray-600'}`}>
+              className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-1 ${activeTab === i ? 'bg-[#1A3C6E] text-white' : 'text-gray-400 hover:text-gray-600'}`}>
               {tab}
+              {tabComplete(i) && <span className={activeTab === i ? 'text-[#5DCAA5]' : 'text-[#0D7377]'}>✓</span>}
             </button>
           ))}
         </div>
