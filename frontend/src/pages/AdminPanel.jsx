@@ -10,6 +10,7 @@ const TABS = [
   { id: 'users', label: 'Users', icon: '👥' },
   { id: 'applications', label: 'Applications', icon: '📨' },
   { id: 'documents', label: 'Documents', icon: '📄' },
+  { id: 'fraud', label: 'Fraud Flags', icon: '🚩' },
   { id: 'settings', label: 'Settings', icon: '⚙️' }
 ]
 
@@ -82,6 +83,23 @@ function AdminPanel() {
   const [docs, setDocs] = useState([])
   const [docFilter, setDocFilter] = useState('all')
   const [docBusy, setDocBusy] = useState(null)
+  const [flags, setFlags] = useState([])
+  const [flagFilter, setFlagFilter] = useState('open')
+  const [flagBusy, setFlagBusy] = useState(null)
+  const loadFlags = async () => {
+    try {
+      const res = await axios.get(`${API_URL}/api/admin/fraud-flags`, { headers, params: { status: flagFilter } })
+      setFlags(res.data.flags || [])
+    } catch (e) { setFlags([]) }
+  }
+  const resolveFlag = async (id, action) => {
+    setFlagBusy(id)
+    try {
+      await axios.patch(`${API_URL}/api/admin/fraud-flags/${id}`, { action }, { headers })
+      await loadFlags()
+    } catch (e) { alert('Could not update flag') }
+    finally { setFlagBusy(null) }
+  }
   const loadDocs = async () => {
     try {
       const res = await axios.get(`${API_URL}/api/admin/documents`, { headers })
@@ -109,6 +127,9 @@ function AdminPanel() {
   useEffect(() => {
     if (active === 'documents') loadDocs()
   }, [active])
+  useEffect(() => {
+    if (active === 'fraud') loadFlags()
+  }, [active, flagFilter])
 
   useEffect(() => {
     if (active === 'applications') loadApplications()
@@ -505,6 +526,47 @@ function AdminPanel() {
                     className={`text-xs font-bold px-3 py-1.5 rounded-lg whitespace-nowrap ${d.trustStatus === 'verified' ? 'bg-gray-100 text-gray-500' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
                     {docBusy === d.id ? '...' : d.trustStatus === 'verified' ? 'Unverify' : 'Verify'}
                   </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+        {active === 'fraud' && (
+          <div>
+            <h1 className="text-xl font-bold text-[#1A3C6E] mb-1">Fraud Flags</h1>
+            <p className="text-xs text-gray-400 mb-4">Profiles flagged for review. Nothing is blocked automatically — you decide.</p>
+            <div className="flex gap-2 mb-4 flex-wrap">
+              {['open', 'resolved', 'dismissed', 'all'].map(f => (
+                <button key={f} onClick={() => setFlagFilter(f)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${flagFilter === f ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  {f}
+                </button>
+              ))}
+            </div>
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              {flags.length === 0 ? (
+                <p className="text-sm text-gray-400 p-6 text-center">No flags found</p>
+              ) : flags.map(f => (
+                <div key={f.id} className="flex items-start justify-between gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap mb-1">
+                      <p className="text-sm font-bold text-[#1A3C6E]">{f.studentName}</p>
+                      <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${f.severity === 'high' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>{f.severity}</span>
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">{f.flagType.replace(/_/g, ' ')}</span>
+                    </div>
+                    <p className="text-xs text-gray-500">{f.details}</p>
+                    {f.studentEmail && <p className="text-[10px] text-gray-400 mt-0.5">{f.studentEmail}</p>}
+                  </div>
+                  {f.status === 'open' ? (
+                    <div className="flex gap-2 flex-shrink-0">
+                      <button onClick={() => resolveFlag(f.id, 'dismiss')} disabled={flagBusy === f.id}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Dismiss</button>
+                      <button onClick={() => resolveFlag(f.id, 'resolve')} disabled={flagBusy === f.id}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63] whitespace-nowrap">Resolve</button>
+                    </div>
+                  ) : (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 capitalize flex-shrink-0">{f.status}</span>
+                  )}
                 </div>
               ))}
             </div>

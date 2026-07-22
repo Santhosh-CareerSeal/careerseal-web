@@ -71,6 +71,10 @@ const completeProfile = async (req, res) => {
       }
     })
     res.json({ message: 'Profile saved successfully', student })
+    try {
+      const { checkStudentProfile } = require('../utils/fraudDetection')
+      checkStudentProfile(student).catch(e => console.error('Fraud check failed:', e.message))
+    } catch (e) { console.error('Fraud check load failed:', e.message) }
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }

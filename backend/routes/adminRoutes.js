@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly } = require('../middleware/adminMiddleware')
 
@@ -20,5 +20,7 @@ router.patch('/companies/:companyId/verify', protect, adminOnly, toggleCompanyVe
 router.get('/documents', protect, adminOnly, getAdminDocuments)
 router.patch('/documents/:documentId/verify', protect, adminOnly, toggleDocumentVerified)
 router.get('/documents/:documentId/view', protect, adminOnly, viewAdminDocument)
+router.get('/fraud-flags', protect, adminOnly, getFraudFlags)
+router.patch('/fraud-flags/:flagId', protect, adminOnly, resolveFraudFlag)
 
 module.exports = router

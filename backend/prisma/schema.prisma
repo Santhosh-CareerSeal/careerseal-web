@@ -259,3 +259,19 @@ model Document {
   @@index([studentId])
 }
 
+model FraudFlag {
+  id          Int      @id @default(autoincrement())
+  studentId   Int?
+  companyId   Int?
+  flagType    String
+  severity    String   @default("medium")
+  details     String
+  status      String   @default("open")
+  reviewedBy  String?
+  reviewedAt  DateTime?
+  createdAt   DateTime @default(now())
+
+  @@index([status])
+  @@index([studentId])
+}
+

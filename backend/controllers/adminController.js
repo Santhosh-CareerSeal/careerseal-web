@@ -289,6 +289,48 @@ const viewAdminDocument = async (req, res) => {
   }
 }
 
+// Fraud flags for review
+const getFraudFlags = async (req, res) => {
+  try {
+    const { status } = req.query
+    const where = status && status !== 'all' ? { status } : {}
+    const flags = await prisma.fraudFlag.findMany({ where, orderBy: { createdAt: 'desc' }, take: 200 })
+    const studentIds = [...new Set(flags.map(f => f.studentId).filter(Boolean))]
+    const students = studentIds.length ? await prisma.student.findMany({
+      where: { id: { in: studentIds } },
+      include: { user: { select: { name: true, email: true } } }
+    }) : []
+    const map = {}
+    students.forEach(st => { map[st.id] = { name: st.user?.name || 'Unknown', email: st.user?.email || '' } })
+    const out = flags.map(f => ({
+      id: f.id, studentId: f.studentId, flagType: f.flagType, severity: f.severity,
+      details: f.details, status: f.status, reviewedBy: f.reviewedBy, reviewedAt: f.reviewedAt,
+      createdAt: f.createdAt,
+      studentName: map[f.studentId]?.name || (f.studentId ? 'Student #' + f.studentId : '-'),
+      studentEmail: map[f.studentId]?.email || ''
+    }))
+    res.json({ flags: out })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Admin resolves or dismisses a flag
+const resolveFraudFlag = async (req, res) => {
+  try {
+    const { flagId } = req.params
+    const { action } = req.body
+    const newStatus = action === 'dismiss' ? 'dismissed' : 'resolved'
+    const updated = await prisma.fraudFlag.update({
+      where: { id: parseInt(flagId) },
+      data: { status: newStatus, reviewedBy: 'GRID Admin', reviewedAt: new Date() }
+    })
+    res.json({ message: 'Flag ' + newStatus, flag: updated })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 // List all applications
 const getAdminApplications = async (req, res) => {
   try {
@@ -366,4 +408,4 @@ const changeAdminPassword = async (req, res) => {
   }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument }
+module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag }
