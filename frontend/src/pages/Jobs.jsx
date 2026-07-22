@@ -281,6 +281,9 @@ function Jobs() {
                 const daysAgo = Math.floor((new Date() - new Date(job.createdAt)) / (1000 * 60 * 60 * 24))
                 const timeLabel = daysAgo === 0 ? 'Today' : daysAgo === 1 ? 'Yesterday' : `${daysAgo} days ago`
                 const skillsList = (job.requiredSkills || '').split(',').map(s => s.trim()).filter(Boolean)
+                const mySkills = ((student?.technicalSkills || student?.skills || '')).toLowerCase().split(',').map(x => x.trim()).filter(Boolean)
+                const hasSkill = (sk) => mySkills.some(ms => ms.includes(sk.toLowerCase()) || sk.toLowerCase().includes(ms))
+                const missingSkills = skillsList.filter(sk => !hasSkill(sk))
 
                 return (
                   <div key={job.id} className={`bg-white rounded-2xl p-5 border-2 transition-all hover:shadow-md ${matchLabel?.label === 'Best match' ? 'border-[#0D7377]' : 'border-gray-100 hover:border-gray-200'}`}
@@ -333,10 +336,21 @@ function Jobs() {
                       <p className="text-xs text-gray-500 mb-3 leading-relaxed line-clamp-2">{job.description}</p>
                     )}
 
+                    {mySkills.length > 0 && skillsList.length > 0 && (
+                      <div className="mb-3 rounded-xl px-3 py-2" style={{ background: missingSkills.length === 0 ? '#E1F5EE' : '#FFF9C4' }}>
+                        <p className="text-xs font-bold" style={{ color: missingSkills.length === 0 ? '#085041' : '#854F0B' }}>
+                          {missingSkills.length === 0
+                            ? 'You have all the skills this role asks for'
+                            : `You match ${skillsList.length - missingSkills.length} of ${skillsList.length} skills — missing: ${missingSkills.slice(0, 3).join(', ')}${missingSkills.length > 3 ? '…' : ''}`}
+                        </p>
+                      </div>
+                    )}
                     <div className="flex justify-between items-center">
                       <div className="flex gap-2 flex-wrap">
                         {skillsList.slice(0, 4).map((skill, i) => (
-                          <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">{skill}</span>
+                          <span key={i} className={`text-xs px-2 py-1 rounded-full ${hasSkill(skill) ? 'bg-[#E1F5EE] text-[#085041] font-bold' : 'bg-gray-100 text-gray-500'}`}>
+                            {hasSkill(skill) ? '✓ ' : ''}{skill}
+                          </span>
                         ))}
                         {job.experienceLevel && (
                           <span className={`text-xs px-2 py-1 rounded-full font-bold ${job.experienceLevel === 'Fresher' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
