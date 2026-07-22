@@ -376,8 +376,24 @@ function ProfileDetails() {
       </div>
 
       <div className="max-w-3xl mx-auto px-6 py-8">
-        <h2 className="text-2xl font-bold text-[#1A3C6E] mb-1">My Profile</h2>
-        <p className="text-gray-400 text-sm mb-4">Complete your profile to get discovered by companies on GRID</p>
+        <div className="profileHero rounded-2xl p-5 mb-5 flex items-center gap-4" style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)' }}>
+          <div className="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-white/25">
+            {(photoPreview || form.photoUrl) ? (
+              <img src={photoPreview || form.photoUrl} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-white text-xl font-bold">{(form.legalFullName || 'G').charAt(0).toUpperCase()}</span>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-white font-bold text-xl truncate">{form.legalFullName || 'My Profile'}</p>
+            <p className="text-white/60 text-xs mt-0.5">{form.degree ? form.degree + (form.branch ? ' · ' + form.branch : '') : 'Complete your profile to get discovered by companies'}</p>
+            <div className="flex items-center gap-2 mt-2 flex-wrap">
+              <span className="bg-white/15 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{completionPct}% complete</span>
+              {emailVerified && <span className="bg-[#5DCAA5]/20 text-[#5DCAA5] text-[10px] font-bold px-2 py-0.5 rounded-full">Email verified</span>}
+              {hasVerifiedSkill && <span className="bg-[#5DCAA5]/20 text-[#5DCAA5] text-[10px] font-bold px-2 py-0.5 rounded-full">Skill verified</span>}
+            </div>
+          </div>
+        </div>
         <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-bold text-[#1A3C6E]">Profile {completionPct}% complete</p>
