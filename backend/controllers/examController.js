@@ -1,6 +1,21 @@
 const { PrismaClient } = require('@prisma/client')
 const prisma = new PrismaClient()
 
+const LEVEL_CONFIG = {
+  beginner:     { questions: 15, passMark: 70, timeLimit: 15, order: 1 },
+  intermediate: { questions: 25, passMark: 70, timeLimit: 25, order: 2 },
+  master:       { questions: 35, passMark: 75, timeLimit: 35, order: 3 }
+}
+const LEVEL_ORDER = ['beginner', 'intermediate', 'master']
+
+// which level can this student attempt next for a skill?
+function nextLevelFor(passedLevels) {
+  for (const lvl of LEVEL_ORDER) {
+    if (!passedLevels.includes(lvl)) return lvl
+  }
+  return null
+}
+
 const EXAM_QUESTIONS = {
   'React': {
     level: 'intermediate', questions: [
@@ -281,6 +296,9 @@ const getAvailableExams = async (req, res) => {
 
     const skillStatus = skills.map(skill => {
       const examKey = availableExams.find(e => e.toLowerCase() === skill.toLowerCase())
+      const allVerifiedForSkill = student.verifiedSkills.filter(v => v.skill.toLowerCase() === skill.toLowerCase() && new Date(v.expiresAt) > new Date())
+      const passedLevels = allVerifiedForSkill.map(v => v.level || 'beginner')
+      const nextLvl = nextLevelFor(passedLevels)
       const verified = student.verifiedSkills.find(v => v.skill.toLowerCase() === skill.toLowerCase())
       const attempts = student.examAttempts.filter(a => a.skill.toLowerCase() === skill.toLowerCase())
       const lastAttempt = attempts[0]
@@ -312,16 +330,19 @@ const getAvailableExams = async (req, res) => {
 
       return {
         skill,
-        hasExam: !!examKey,
-        examKey,
+        hasExam: true,
+        examKey: examKey || skill,
+        nextLevel: nextLvl,
+        passedLevels,
+        levelConfig: nextLvl ? LEVEL_CONFIG[nextLvl] : null,
         status,
         canRetake,
         nextRetryAt,
         expiresAt,
         attemptCount,
         redirectToCourses,
-        level: examKey ? EXAM_QUESTIONS[examKey]?.level : null,
-        questionCount: examKey ? EXAM_QUESTIONS[examKey]?.questions.length : null
+        level: nextLvl,
+        questionCount: nextLvl ? LEVEL_CONFIG[nextLvl].questions : null
       }
     })
 
@@ -334,8 +355,8 @@ const getAvailableExams = async (req, res) => {
 const getExamQuestions = async (req, res) => {
   try {
     const { skill } = req.params
-    const examKey = Object.keys(EXAM_QUESTIONS).find(e => e.toLowerCase() === skill.toLowerCase())
-    if (!examKey) return res.status(404).json({ message: 'Exam not available for this skill' })
+    const examKey = Object.keys(EXAM_QUESTIONS).find(e => e.toLowerCase() === skill.toLowerCase()) || skill.trim()
+    if (!examKey) return res.status(404).json({ message: 'Invalid skill' })
 
     const userId = req.user.userId
     const student = await prisma.student.findUnique({
@@ -363,20 +384,43 @@ const getExamQuestions = async (req, res) => {
     }
 
     const exam = EXAM_QUESTIONS[examKey]
-    const shuffled = [...exam.questions].sort(() => Math.random() - 0.5)
-    const questionsForStudent = shuffled.map((q, i) => ({
-      id: i,
-      question: q.q,
-      options: q.options,
-    }))
 
+    // progressive unlocking: find which level this student should take next
+    const passedLevels = (student?.verifiedSkills || [])
+      .filter(v => v.skill.toLowerCase() === examKey.toLowerCase() && new Date(v.expiresAt) > new Date())
+      .map(v => v.level || 'beginner')
+    const level = nextLevelFor(passedLevels)
+    if (!level) return res.status(400).json({ message: 'You have already mastered this skill!' })
+    const levelCfg = LEVEL_CONFIG[level]
+
+    let paperQuestions = null
+    let source = 'ai'
+    try {
+      const { generateExam } = require('../utils/examGenerator')
+      paperQuestions = await generateExam(examKey, level, levelCfg.questions)
+    } catch (e) {
+      console.error('AI exam generation failed:', e.message)
+      if (exam) {
+        paperQuestions = [...exam.questions].sort(() => Math.random() - 0.5)
+        source = 'hardcoded'
+      }
+    }
+    if (!paperQuestions || !paperQuestions.length) {
+      return res.status(503).json({ message: 'Could not prepare an exam for this skill right now. Please try again shortly.' })
+    }
+    await prisma.examPaper.updateMany({ where: { studentId: student.id, skill: examKey, used: false }, data: { used: true } })
+    const paper = await prisma.examPaper.create({
+      data: { studentId: student.id, skill: examKey, level, questions: JSON.stringify(paperQuestions), source }
+    })
+    const questionsForStudent = paperQuestions.map((q, i) => ({ id: i, question: q.q, options: q.options }))
     res.json({
+      paperId: paper.id,
       skill: examKey,
-      level: exam.level,
+      level,
       questions: questionsForStudent,
       totalQuestions: questionsForStudent.length,
-      timeLimit: 30,
-      passMark: 70,
+      timeLimit: levelCfg.timeLimit,
+      passMark: levelCfg.passMark,
       attemptNumber: attempts.length + 1
     })
   } catch (error) {
@@ -390,8 +434,8 @@ const submitExam = async (req, res) => {
     const { answers } = req.body
     const userId = req.user.userId
 
-    const examKey = Object.keys(EXAM_QUESTIONS).find(e => e.toLowerCase() === skill.toLowerCase())
-    if (!examKey) return res.status(404).json({ message: 'Exam not found' })
+    const examKey = Object.keys(EXAM_QUESTIONS).find(e => e.toLowerCase() === skill.toLowerCase()) || skill.trim()
+    if (!examKey) return res.status(404).json({ message: 'Invalid skill' })
 
     const student = await prisma.student.findUnique({
       where: { userId },
@@ -399,16 +443,20 @@ const submitExam = async (req, res) => {
     })
     if (!student) return res.status(404).json({ message: 'Student not found' })
 
-    const exam = EXAM_QUESTIONS[examKey]
-    const shuffled = [...exam.questions].sort(() => Math.random() - 0.5)
-
+    const paper = await prisma.examPaper.findFirst({
+      where: { studentId: student.id, skill: examKey },
+      orderBy: { issuedAt: 'desc' }
+    })
+    if (!paper) return res.status(400).json({ message: 'No exam paper found. Please start the exam again.' })
+    const paperQuestions = JSON.parse(paper.questions)
+    const paperLevel = paper.level || 'beginner'
+    const paperCfg = LEVEL_CONFIG[paperLevel] || LEVEL_CONFIG.beginner
     let correct = 0
     answers.forEach((answer, i) => {
-      if (i < shuffled.length && answer === shuffled[i].answer) correct++
+      if (i < paperQuestions.length && answer === paperQuestions[i].answer) correct++
     })
-
-    const score = Math.round((correct / exam.questions.length) * 100)
-    const passed = score >= 70
+    const score = Math.round((correct / paperQuestions.length) * 100)
+    const passed = score >= paperCfg.passMark
     const attemptNumber = (student.examAttempts.length || 0) + 1
     const nextRetryAt = passed ? null : getRetryTime(attemptNumber)
     const redirectToCourses = !passed && attemptNumber >= 4
@@ -417,8 +465,9 @@ const submitExam = async (req, res) => {
       data: {
         studentId: student.id,
         skill: examKey,
+        level: paperLevel,
         score,
-        totalQuestions: exam.questions.length,
+        totalQuestions: paperQuestions.length,
         passed,
         attemptNumber,
         nextRetryAt
@@ -428,15 +477,15 @@ const submitExam = async (req, res) => {
     if (passed) {
       const expiresAt = new Date()
       expiresAt.setMonth(expiresAt.getMonth() + 3)
-      const existing = await prisma.verifiedSkill.findFirst({ where: { studentId: student.id, skill: examKey } })
+      const existing = await prisma.verifiedSkill.findFirst({ where: { studentId: student.id, skill: examKey, level: paperLevel } })
       if (existing) {
         await prisma.verifiedSkill.update({ where: { id: existing.id }, data: { verifiedAt: new Date(), expiresAt } })
       } else {
-        await prisma.verifiedSkill.create({ data: { studentId: student.id, skill: examKey, expiresAt } })
+        await prisma.verifiedSkill.create({ data: { studentId: student.id, skill: examKey, level: paperLevel, expiresAt } })
       }
     }
 
-    res.json({ score, passed, correct, total: exam.questions.length, attemptNumber, nextRetryAt, redirectToCourses, message: passed ? `Congratulations! You scored ${score}%. ${examKey} is now verified on your GRID!` : `You scored ${score}%. You need 70% to pass.` })
+    res.json({ score, passed, correct, total: paperQuestions.length, attemptNumber, nextRetryAt, redirectToCourses, level: paperLevel, message: passed ? `Congratulations! You scored ${score}%. ${examKey} (${paperLevel}) is now verified on your GRID!` : `You scored ${score}%. You need ${paperCfg.passMark}% to pass.` })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }

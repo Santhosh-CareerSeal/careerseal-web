@@ -7,7 +7,8 @@ import API_URL from '../config'
 const LEVEL_COLORS = {
   beginner: { bg: '#E1F5EE', color: '#085041', label: 'Beginner' },
   intermediate: { bg: '#f0f4ff', color: '#1A3C6E', label: 'Intermediate' },
-  advanced: { bg: '#FFF9C4', color: '#854F0B', label: 'Advanced' }
+  advanced: { bg: '#FFF9C4', color: '#854F0B', label: 'Advanced' },
+  master: { bg: '#FFF4E0', color: '#854F0B', label: 'Master' }
 }
 
 const STATUS_CONFIG = {
