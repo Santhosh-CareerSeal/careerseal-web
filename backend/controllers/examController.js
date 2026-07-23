@@ -431,7 +431,7 @@ const getExamQuestions = async (req, res) => {
 const submitExam = async (req, res) => {
   try {
     const { skill } = req.params
-    const { answers } = req.body
+    const { answers, violations } = req.body
     const userId = req.user.userId
 
     const examKey = Object.keys(EXAM_QUESTIONS).find(e => e.toLowerCase() === skill.toLowerCase()) || skill.trim()
@@ -474,6 +474,18 @@ const submitExam = async (req, res) => {
       }
     })
 
+    if (violations && violations > 0) {
+      try {
+        await prisma.fraudFlag.create({
+          data: {
+            studentId: student.id,
+            flagType: 'exam_violations',
+            severity: violations >= 3 ? 'high' : 'medium',
+            details: violations + ' exam violation(s) during ' + examKey + ' (' + paperLevel + ') exam — tab switches or leaving fullscreen. Score: ' + score + '%'
+          }
+        })
+      } catch (e) { console.error('Violation flag failed:', e.message) }
+    }
     if (passed) {
       const expiresAt = new Date()
       expiresAt.setMonth(expiresAt.getMonth() + 3)
@@ -502,4 +514,24 @@ const getVerifiedSkills = async (req, res) => {
   }
 }
 
-module.exports = { getAvailableExams, getExamQuestions, submitExam, getVerifiedSkills }
+const reportQuestion = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const student = await prisma.student.findUnique({ where: { userId } })
+    const { skill, question, reason } = req.body
+    if (!question) return res.status(400).json({ message: 'Question text is required' })
+    await prisma.questionReport.create({
+      data: {
+        studentId: student?.id || null,
+        skill: (skill || '').toString().slice(0, 100),
+        question: question.toString().slice(0, 500),
+        reason: (reason || '').toString().slice(0, 300) || null
+      }
+    })
+    res.json({ message: 'Thanks — this question has been reported for review.' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { getAvailableExams, getExamQuestions, submitExam, getVerifiedSkills, reportQuestion }

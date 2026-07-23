@@ -326,6 +326,27 @@ const updateAskQuestion = async (req, res) => {
   }
 }
 
+// Admin grants a student a fresh exam attempt for a skill
+const grantExamRetake = async (req, res) => {
+  try {
+    const { studentId, skill } = req.body
+    if (!studentId || !skill) return res.status(400).json({ message: 'studentId and skill are required' })
+
+    // clear attempt history for this skill so cooldowns and max-attempts reset
+    const deleted = await prisma.studentExamAttempt.deleteMany({
+      where: { studentId: parseInt(studentId), skill: { equals: skill, mode: 'insensitive' } }
+    })
+    // clear any unused paper so a fresh one is generated
+    await prisma.examPaper.deleteMany({
+      where: { studentId: parseInt(studentId), skill: { equals: skill, mode: 'insensitive' }, used: false }
+    })
+
+    res.json({ message: 'Retake granted. ' + deleted.count + ' previous attempt(s) cleared.', cleared: deleted.count })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 // Fraud flags for review
 const getFraudFlags = async (req, res) => {
   try {
@@ -445,4 +466,4 @@ const changeAdminPassword = async (req, res) => {
   }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion }
+module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake }

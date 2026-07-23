@@ -34,9 +34,20 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [shuffledQuestions, setShuffledQuestions] = useState([])
   const MAX_VIOLATIONS = 3
+  const [reported, setReported] = useState([])
+  const reportQuestion = async () => {
+    const qText = (shuffledQuestions[current] || questions[current])?.question
+    if (!qText || reported.includes(current)) return
+    setReported(r => [...r, current])
+    try {
+      await axios.post(`${API_URL}/api/exams/report-question`, { skill, question: qText, reason: 'Reported during exam' }, { headers: { Authorization: `Bearer ${token}` } })
+    } catch (e) { }
+  }
 
   useEffect(() => {
-    const shuffled = [...questions].sort(() => Math.random() - 0.5).map(q => ({
+    // paper is already unique per student — do NOT reorder questions,
+    // the backend scores answers against the stored paper order
+    const shuffled = questions.map(q => ({
       ...q,
       options: [...q.options].map((opt, i) => ({ opt, origIdx: i })).sort(() => Math.random() - 0.5)
     }))
@@ -112,7 +123,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
     setSubmitting(true)
     setSubmitted(true)
     try {
-      const res = await axios.post(`${API_URL}/api/exams/${skill}/submit`, { answers }, { headers: { Authorization: `Bearer ${token}` } })
+      const res = await axios.post(`${API_URL}/api/exams/${skill}/submit`, { answers, violations }, { headers: { Authorization: `Bearer ${token}` } })
       setResult(res.data)
     } catch (e) {
       console.error(e)
@@ -247,6 +258,10 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
         <div className="bg-white rounded-2xl p-6 border border-gray-100 mb-4">
           <p className="text-xs font-bold text-gray-400 mb-3">QUESTION {current + 1}</p>
           <p className="text-[#1A3C6E] font-bold text-base leading-relaxed">{(shuffledQuestions[current] || questions[current]).question}</p>
+          <button onClick={reportQuestion} disabled={reported.includes(current)}
+            className="text-[11px] text-gray-400 hover:text-red-500 mt-2 underline">
+            {reported.includes(current) ? 'Reported — thanks' : 'Report this question'}
+          </button>
         </div>
 
         {/* Options */}
@@ -254,12 +269,13 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
           {(shuffledQuestions[current]?.options?.map(o => o.opt) || questions[current].options).map((option, i) => (
             <button key={i} onClick={() => {
               const newAnswers = [...answers]
-              newAnswers[current] = i
+              const opts = shuffledQuestions[current]?.options
+              newAnswers[current] = opts ? opts[i].origIdx : i
               setAnswers(newAnswers)
             }}
-              className={`w-full text-left p-4 rounded-2xl border-2 transition-all font-medium text-sm ${answers[current] === i ? 'border-[#0D7377] bg-[#0D7377]/5 text-[#1A3C6E]' : 'border-gray-100 bg-white hover:border-gray-200 text-gray-700'}`}>
+              className={`w-full text-left p-4 rounded-2xl border-2 transition-all font-medium text-sm ${answers[current] === (shuffledQuestions[current]?.options ? shuffledQuestions[current].options[i].origIdx : i) ? 'border-[#0D7377] bg-[#0D7377]/5 text-[#1A3C6E]' : 'border-gray-100 bg-white hover:border-gray-200 text-gray-700'}`}>
               <span className="inline-flex w-6 h-6 rounded-full border-2 items-center justify-center mr-3 flex-shrink-0 text-xs font-bold"
-                style={{ borderColor: answers[current] === i ? '#0D7377' : '#e5e7eb', background: answers[current] === i ? '#0D7377' : 'white', color: answers[current] === i ? 'white' : '#9ca3af' }}>
+                style={{ borderColor: answers[current] === (shuffledQuestions[current]?.options ? shuffledQuestions[current].options[i].origIdx : i) ? '#0D7377' : '#e5e7eb', background: answers[current] === (shuffledQuestions[current]?.options ? shuffledQuestions[current].options[i].origIdx : i) ? '#0D7377' : 'white', color: answers[current] === (shuffledQuestions[current]?.options ? shuffledQuestions[current].options[i].origIdx : i) ? 'white' : '#9ca3af' }}>
                 {String.fromCharCode(65 + i)}
               </span>
               {option}

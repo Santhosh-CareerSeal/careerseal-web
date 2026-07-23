@@ -109,6 +109,19 @@ function AdminPanel() {
       setFlags(res.data.flags || [])
     } catch (e) { setFlags([]) }
   }
+  const grantRetake = async (flag) => {
+    const m = (flag.details || '').match(/during ([^(]+)\(/)
+    const skill = m ? m[1].trim() : prompt('Which skill should be reset?')
+    if (!skill) return
+    if (!window.confirm('Clear all exam attempts for "' + skill + '" so this student can retake it?')) return
+    setFlagBusy(flag.id)
+    try {
+      const res = await axios.post(`${API_URL}/api/admin/grant-retake`, { studentId: flag.studentId, skill }, { headers })
+      alert(res.data.message)
+      await loadFlags()
+    } catch (e) { alert('Could not grant retake') }
+    finally { setFlagBusy(null) }
+  }
   const resolveFlag = async (id, action) => {
     setFlagBusy(id)
     try {
@@ -580,6 +593,10 @@ function AdminPanel() {
                   </div>
                   {f.status === 'open' ? (
                     <div className="flex gap-2 flex-shrink-0">
+                      {f.flagType === 'exam_violations' && (
+                        <button onClick={() => grantRetake(f)} disabled={flagBusy === f.id}
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-amber-100 text-amber-800 hover:bg-amber-200 whitespace-nowrap">Allow retake</button>
+                      )}
                       <button onClick={() => resolveFlag(f.id, 'dismiss')} disabled={flagBusy === f.id}
                         className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Dismiss</button>
                       <button onClick={() => resolveFlag(f.id, 'resolve')} disabled={flagBusy === f.id}

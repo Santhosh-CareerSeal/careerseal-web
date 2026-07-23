@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly } = require('../middleware/adminMiddleware')
 
@@ -24,5 +24,6 @@ router.get('/fraud-flags', protect, adminOnly, getFraudFlags)
 router.patch('/fraud-flags/:flagId', protect, adminOnly, resolveFraudFlag)
 router.get('/ask-questions', protect, adminOnly, getAskQuestions)
 router.patch('/ask-questions/:questionId', protect, adminOnly, updateAskQuestion)
+router.post('/grant-retake', protect, adminOnly, grantExamRetake)
 
 module.exports = router
