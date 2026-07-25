@@ -2,6 +2,10 @@ import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 
 function Landing() {
+  const token = localStorage.getItem('token')
+  let loggedUser = {}
+  try { loggedUser = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
+  const loginDest = loggedUser.role === 'company' ? '/company' : loggedUser.role === 'college' ? '/college-portal' : loggedUser.role === 'admin' ? '/admin' : '/dashboard'
   return (
     <div style={{ background: '#fff', minHeight: '100vh' }}>
       <div style={{ background: '#1A3C6E', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
@@ -12,8 +16,14 @@ function Landing() {
           <span style={{ color: '#fff', fontWeight: 700, fontSize: '17px' }}>GRID</span>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <Link to="/login" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 14px' }}>Log in</Link>
-          <Link to="/register" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Get started</Link>
+          {token ? (
+            <Link to={loginDest} style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Go to dashboard</Link>
+          ) : (
+            <>
+              <Link to="/login" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 14px' }}>Log in</Link>
+              <Link to="/register" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Get started</Link>
+            </>
+          )}
         </div>
       </div>
 
