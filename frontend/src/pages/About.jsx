@@ -2,16 +2,26 @@ import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 
 function About() {
+  const homeDest = (() => {
+    const token = localStorage.getItem('token')
+    if (!token) return '/home'
+    let user = {}
+    try { user = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
+    if (user.role === 'company') return '/company'
+    if (user.role === 'college') return '/college-portal'
+    if (user.role === 'admin') return '/admin'
+    return '/dashboard'
+  })()
   return (
     <div style={{ background: '#fff', minHeight: '100vh' }}>
       <div style={{ background: '#1A3C6E', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+        <Link to={homeDest} style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#5DCAA5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5l9-9" stroke="#1A3C6E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </span>
           <span style={{ color: '#fff', fontWeight: 700, fontSize: '17px' }}>GRID</span>
         </Link>
-        <Link to="/home" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>Home</Link>
+        <Link to={homeDest} style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, textDecoration: 'none' }}>Home</Link>
       </div>
 
       <div style={{ maxWidth: '720px', margin: '0 auto', padding: '3.5rem 1.5rem' }}>
