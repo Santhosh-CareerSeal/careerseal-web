@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /dashboard
+Disallow: /company-dashboard
+Disallow: /college-portal
+Disallow: /profile
+
+Sitemap: https://thegridcard.com/sitemap.xml
