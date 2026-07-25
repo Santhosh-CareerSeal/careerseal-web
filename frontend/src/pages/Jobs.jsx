@@ -305,6 +305,11 @@ function Jobs() {
                           </div>
                           <p className="text-xs text-gray-400">
                             {job.company?.companyName || 'Company'}
+                            {job.companyRating && (
+                              <span className="inline-flex items-center gap-0.5 ml-2 text-xs font-bold" style={{ color: '#EF9F27' }} title={job.companyRating.count + ' student ratings'}>
+                                ★ <span style={{ color: '#6b7280' }}>{job.companyRating.average}</span>
+                              </span>
+                            )}
                             {job.location && ` · ${job.location}`}
                             {` · ${timeLabel}`}
                           </p>

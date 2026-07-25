@@ -42,7 +42,27 @@ const getAllJobs = async (req, res) => {
       include: { company: true },
       orderBy: { createdAt: 'desc' }
     })
-    res.json({ jobs })
+    // attach public rating (only when a company has 5+ ratings)
+    const companyIds = [...new Set(jobs.map(j => j.company?.id).filter(Boolean))]
+    const ratingMap = {}
+    if (companyIds.length) {
+      const grouped = await prisma.companyRating.groupBy({
+        by: ['companyId'],
+        where: { companyId: { in: companyIds } },
+        _avg: { stars: true },
+        _count: { stars: true }
+      })
+      grouped.forEach(g => {
+        if (g._count.stars >= 5) {
+          ratingMap[g.companyId] = { average: Math.round(g._avg.stars * 10) / 10, count: g._count.stars }
+        }
+      })
+    }
+    const jobsWithRating = jobs.map(j => ({
+      ...j,
+      companyRating: j.company?.id ? (ratingMap[j.company.id] || null) : null
+    }))
+    res.json({ jobs: jobsWithRating })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
