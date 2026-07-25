@@ -4,6 +4,7 @@ import axios from 'axios'
 import API_URL from '../config'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import Footer from '../components/Footer'
 
 function Sidebar({ active, setActive, college, navigate }) {
   const navItems = [
@@ -589,6 +590,7 @@ export default function CollegePortal() {
           </div>
         )}
 
+        <Footer />
       </div>
     </div>
   )

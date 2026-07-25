@@ -29,6 +29,7 @@ import RegisterCompany from './pages/RegisterCompany'
 import RegisterStudent from './pages/RegisterStudent'
 import AskGrid from './components/AskGrid'
 import Landing from './pages/Landing'
+import About from './pages/About'
 
 function App() {
   return (
@@ -36,6 +37,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Splash />} />
         <Route path="/home" element={<Landing />} />
+        <Route path="/about" element={<About />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

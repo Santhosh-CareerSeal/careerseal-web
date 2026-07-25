@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import Footer from '../components/Footer'
 
 const TIPS = [
   "Tailor your skills section for each job — profiles with matching skills get 3x more shortlists.",
@@ -446,6 +447,7 @@ function Dashboard() {
 
         </div>
       </div>
+      <Footer />
     </div>
   )
 }

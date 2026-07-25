@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import Footer from '../components/Footer'
 
 const STAGES = ['applied', 'shortlisted', 'interview', 'hired', 'rejected']
 const STAGE_COLORS = {
@@ -897,6 +898,7 @@ export default function CompanyDashboard() {
           </div>
         )}
 
+        <Footer />
       </div>
     </div>
   )

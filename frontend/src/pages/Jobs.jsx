@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import Footer from '../components/Footer'
 
 const JOB_ICONS = {
   'frontend': '💻', 'react': '⚛️', 'java': '☕', 'python': '🐍',
@@ -382,6 +383,7 @@ function Jobs() {
           )}
         </div>
       </div>
+      <Footer />
     </div>
   )
 }
