@@ -20,6 +20,7 @@ const otpRoutes = require('./routes/otpRoutes')
 const roadmapRoutes = require('./routes/roadmapRoutes')
 const documentRoutes = require('./routes/documentRoutes')
 const askRoutes = require('./routes/askRoutes')
+const ratingRoutes = require('./routes/ratingRoutes')
 
 dotenv.config()
 
@@ -83,6 +84,7 @@ app.use('/api/otp', otpRoutes)
 app.use('/api/roadmap', roadmapRoutes)
 app.use('/api/documents', documentRoutes)
 app.use('/api/ask', askRoutes)
+app.use('/api/ratings', ratingRoutes)
 app.use('/api/admin', adminRoutes)
 
 app.listen(PORT, () => {

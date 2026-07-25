@@ -75,6 +75,7 @@ export default function CompanyDashboard() {
   const navigate = useNavigate()
   const [active, setActive] = useState('dashboard')
   const [company, setCompany] = useState(null)
+  const [ownRating, setOwnRating] = useState(null)
   const [stats, setStats] = useState(null)
   const [jobs, setJobs] = useState([])
   const [candidates, setCandidates] = useState([])
@@ -102,6 +103,11 @@ export default function CompanyDashboard() {
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
+  useEffect(() => {
+    if (active === 'analytics' && !ownRating) {
+      axios.get(`${API_URL}/api/ratings/own`, { headers }).then(r => setOwnRating(r.data)).catch(() => {})
+    }
+  }, [active])
 
   const handleDeleteAccount = async () => {
     if (!window.confirm('Are you sure? This will permanently delete your company account, all jobs and candidate data.')) return
@@ -666,6 +672,21 @@ export default function CompanyDashboard() {
         {active === 'analytics' && (
           <div>
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 20px' }}>Analytics</p>
+            {ownRating && (
+              <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)', borderRadius: '16px', padding: '20px', marginBottom: '20px', color: 'white' }}>
+                <p style={{ fontSize: '13px', opacity: 0.8, margin: '0 0 6px' }}>Your GRID rating (from students you've interviewed)</p>
+                {ownRating.count === 0 ? (
+                  <p style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>No ratings yet</p>
+                ) : (
+                  <>
+                    <p style={{ fontSize: '30px', fontWeight: 700, margin: '0 0 2px' }}>{'★'.repeat(Math.round(ownRating.average))}<span style={{ fontSize: '18px', opacity: 0.9 }}> {ownRating.average}/5</span></p>
+                    <p style={{ fontSize: '12px', opacity: 0.8, margin: 0 }}>
+                      From {ownRating.count} student{ownRating.count !== 1 ? 's' : ''}. {ownRating.public ? 'This score is public on your profile.' : `Shown publicly once you reach ${ownRating.threshold} ratings.`}
+                    </p>
+                  </>
+                )}
+              </div>
+            )}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', marginBottom: '20px' }}>
               {[
                 { label: 'TOTAL JOBS POSTED', value: analytics?.totalJobs || 0 },

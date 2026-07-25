@@ -317,3 +317,16 @@ model QuestionReport {
   @@index([status])
 }
 
+model CompanyRating {
+  id         Int      @id @default(autoincrement())
+  companyId  Int
+  studentId  Int
+  stars      Int
+  comment    String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([companyId, studentId])
+  @@index([companyId])
+}
+

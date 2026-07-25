@@ -4,6 +4,58 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 
+function RateCompany({ companyId, companyName }) {
+  const [stars, setStars] = useState(0)
+  const [hover, setHover] = useState(0)
+  const [comment, setComment] = useState('')
+  const [saved, setSaved] = useState(false)
+  const [canRate, setCanRate] = useState(false)
+  const token = localStorage.getItem('token')
+
+  useEffect(() => {
+    const headers = { Authorization: 'Bearer ' + token }
+    axios.get(API_URL + '/api/ratings/mine/' + companyId, { headers })
+      .then(r => {
+        setCanRate(r.data.canRate)
+        if (r.data.existing) { setStars(r.data.existing.stars); setComment(r.data.existing.comment || ''); setSaved(true) }
+      })
+      .catch(() => {})
+  }, [companyId])
+
+  if (!canRate) return null
+
+  const submit = async () => {
+    if (!stars) return
+    try {
+      await axios.post(API_URL + '/api/ratings', { companyId, stars, comment }, { headers: { Authorization: 'Bearer ' + token } })
+      setSaved(true)
+    } catch (e) { alert(e.response?.data?.message || 'Could not save rating') }
+  }
+
+  return (
+    <div className="mt-3 bg-gray-50 border border-gray-100 rounded-xl p-3">
+      <p className="text-xs font-bold text-[#1A3C6E] mb-2">{saved ? 'Your rating for ' + companyName : 'Rate your experience with ' + companyName}</p>
+      <div className="flex gap-1 mb-2">
+        {[1,2,3,4,5].map(n => (
+          <button key={n} onClick={() => setStars(n)} onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)}
+            className="text-xl leading-none" style={{ color: (hover || stars) >= n ? '#EF9F27' : '#d1d5db' }}>★</button>
+        ))}
+      </div>
+      {!saved ? (
+        <>
+          <textarea value={comment} onChange={e => setComment(e.target.value)} rows={2} maxLength={500}
+            placeholder="Optional: how was the process, communication, fairness?"
+            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-xs outline-none focus:border-[#0D7377] mb-2" />
+          <button onClick={submit} disabled={!stars}
+            className="text-xs font-bold px-4 py-1.5 rounded-lg bg-[#0D7377] text-white disabled:opacity-40">Submit rating</button>
+        </>
+      ) : (
+        <p className="text-[11px] text-[#085041] font-medium">Thanks — you can update this anytime.</p>
+      )}
+    </div>
+  )
+}
+
 const STAGES = [
   { key: 'applied', label: 'Applied', color: '#1A3C6E', bg: '#f0f4ff' },
   { key: 'shortlisted', label: 'Shortlisted', color: '#854F0B', bg: '#FFF9C4' },
@@ -169,6 +221,9 @@ function JobTracker() {
                       {app.rejectionNote && <p className="text-xs text-gray-600 mt-2 leading-relaxed">{app.rejectionNote}</p>}
                       <p className="text-[10px] text-gray-400 mt-2">Every GRID company must give a reason — so you always know where you stand.</p>
                     </div>
+                  )}
+                  {['shortlisted','interview','hired','rejected'].includes(app.status) && app.job?.company?.id && (
+                    <RateCompany companyId={app.job.company.id} companyName={app.job?.company?.companyName || 'this company'} />
                   )}
                 </div>
               )
