@@ -43,11 +43,20 @@ function Splash() {
     if (!token) return
     let user = {}
     try { user = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
-    const alreadyLoggedIn = true
-    if (user.role === 'company') navigate('/company', { replace: true })
-    else if (user.role === 'college') navigate('/college-portal', { replace: true })
-    else if (user.role === 'admin') navigate('/admin', { replace: true })
-    else navigate('/dashboard', { replace: true })
+    if (user.role === 'company') return navigate('/company', { replace: true })
+    if (user.role === 'college') return navigate('/college-portal', { replace: true })
+    if (user.role === 'admin') return navigate('/admin', { replace: true })
+    return navigate('/dashboard', { replace: true })
+  }, [])
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) return
+    if (localStorage.getItem('grid_splash_seen')) {
+      navigate('/home', { replace: true })
+    } else {
+      localStorage.setItem('grid_splash_seen', '1')
+    }
   }, [])
   const [poppedCount, setPoppedCount] = useState(0)
   const [mottoText, setMottoText] = useState('')
