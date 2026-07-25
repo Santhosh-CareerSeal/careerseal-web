@@ -37,6 +37,18 @@ const SPLASH_DURATION = 3000
 
 function Splash() {
   const navigate = useNavigate()
+
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (!token) return
+    let user = {}
+    try { user = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
+    const alreadyLoggedIn = true
+    if (user.role === 'company') navigate('/company', { replace: true })
+    else if (user.role === 'college') navigate('/college-portal', { replace: true })
+    else if (user.role === 'admin') navigate('/admin', { replace: true })
+    else navigate('/dashboard', { replace: true })
+  }, [])
   const [poppedCount, setPoppedCount] = useState(0)
   const [mottoText, setMottoText] = useState('')
   const [propIndex, setPropIndex] = useState(-1)
@@ -44,7 +56,7 @@ function Splash() {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const redirectTimer = setTimeout(() => navigate('/register'), SPLASH_DURATION)
+    const redirectTimer = setTimeout(() => navigate('/home'), SPLASH_DURATION)
 
     let popTimer
     const popInterval = Math.floor((SPLASH_DURATION - 600) / fields.length)

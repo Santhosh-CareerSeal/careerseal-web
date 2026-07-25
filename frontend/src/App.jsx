@@ -28,12 +28,14 @@ import NotFound from './pages/NotFound'
 import RegisterCompany from './pages/RegisterCompany'
 import RegisterStudent from './pages/RegisterStudent'
 import AskGrid from './components/AskGrid'
+import Landing from './pages/Landing'
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Splash />} />
+        <Route path="/home" element={<Landing />} />
         <Route path="/onboarding" element={<Onboarding />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
