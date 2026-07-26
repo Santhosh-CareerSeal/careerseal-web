@@ -35,7 +35,7 @@ function Landing() {
             GRID gives every student a verified career identity — skills tested, documents checked — so companies can trust what they see, and no one gets overlooked for lack of a fancy resume.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/register" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>Create your GRID Card</Link>
+            <Link to="/register-student" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>Create your GRID Card</Link>
             <a href="#how" style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '15px', fontWeight: 600, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>See how it works</a>
           </div>
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '18px 0 0' }}>Hiring, or a college? <a href="#audiences" style={{ color: '#9FE1CB', fontWeight: 700, textDecoration: 'none' }}>Choose your path below ↓</a></p>
@@ -101,7 +101,7 @@ function Landing() {
       <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)', padding: '3rem 1.5rem', textAlign: 'center', color: '#fff' }}>
         <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 10px' }}>Your verified career starts here</h2>
         <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', margin: '0 0 22px' }}>Join GRID free and build a career identity companies trust.</p>
-        <Link to="/register" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 30px', borderRadius: '10px' }}>Create your GRID Card</Link>
+        <Link to="/register-student" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 30px', borderRadius: '10px' }}>Create your GRID Card</Link>
       </div>
 
       <Footer />
