@@ -111,11 +111,6 @@ function RegisterStudent() {
             {connecting === 'Google' ? 'Connecting...' : 'Continue with Google'}
           </button>
 
-          <button onClick={() => handleOAuth('Zoho')} disabled={connecting === 'Zoho'}
-            className="w-full flex items-center justify-center gap-3 border-2 border-gray-100 rounded-xl px-4 py-3 mb-5 font-bold text-gray-700 hover:bg-gray-50 transition-colors text-sm">
-            <svg width="18" height="18" viewBox="0 0 24 24"><rect width="24" height="24" rx="4" fill="#E42527"/><text x="12" y="16" textAnchor="middle" fontSize="10" fontWeight="bold" fill="white" fontFamily="Arial">Z</text></svg>
-            {connecting === 'Zoho' ? 'Connecting...' : 'Continue with Zoho'}
-          </button>
 
           <div className="flex items-center gap-3 mb-5">
             <div className="h-px bg-gray-200 flex-1"></div>
