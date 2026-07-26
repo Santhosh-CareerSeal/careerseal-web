@@ -38,6 +38,7 @@ function Landing() {
             <Link to="/register" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>Create your GRID Card</Link>
             <a href="#how" style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '15px', fontWeight: 600, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>See how it works</a>
           </div>
+          <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '18px 0 0' }}>Hiring, or a college? <a href="#audiences" style={{ color: '#9FE1CB', fontWeight: 700, textDecoration: 'none' }}>Choose your path below ↓</a></p>
         </div>
       </div>
 
@@ -76,22 +77,22 @@ function Landing() {
         </div>
       </div>
 
-      <div style={{ padding: '3.5rem 1.5rem', maxWidth: '860px', margin: '0 auto' }}>
-        <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#1A3C6E', textAlign: 'center', margin: '0 0 32px' }}>Built for everyone in hiring</h2>
+      <div id="audiences" style={{ padding: '3.5rem 1.5rem', maxWidth: '900px', margin: '0 auto' }}>
+        <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#1A3C6E', textAlign: 'center', margin: '0 0 8px' }}>Find your path</h2>
+        <p style={{ fontSize: '14px', color: '#8a929c', textAlign: 'center', margin: '0 0 32px' }}>GRID works for everyone in hiring. Pick the one that's you.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
           {[
-            ['For students', 'A verified GRID Card that proves your skills, an AI career roadmap, and jobs that actually see you. Free.', '/register', 0],
-            ['For companies', 'Hire from a pool of skill-verified, document-checked candidates. Less time on fakes, more on real talent.', '/register', 0],
-            ['For colleges', 'Manage placements, run drives, and generate NAAC/NBA-ready reports in a click. We onboard you.', 'mailto:support@thegridcard.com', 1]
-          ].map(([t, d, link, isMail]) => (
-            <div key={t} style={{ border: '1px solid #eef0f3', borderRadius: '14px', padding: '22px' }}>
-              <p style={{ fontSize: '17px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 8px' }}>{t}</p>
-              <p style={{ fontSize: '13px', color: '#6b7480', lineHeight: 1.65, margin: '0 0 14px' }}>{d}</p>
-              {isMail ? (
-                <a href={link} style={{ fontSize: '13px', fontWeight: 700, color: '#0D7377', textDecoration: 'none' }}>Get in touch →</a>
-              ) : (
-                <Link to={link} style={{ fontSize: '13px', fontWeight: 700, color: '#0D7377', textDecoration: 'none' }}>Get started →</Link>
-              )}
+            { icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-5 0-9 2.5-9 6v1h18v-1c0-3.5-4-6-9-6z', tint: '#E1F5EE', iconColor: '#0F6E56', title: 'For students', desc: 'Prove your skills, get a verified GRID Card, and be seen by companies that trust it.', cta: 'Join as a student', to: '/register-student' },
+            { icon: 'M3 21V7l6-4 6 4v14M9 21v-4h2v4M17 21V11l4 2v8M6 9h.01M6 12h.01M6 15h.01', tint: '#E6F1FB', iconColor: '#185FA5', title: 'For companies', desc: 'Hire skill-verified, document-checked candidates. Spend less time sorting out fakes.', cta: 'Hire on GRID', to: '/register-company' },
+            { icon: 'M12 3L2 8l10 5 10-5-10-5zM4 10v6c0 1 3.5 3 8 3s8-2 8-3v-6', tint: '#EEEDFE', iconColor: '#3C3489', title: 'For colleges', desc: 'Run placements and drives, and generate NAAC/NBA-ready reports in a click.', cta: 'Bring GRID to your college', to: '/college-login' }
+          ].map(a => (
+            <div key={a.title} style={{ background: '#fff', border: '1px solid #eef0f3', borderRadius: '14px', padding: '22px', display: 'flex', flexDirection: 'column' }}>
+              <span style={{ width: '38px', height: '38px', borderRadius: '10px', background: a.tint, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '14px' }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={a.iconColor} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d={a.icon}/></svg>
+              </span>
+              <p style={{ fontSize: '17px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 8px' }}>{a.title}</p>
+              <p style={{ fontSize: '13px', color: '#6b7480', lineHeight: 1.65, margin: '0 0 18px', flex: 1 }}>{a.desc}</p>
+              <Link to={a.to} style={{ display: 'inline-block', textAlign: 'center', background: '#1A3C6E', color: '#fff', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '11px 16px', borderRadius: '9px' }}>{a.cta}</Link>
             </div>
           ))}
         </div>
