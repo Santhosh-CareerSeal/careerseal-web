@@ -60,6 +60,8 @@ model Student {
   currentCompany        String?
   jobTitle              String?
   workExperience        String?
+  projects              String?       @db.Text
+  employmentHistory     String?       @db.Text
   preferredJobType      String?
   preferredWorkLocation String?
   noticePeriod          String?

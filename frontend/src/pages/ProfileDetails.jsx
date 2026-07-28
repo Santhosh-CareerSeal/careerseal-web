@@ -39,7 +39,7 @@ function ProfileDetails() {
     twelfthSchoolName: '', twelfthBoard: '', twelfthPassingYear: '', twelfthPercentage: '',
     collegeName: '', collegeId: '', degree: '', branch: '', collegePassingYear: '', collegeCGPA: '',
     pgCollegeName: '', pgDegree: '', pgBranch: '', pgPassingYear: '', pgCGPA: '',
-    workStatus: '', currentCompany: '', jobTitle: '', workExperience: '',
+    workStatus: '', currentCompany: '', jobTitle: '', workExperience: '', projects: [], employmentHistory: [],
     preferredJobType: '', preferredWorkLocation: '', noticePeriod: '', expectedSalary: '',
     technicalSkills: '', softSkills: '', languagesKnown: '', certifications: '', toolsAndSoftware: '',
     hobbies: '', pfAccountNumber: '', aadhaarNumber: '', panNumber: '', passportNumber: '',
@@ -179,6 +179,8 @@ function ProfileDetails() {
             pgBranch: s.pgBranch || '', pgPassingYear: s.pgPassingYear || '', pgCGPA: s.pgCGPA || '',
             workStatus: s.workStatus || '', currentCompany: s.currentCompany || '',
             jobTitle: s.jobTitle || '', workExperience: s.workExperience || '',
+            projects: (() => { try { return s.projects ? JSON.parse(s.projects) : [] } catch (e) { return [] } })(),
+            employmentHistory: (() => { try { return s.employmentHistory ? JSON.parse(s.employmentHistory) : [] } catch (e) { return [] } })(),
             preferredJobType: s.preferredJobType || '', preferredWorkLocation: s.preferredWorkLocation || '',
             noticePeriod: s.noticePeriod || '', expectedSalary: s.expectedSalary || '',
             technicalSkills: s.technicalSkills || '', softSkills: s.softSkills || '',
@@ -285,12 +287,36 @@ function ProfileDetails() {
     finally { setUploadingPhoto(false) }
   }
 
+  const [savingStep, setSavingStep] = useState(false)
+  const addProject = () => setForm(f => ({ ...f, projects: [...(f.projects || []), { title: '', details: '', role: '' }] }))
+  const removeProject = (idx) => setForm(f => ({ ...f, projects: f.projects.filter((_, i) => i !== idx) }))
+  const updateProject = (idx, field, value) => setForm(f => ({ ...f, projects: f.projects.map((pr, i) => i === idx ? { ...pr, [field]: value } : pr) }))
+  const addJob = () => setForm(f => ({ ...f, employmentHistory: [...(f.employmentHistory || []), { company: '', role: '', duration: '', projects: [] }] }))
+  const addJobProject = (jobIdx) => setForm(f => ({ ...f, employmentHistory: f.employmentHistory.map((j, i) => i === jobIdx ? { ...j, projects: [...(j.projects || []), { title: '', details: '', role: '' }] } : j) }))
+  const removeJobProject = (jobIdx, prIdx) => setForm(f => ({ ...f, employmentHistory: f.employmentHistory.map((j, i) => i === jobIdx ? { ...j, projects: j.projects.filter((_, pi) => pi !== prIdx) } : j) }))
+  const updateJobProject = (jobIdx, prIdx, field, value) => setForm(f => ({ ...f, employmentHistory: f.employmentHistory.map((j, i) => i === jobIdx ? { ...j, projects: j.projects.map((pr, pi) => pi === prIdx ? { ...pr, [field]: value } : pr) } : j) }))
+  const removeJob = (idx) => setForm(f => ({ ...f, employmentHistory: f.employmentHistory.filter((_, i) => i !== idx) }))
+  const updateJob = (idx, field, value) => setForm(f => ({ ...f, employmentHistory: f.employmentHistory.map((j, i) => i === idx ? { ...j, [field]: value } : j) }))
+  const saveAndGo = async (targetTab) => {
+    setSavingStep(true); setError(''); setSuccess('')
+    try {
+      const photoUrl = photoFile ? await uploadPhoto() : form.photoUrl
+      const token = localStorage.getItem('token')
+      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
+      setForm(f => ({ ...f, photoUrl }))
+      setSuccess('Saved')
+      setTimeout(() => setSuccess(''), 1500)
+      if (typeof targetTab === 'number') setActiveTab(targetTab)
+    } catch (e) {
+      setError(e.response?.data?.message || 'Could not save. Please try again.')
+    } finally { setSavingStep(false) }
+  }
   const handleSave = async () => {
     setSaving(true); setError(''); setSuccess('')
     try {
       const photoUrl = photoFile ? await uploadPhoto() : form.photoUrl
       const token = localStorage.getItem('token')
-      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl }, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
       setSuccess('Profile saved successfully!')
       setForm(f => ({ ...f, photoUrl }))
       setTimeout(() => navigate('/dashboard'), 1500)
@@ -303,7 +329,7 @@ function ProfileDetails() {
     try {
       const photoUrl = photoFile ? await uploadPhoto() : form.photoUrl
       const token = localStorage.getItem('token')
-      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl }, { headers: { Authorization: `Bearer ${token}` } })
+      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
       const res = await axios.post(`${API_URL}/api/profile/move-to-grid`, {}, { headers: { Authorization: `Bearer ${token}` } })
       setUpdatesRemaining(res.data.updatesRemaining)
       setGridMsg(`Published to GRID! ${res.data.updatesRemaining} update${res.data.updatesRemaining !== 1 ? 's' : ''} remaining this month.`)
@@ -489,8 +515,8 @@ function ProfileDetails() {
                 </div>
               </div>
 
-              <button onClick={() => setActiveTab(1)} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-2">
-                Next: Education →
+              <button onClick={() => saveAndGo(1)} disabled={savingStep} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-2">
+                {savingStep ? 'Saving...' : 'Save & Next: Education →'}
               </button>
             </div>
           )}
@@ -581,7 +607,7 @@ function ProfileDetails() {
 
               <div className="flex gap-3 mt-2">
                 <button onClick={() => setActiveTab(0)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Personal</button>
-                <button onClick={() => setActiveTab(2)} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">Next: Profession →</button>
+                <button onClick={() => saveAndGo(2)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Profession →'}</button>
               </div>
             </div>
           )}
@@ -600,14 +626,81 @@ function ProfileDetails() {
                 </div>
               </div>
 
+              <div>
+                <label className={labelClass}>{form.workStatus === 'Experienced' ? 'Work summary' : 'Internship summary (if any)'}</label>
+                <textarea placeholder={form.workStatus === 'Experienced' ? 'Briefly summarise your overall work experience...' : 'Briefly describe any internships or training you have done...'} value={form.workExperience} onChange={e => set('workExperience', e.target.value)} className={`${inputClass} h-20`} />
+              </div>
+
               {form.workStatus === 'Experienced' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div><label className={labelClass}>Current company</label><input type="text" placeholder="e.g. Infosys" value={form.currentCompany} onChange={e => set('currentCompany', e.target.value)} className={inputClass} /></div>
-                  <div><label className={labelClass}>Job title</label><input type="text" placeholder="e.g. Software Engineer" value={form.jobTitle} onChange={e => set('jobTitle', e.target.value)} className={inputClass} /></div>
+                <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-bold text-[#1A3C6E]">Employment history</label>
+                    <button type="button" onClick={addJob} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63]">+ Add company</button>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3">Tip: Add each company you've worked at, your role, and the projects you did there. Recruiters want specific, real experience.</p>
+                  {(!form.employmentHistory || form.employmentHistory.length === 0) && (
+                    <p className="text-xs text-gray-400 italic py-2">No companies added yet. Click "+ Add company" to add your work history.</p>
+                  )}
+                  {(form.employmentHistory || []).map((j, idx) => (
+                    <div key={idx} className="bg-white border border-gray-100 rounded-xl p-3 mb-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-[#0D7377]">Company {idx + 1}</span>
+                        <button type="button" onClick={() => removeJob(idx)} className="text-xs text-red-500 hover:text-red-700 font-bold">Remove</button>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
+                        <input type="text" placeholder="Company (e.g. Infosys)" value={j.company} onChange={e => updateJob(idx, 'company', e.target.value)} className={inputClass} />
+                        <input type="text" placeholder="Role (e.g. Software Engineer)" value={j.role} onChange={e => updateJob(idx, 'role', e.target.value)} className={inputClass} />
+                      </div>
+                      <input type="text" placeholder="Duration (e.g. Jun 2022 - Present)" value={j.duration} onChange={e => updateJob(idx, 'duration', e.target.value)} className={`${inputClass} mb-3`} />
+                      <div className="border-t border-gray-100 pt-2">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-xs font-bold text-gray-500">Projects at {j.company || 'this company'}</span>
+                          <button type="button" onClick={() => addJobProject(idx)} className="text-xs font-bold px-2 py-1 rounded-lg bg-[#1A3C6E] text-white hover:bg-[#0D7377]">+ Project</button>
+                        </div>
+                        {(!j.projects || j.projects.length === 0) && (
+                          <p className="text-xs text-gray-300 italic pb-2">No projects added for this company yet.</p>
+                        )}
+                        {(j.projects || []).map((pr, pi) => (
+                          <div key={pi} className="bg-gray-50 border border-gray-100 rounded-lg p-2 mb-2">
+                            <div className="flex items-center justify-between mb-1">
+                              <span className="text-[11px] font-bold text-[#0D7377]">Project {pi + 1}</span>
+                              <button type="button" onClick={() => removeJobProject(idx, pi)} className="text-[11px] text-red-400 hover:text-red-600 font-bold">Remove</button>
+                            </div>
+                            <input type="text" placeholder="Project title" value={pr.title} onChange={e => updateJobProject(idx, pi, 'title', e.target.value)} className={`${inputClass} mb-2`} />
+                            <textarea placeholder="Project details — what was it about?" value={pr.details} onChange={e => updateJobProject(idx, pi, 'details', e.target.value)} className={`${inputClass} h-14 mb-2`} />
+                            <textarea placeholder="Your role — what did you do?" value={pr.role} onChange={e => updateJobProject(idx, pi, 'role', e.target.value)} className={`${inputClass} h-14`} />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
 
-              <div><label className={labelClass}>Work experience / description</label><textarea placeholder="Describe your work experience, internships, projects..." value={form.workExperience} onChange={e => set('workExperience', e.target.value)} className={`${inputClass} h-24`} /></div>
+              {(form.workStatus === 'Student' || form.workStatus === 'Fresher') && (
+                <div className="border border-gray-100 rounded-2xl p-4 bg-gray-50/50">
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-sm font-bold text-[#1A3C6E]">Projects / Internships</label>
+                    <button type="button" onClick={addProject} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63]">+ Add project</button>
+                  </div>
+                  <p className="text-xs text-gray-400 mb-3">Add the projects or internships you want recruiters to see on your GRID Card. Explain what the project was and what you did.</p>
+                  {(!form.projects || form.projects.length === 0) && (
+                    <p className="text-xs text-gray-400 italic py-2">No projects added yet. Click "+ Add project" to showcase your work.</p>
+                  )}
+                  {(form.projects || []).map((pr, idx) => (
+                    <div key={idx} className="bg-white border border-gray-100 rounded-xl p-3 mb-3">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs font-bold text-[#0D7377]">Project {idx + 1}</span>
+                        <button type="button" onClick={() => removeProject(idx)} className="text-xs text-red-500 hover:text-red-700 font-bold">Remove</button>
+                      </div>
+                      <input type="text" placeholder="Project title (e.g. E-commerce website)" value={pr.title} onChange={e => updateProject(idx, 'title', e.target.value)} className={`${inputClass} mb-2`} />
+                      <textarea placeholder="Project details — what was the project about?" value={pr.details} onChange={e => updateProject(idx, 'details', e.target.value)} className={`${inputClass} h-16 mb-2`} />
+                      <textarea placeholder="Your role — what did you do in this project?" value={pr.role} onChange={e => updateProject(idx, 'role', e.target.value)} className={`${inputClass} h-16`} />
+                    </div>
+                  ))}
+                </div>
+              )}
+
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div><label className={labelClass}>Preferred job type</label>
@@ -628,7 +721,7 @@ function ProfileDetails() {
 
               <div className="flex gap-3 mt-2">
                 <button onClick={() => setActiveTab(1)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Education</button>
-                <button onClick={() => setActiveTab(3)} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">Next: Skills →</button>
+                <button onClick={() => saveAndGo(3)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Skills →'}</button>
               </div>
             </div>
           )}
@@ -670,7 +763,7 @@ function ProfileDetails() {
               <div><label className={labelClass}>Certifications</label><textarea placeholder="e.g. AWS Certified Developer - 2024, Google Analytics - 2023" value={form.certifications} onChange={e => set('certifications', e.target.value)} className={`${inputClass} h-20`} /></div>
               <div className="flex gap-3 mt-2">
                 <button onClick={() => setActiveTab(2)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Profession</button>
-                <button onClick={() => setActiveTab(4)} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">Next: Others →</button>
+                <button onClick={() => saveAndGo(4)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Others →'}</button>
               </div>
             </div>
           )}
@@ -734,6 +827,7 @@ function ProfileDetails() {
 
               <div className="flex gap-3 mt-2">
                 <button onClick={() => setActiveTab(3)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Skills</button>
+                <button onClick={() => saveAndGo(5)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Documents →'}</button>
               </div>
 
               
@@ -797,24 +891,42 @@ function ProfileDetails() {
               </div>
             </div>
           )}
-          <div className="border-t border-gray-100 pt-4 mt-4">
-            <div className="flex gap-3 items-center">
-              <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
+          <div className="border-t border-gray-100 pt-5 mt-4">
+            {activeTab === 5 ? (
+              <div>
+                <div className="bg-gradient-to-br from-[#1A3C6E] to-[#0D7377] rounded-2xl p-5 mb-4 text-white">
+                  <p className="text-base font-bold mb-2">🚀 Ready to go live?</p>
+                  <p className="text-sm text-white/85 leading-relaxed mb-2">
+                    Moving to GRID publishes your profile as your shareable GRID Card — one verified identity that companies across India and beyond can discover, view, and trust. This is what puts you in front of recruiters.
+                  </p>
+                  <p className="text-sm text-white/85 leading-relaxed">
+                    You can update your published card <span className="font-bold text-[#5DCAA5]">3 times a month</span>, so publish when your profile's ready. You can always edit your details anytime.
+                  </p>
+                  {updatesRemaining !== null && updatesRemaining > 0 && (
+                    <p className="text-xs font-bold text-[#5DCAA5] mt-3">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
+                  )}
+                  {updatesRemaining === 0 && (
+                    <div className="mt-3 bg-white/10 rounded-xl p-3">
+                      <p className="text-xs text-white/90 font-bold">You've used all 3 updates this month.</p>
+                      <p className="text-xs text-white/70 mt-0.5">Need more? A ₹49 top-up for 3 extra updates is coming soon. Otherwise, your limit resets next month.</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex gap-3 items-center">
+                  <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 border-2 border-[#1A3C6E] text-[#1A3C6E] py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">
+                    {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
+                  </button>
+                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
+                    Move to GRID →
+                  </button>
+                </div>
+                {gridMsg && <p className="text-sm text-center mt-3 font-bold text-[#0D7377]">{gridMsg}</p>}
+              </div>
+            ) : (
+              <button onClick={handleSave} disabled={saving || uploadingPhoto} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
                 {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
               </button>
-              {activeTab === 5 && (
-                <div className="relative flex-1 group">
-                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`w-full py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
-                    Move to GRID
-                  </button>
-                  <div className="absolute bottom-14 right-0 w-64 bg-[#1A3C6E] text-white text-xs rounded-xl p-3 z-50 hidden group-hover:block shadow-lg">
-                    <p className="font-bold mb-1">What is Move to GRID?</p>
-                    <p className="text-white/80 leading-relaxed">Publishing makes your profile visible to companies globally. You can only do this <span className="font-bold text-[#5DCAA5]">3 times per month</span> — make sure your profile is complete before publishing.</p>
-                    <p className="text-[#5DCAA5] font-bold mt-2">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
-                  </div>
-                </div>
-              )}
-            </div>
+            )}
           </div>
 
         </div>
