@@ -18,6 +18,7 @@ function ProfileDetails() {
   const [showGridInfo, setShowGridInfo] = useState(false)
   const [verifiedSkills, setVerifiedSkills] = useState([])
   const [colleges, setColleges] = useState([])
+  const [showCollegeList, setShowCollegeList] = useState(false)
   const [gridMsg, setGridMsg] = useState('')
   const [uploadingPhoto, setUploadingPhoto] = useState(false)
   const [emailVerified, setEmailVerified] = useState(true)
@@ -560,22 +561,32 @@ function ProfileDetails() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <label className={labelClass}>College / University</label>
-                    <select value={form.collegeId} onChange={e => {
-                      const selected = colleges.find(c => String(c.id) === e.target.value)
-                      set('collegeId', e.target.value)
-                      set('collegeName', selected ? selected.collegeName : form.collegeName)
-                    }} className={inputClass}>
-                      <option value="">Select your college</option>
-                      {colleges.map(c => (
-                        <option key={c.id} value={c.id}>{c.collegeName}{c.city ? ` — ${c.city}` : ''}</option>
-                      ))}
-                      <option value="other">Other / Not Listed</option>
-                    </select>
-                    {(form.collegeId === 'other' || (!form.collegeId && form.collegeName)) && (
+                    <div className="relative">
                       <input type="text" placeholder="Type your college name" value={form.collegeName}
-                        onChange={e => set('collegeName', e.target.value)} className={`${inputClass} mt-2`} />
-                    )}
-                    <p className="text-xs text-gray-400 mt-1">Selecting your college links your verified profile to their placement portal</p>
+                        onChange={e => { set('collegeName', e.target.value); set('collegeId', ''); setShowCollegeList(true) }}
+                        onFocus={() => setShowCollegeList(true)}
+                        onBlur={() => setTimeout(() => setShowCollegeList(false), 200)}
+                        className={inputClass} />
+                      {form.collegeId && (
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#0D7377]">✓ Linked</span>
+                      )}
+                      {showCollegeList && form.collegeName && !form.collegeId && (() => {
+                        const matches = colleges.filter(c => c.collegeName.toLowerCase().includes(form.collegeName.toLowerCase())).slice(0, 6)
+                        if (matches.length === 0) return null
+                        return (
+                          <div className="absolute z-30 left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden">
+                            {matches.map(c => (
+                              <button key={c.id} type="button"
+                                onMouseDown={() => { set('collegeName', c.collegeName); set('collegeId', String(c.id)); setShowCollegeList(false) }}
+                                className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 border-b border-gray-50 last:border-0">
+                                <span className="font-medium text-[#1A3C6E]">{c.collegeName}</span>{c.city ? <span className="text-gray-400"> — {c.city}</span> : ''}
+                              </button>
+                            ))}
+                          </div>
+                        )
+                      })()}
+                    </div>
+                    <p className="text-xs text-gray-400 mt-1">{form.collegeId ? 'Linked to your college — they can see your verified profile in their portal.' : 'Type your college. If it appears in the list, click it to link with their placement portal.'}</p>
                   </div>
                   <div><label className={labelClass}>Degree</label>
                     <select value={form.degree} onChange={e => set('degree', e.target.value)} className={inputClass}>
@@ -774,7 +785,6 @@ function ProfileDetails() {
               <p className={sectionTitle}>📌 Other details</p>
               <div><label className={labelClass}>Bio / Summary</label><textarea placeholder="Write 2-3 lines about yourself, your goals and what you bring to the table..." value={form.bio} onChange={e => set('bio', e.target.value)} className={`${inputClass} h-24`} /></div>
               <div><label className={labelClass}>Hobbies</label><input type="text" placeholder="e.g. Chess, Photography, Reading" value={form.hobbies} onChange={e => set('hobbies', e.target.value)} className={inputClass} /></div>
-              <div><label className={labelClass}>PF account number</label><input type="text" placeholder="e.g. KA/BNG/1234567/000/0000000" value={form.pfAccountNumber} onChange={e => set('pfAccountNumber', e.target.value)} className={inputClass} /></div>
 
               <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                 <p className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-3">Government ID details</p>
@@ -784,10 +794,6 @@ function ProfileDetails() {
                     <label className={labelClass}>Aadhaar number</label>
                     <input type="text" placeholder="XXXX XXXX XXXX" maxLength={14} value={form.aadhaarNumber} onChange={e => set('aadhaarNumber', e.target.value)} className={inputClass} />
                     <p className="text-xs text-gray-400 mt-1">Real eKYC verification coming soon</p>
-                  </div>
-                  <div>
-                    <label className={labelClass}>PAN number</label>
-                    <input type="text" placeholder="e.g. ABCDE1234F" maxLength={10} value={form.panNumber} onChange={e => set('panNumber', e.target.value.toUpperCase())} className={inputClass} />
                   </div>
                   <div>
                     <label className={labelClass}>Passport number (optional)</label>
