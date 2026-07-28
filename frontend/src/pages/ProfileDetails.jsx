@@ -928,11 +928,7 @@ function ProfileDetails() {
                 </div>
                 {gridMsg && <p className="text-sm text-center mt-3 font-bold text-[#0D7377]">{gridMsg}</p>}
               </div>
-            ) : (
-              <button onClick={handleSave} disabled={saving || uploadingPhoto} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
-                {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
-              </button>
-            )}
+            ) : null}
           </div>
 
         </div>
