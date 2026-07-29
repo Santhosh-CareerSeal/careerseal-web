@@ -323,7 +323,7 @@ function PublicProfile() {
         )}
 
         {/* Footer */}
-        <div className="bg-[#1A3C6E] rounded-2xl p-5 text-center">
+        <div className="bg-[#1A3C6E] rounded-2xl p-5 text-center" style={{ order: 10 }}>
           <div className="flex items-center justify-center gap-2 mb-2">
             <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
             <span className="text-white font-bold text-sm">GRID</span>
