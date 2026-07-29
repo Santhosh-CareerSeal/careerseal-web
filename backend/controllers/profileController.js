@@ -107,6 +107,7 @@ const moveToGrid = async (req, res) => {
       where: { userId },
       data: {
         gridPublished: true,
+        aiSummary: null,
         gridUpdatesThisMonth: updatesThisMonth + 1,
         gridLastUpdatedMonth: currentMonth
       }

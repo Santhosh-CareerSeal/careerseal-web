@@ -10,6 +10,19 @@ function PublicProfile() {
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
   const [expandedJobs, setExpandedJobs] = useState({})
+  const [aiSummary, setAiSummary] = useState('')
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiError, setAiError] = useState('')
+  const fetchAiSummary = async () => {
+    if (aiSummary || aiLoading) return
+    setAiLoading(true); setAiError('')
+    try {
+      const res = await axios.get(`${API_URL}/api/public/profile/${gridNumber}/ai-summary`)
+      setAiSummary(res.data.summary)
+    } catch (e) {
+      setAiError(e.response?.data?.message || 'Could not generate summary right now.')
+    } finally { setAiLoading(false) }
+  }
   const toggleJob = (i) => setExpandedJobs(e => ({ ...e, [i]: !e[i] }))
 
   useEffect(() => {
@@ -141,6 +154,29 @@ function PublicProfile() {
           </div>
         )}
 
+        {/* AI Summary */}
+        <div className="bg-white rounded-2xl p-5 shadow-sm" style={{ order: -1 }}>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">AI Summary</p>
+            {!aiSummary && (
+              <button onClick={fetchAiSummary} disabled={aiLoading}
+                className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63] disabled:opacity-50">
+                {aiLoading ? 'Generating...' : 'Generate summary'}
+              </button>
+            )}
+          </div>
+          {!aiSummary && !aiError && !aiLoading && (
+            <p className="text-xs text-gray-400">Get an instant AI-distilled overview of this candidate's strengths and fit.</p>
+          )}
+          {aiLoading && <p className="text-sm text-gray-400">Reading the profile and distilling the highlights...</p>}
+          {aiError && <p className="text-sm text-red-500">{aiError}</p>}
+          {aiSummary && (
+            <>
+              <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">{aiSummary}</p>
+              <p className="text-[10px] text-gray-300 mt-3">AI-generated from the candidate's profile — may not capture everything. Read the full profile below.</p>
+            </>
+          )}
+        </div>
         {/* Education */}
         {(profile.collegeName || profile.schoolName) && (
           <div className="bg-white rounded-2xl p-5 shadow-sm" style={{ order: isExp ? 5 : 0 }}>

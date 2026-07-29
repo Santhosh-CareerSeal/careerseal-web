@@ -70,4 +70,35 @@ router.get('/profile/:gridNumber', async (req, res) => {
   }
 })
 
+
+// AI candidate summary — generated on demand, cached until profile republished
+router.get('/profile/:gridNumber/ai-summary', async (req, res) => {
+  try {
+    const { gridNumber } = req.params
+    const student = await prisma.student.findUnique({ where: { gridNumber } })
+    if (!student) return res.status(404).json({ message: 'Profile not found' })
+    if (!student.gridPublished) return res.status(403).json({ message: 'Profile not published' })
+
+    // return cached summary if present
+    if (student.aiSummary) {
+      return res.json({ summary: student.aiSummary, cached: true })
+    }
+
+    const { generateSummary } = require('../utils/summaryGenerator')
+    let summary
+    try {
+      summary = await generateSummary(student)
+    } catch (e) {
+      console.error('AI summary generation failed:', e.message)
+      return res.status(503).json({ message: 'Could not generate summary right now. Please try again shortly.' })
+    }
+
+    // cache it
+    await prisma.student.update({ where: { id: student.id }, data: { aiSummary: summary } })
+    res.json({ summary, cached: false })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+})
+
 module.exports = router
