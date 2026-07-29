@@ -175,16 +175,66 @@ function PublicProfile() {
           </div>
         )}
 
-        {/* Experience */}
-        {profile.workExperience && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Experience</p>
-            {profile.currentCompany && (
-              <p className="text-sm font-bold text-[#1A3C6E] mb-2">{profile.jobTitle || 'Professional'} — {profile.currentCompany}</p>
-            )}
-            <p className="text-sm text-gray-600 leading-relaxed">{profile.workExperience}</p>
-          </div>
-        )}
+        {/* Experience — CV format for Experienced, Resume format for Student/Fresher */}
+        {(() => {
+          let projects = []
+          let employment = []
+          try { projects = profile.projects ? JSON.parse(profile.projects) : [] } catch (e) {}
+          try { employment = profile.employmentHistory ? JSON.parse(profile.employmentHistory) : [] } catch (e) {}
+          const isExperienced = profile.workStatus === 'Experienced'
+
+          return (
+            <>
+              {profile.workExperience && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">{isExperienced ? 'Professional Summary' : 'Summary'}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">{profile.workExperience}</p>
+                </div>
+              )}
+
+              {isExperienced && employment.length > 0 && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Work Experience</p>
+                  <div className="flex flex-col gap-5">
+                    {employment.map((job, i) => (
+                      <div key={i} className="border-l-2 border-[#0D7377] pl-4">
+                        <p className="text-sm font-bold text-[#1A3C6E]">{job.role || 'Role'}{job.company ? ` — ${job.company}` : ''}</p>
+                        {job.duration && <p className="text-xs text-gray-400 mb-2">{job.duration}</p>}
+                        {(job.projects || []).length > 0 && (
+                          <div className="flex flex-col gap-2 mt-2">
+                            {job.projects.map((pr, pi) => (
+                              <div key={pi} className="bg-gray-50 rounded-lg p-3">
+                                <p className="text-xs font-bold text-[#0D7377]">{pr.title || `Project ${pi + 1}`}</p>
+                                {pr.details && <p className="text-xs text-gray-600 mt-1 leading-relaxed">{pr.details}</p>}
+                                {pr.role && <p className="text-xs text-gray-500 mt-1 leading-relaxed"><span className="font-bold">Role:</span> {pr.role}</p>}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {!isExperienced && projects.length > 0 && (
+                <div className="bg-white rounded-2xl p-5 shadow-sm">
+                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Projects & Internships</p>
+                  <div className="flex flex-col gap-3">
+                    {projects.map((pr, i) => (
+                      <div key={i} className="border-l-2 border-[#0D7377] pl-4">
+                        <p className="text-sm font-bold text-[#1A3C6E]">{pr.title || `Project ${i + 1}`}</p>
+                        {pr.details && <p className="text-xs text-gray-600 mt-1 leading-relaxed">{pr.details}</p>}
+                        {pr.role && <p className="text-xs text-gray-500 mt-1 leading-relaxed"><span className="font-bold">Role:</span> {pr.role}</p>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </>
+          )
+        })()}
+
 
         {/* Skills */}
         {skillsList.length > 0 && (

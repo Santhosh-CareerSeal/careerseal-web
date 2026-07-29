@@ -62,6 +62,8 @@ router.get('/profile/:gridNumber', async (req, res) => {
       certifications: student.certifications,
       hobbies: student.hobbies,
       workExperience: student.workExperience,
+      projects: student.projects,
+      employmentHistory: student.employmentHistory,
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
