@@ -67,6 +67,11 @@ function GridCard() {
   }, [])
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
+  const gcIsExperienced = student?.workStatus === 'Experienced'
+  let gcProjects = []
+  let gcEmployment = []
+  try { gcProjects = student?.projects ? JSON.parse(student.projects) : [] } catch (e) {}
+  try { gcEmployment = student?.employmentHistory ? JSON.parse(student.employmentHistory) : [] } catch (e) {}
   const allSkills = student?.technicalSkills
     ? student.technicalSkills.split(',').map(s => s.trim())
     : student?.skills ? student.skills.split(',').map(s => s.trim()) : []
@@ -376,7 +381,7 @@ function GridCard() {
               )}
               <div style={{ marginTop: 'auto' }}>
                 <div style={{ background: '#0D7377', borderRadius: '8px', padding: '8px 12px', textAlign: 'center', marginBottom: '6px' }}>
-                  <p style={{ color: 'white', fontSize: '9px', letterSpacing: '1.5px', margin: 0, fontWeight: '600' }}>CAREERSEAL VERIFIED</p>
+                  <p style={{ color: 'white', fontSize: '9px', letterSpacing: '1.5px', margin: 0, fontWeight: '600' }}>GRID VERIFIED</p>
                 </div>
                 <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '8px', textAlign: 'center', margin: 0, wordBreak: 'break-all' }}>{gridCard?.gridNumber}</p>
               </div>
@@ -394,7 +399,9 @@ function GridCard() {
                   </div>
                 </div>
               )}
-              {student?.workExperience && <div><p style={{ fontSize: '11px', fontWeight: '700', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 12px', paddingBottom: '6px', borderBottom: '2px solid #1A3C6E' }}>EXPERIENCE</p>{student?.currentCompany && <p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>{student.jobTitle || 'Professional'} — {student.currentCompany}</p>}<p style={{ fontSize: '13px', color: '#555', lineHeight: '1.6', margin: 0 }}>{student.workExperience}</p></div>}
+              {student?.workExperience && <div><p style={{ fontSize: '11px', fontWeight: '700', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 8px', paddingBottom: '6px', borderBottom: '2px solid #1A3C6E' }}>{gcIsExperienced ? 'PROFESSIONAL SUMMARY' : 'SUMMARY'}</p><p style={{ fontSize: '13px', color: '#555', lineHeight: '1.6', margin: 0 }}>{student.workExperience}</p></div>}
+              {gcIsExperienced && gcEmployment.length > 0 && <div><p style={{ fontSize: '11px', fontWeight: '700', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 12px', paddingBottom: '6px', borderBottom: '2px solid #1A3C6E' }}>WORK EXPERIENCE</p><div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>{gcEmployment.map((job, i) => <div key={i} style={{ borderLeft: '3px solid #0D7377', paddingLeft: '12px' }}><p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 2px' }}>{job.role || 'Role'}{job.company ? ` — ${job.company}` : ''}</p>{job.duration && <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 6px' }}>{job.duration}</p>}{(job.projects || []).map((pr, pi) => <div key={pi} style={{ background: '#f8f9fa', borderRadius: '8px', padding: '10px', marginBottom: '6px' }}><p style={{ fontSize: '12px', fontWeight: '700', color: '#0D7377', margin: '0 0 3px' }}>{pr.title || `Project ${pi + 1}`}</p>{pr.details && <p style={{ fontSize: '12px', color: '#555', lineHeight: '1.5', margin: '0 0 3px', whiteSpace: 'pre-line' }}>{pr.details}</p>}{pr.role && <p style={{ fontSize: '11px', color: '#777', margin: 0 }}><b>Role:</b> {pr.role}</p>}</div>)}</div>)}</div></div>}
+              {!gcIsExperienced && gcProjects.length > 0 && <div><p style={{ fontSize: '11px', fontWeight: '700', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 12px', paddingBottom: '6px', borderBottom: '2px solid #1A3C6E' }}>PROJECTS & INTERNSHIPS</p><div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>{gcProjects.map((pr, i) => <div key={i} style={{ borderLeft: '3px solid #0D7377', paddingLeft: '12px' }}><p style={{ fontSize: '14px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 3px' }}>{pr.title || `Project ${i + 1}`}</p>{pr.details && <p style={{ fontSize: '12px', color: '#555', lineHeight: '1.5', margin: '0 0 3px', whiteSpace: 'pre-line' }}>{pr.details}</p>}{pr.role && <p style={{ fontSize: '11px', color: '#777', margin: 0 }}><b>Role:</b> {pr.role}</p>}</div>)}</div></div>}
               {student?.certifications && <div><p style={{ fontSize: '11px', fontWeight: '700', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 10px', paddingBottom: '6px', borderBottom: '2px solid #1A3C6E' }}>CERTIFICATIONS</p>{student.certifications.split(',').map((c, i) => <p key={i} style={{ fontSize: '12px', color: '#444', margin: '0 0 4px' }}>✓ {c.trim()}</p>)}</div>}
               {student?.toolsAndSoftware && <div><p style={{ fontSize: '11px', fontWeight: '700', color: '#1A3C6E', letterSpacing: '1.5px', margin: '0 0 10px', paddingBottom: '6px', borderBottom: '2px solid #1A3C6E' }}>TOOLS & SOFTWARE</p><div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>{student.toolsAndSoftware.split(',').map((t, i) => <span key={i} style={{ background: '#f0f4ff', color: '#1A3C6E', fontSize: '11px', padding: '3px 10px', borderRadius: '4px', fontWeight: '500' }}>{t.trim()}</span>)}</div></div>}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
