@@ -121,6 +121,9 @@ function PublicProfile() {
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-[#5DCAA5]"></div>
           <span className="text-[#5DCAA5] text-xs font-bold">Verified Profile</span>
+          <button onClick={handleShare} className="ml-3 text-xs font-bold px-3 py-1.5 rounded-lg bg-white/10 text-white hover:bg-white/20 flex items-center gap-1">
+            {copied ? '✓ Copied' : '🔗 Share'}
+          </button>
         </div>
       </div>
 
@@ -172,21 +175,32 @@ function PublicProfile() {
 
                 {employment.length > 0 && (
                   <div>
-                    <SectionHead>Work Experience</SectionHead>
+                    {/* WorkExpHead */}
+                    <div className="mb-3">
+                      <div className="flex items-center justify-between gap-2 flex-wrap">
+                        <h2 className="text-sm font-extrabold tracking-wide uppercase" style={{ color: navy }}>Work Experience</h2>
+                        <button onClick={fetchAiSummary} disabled={aiLoading}
+                          className="text-xs font-bold px-3 py-1.5 rounded-lg text-white flex items-center gap-1 disabled:opacity-50" style={{ background: teal }}>
+                          {aiLoading ? 'Generating…' : '✨ AI Summary'}
+                        </button>
+                      </div>
+                      <div className="h-0.5 w-full mt-1" style={{ background: '#e5e8ec' }}></div>
+                    </div>
+                    <p className="text-xs text-gray-400 mb-2">Tap each role to expand projects and details.</p>
                     <div className="flex flex-col gap-3">
                       {employment.map((job, i) => {
                         const open = expandedJobs[i]
                         const pc = (job.projects || []).length
                         return (
-                          <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
-                            <button onClick={() => toggleJob(i)} className="w-full text-left px-4 py-3 hover:bg-gray-50">
+                          <div key={i} className="rounded-xl overflow-hidden shadow-sm" style={{ borderLeft: `3px solid ${teal}`, background: open ? '#f7fbfa' : '#fff', border: '1px solid #e5e8ec' }}>
+                            <button onClick={() => toggleJob(i)} className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
                               <div className="flex items-start justify-between gap-2">
                                 <div className="min-w-0">
                                   <p className="text-sm font-bold" style={{ color: navy }}>{job.role || 'Role'}{job.company ? ` — ${job.company}` : ''}</p>
                                   {job.duration && <p className="text-xs text-gray-400 mt-0.5">{job.duration}</p>}
                                   {pc > 0 && <p className="text-xs font-bold mt-1" style={{ color: teal }}>{pc} project{pc !== 1 ? 's' : ''}{!open ? ' — tap to view' : ''}</p>}
                                 </div>
-                                <span className={`text-gray-400 text-lg flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+                                <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-white text-xs" style={{ background: teal, transform: open ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s' }}>⌄</span>
                               </div>
                             </button>
                             {open && pc > 0 && (
@@ -234,7 +248,7 @@ function PublicProfile() {
                 {toolsList.length > 0 && (
                   <div>
                     <SectionHead>Tools</SectionHead>
-                    <div className="flex flex-wrap gap-2">{toolsList.map((t, i) => <span key={i} className="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-600">{t}</span>)}</div>
+                    <div className="flex flex-wrap gap-2">{toolsList.map((t, i) => <span key={i} className="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 break-words max-w-full">{t}</span>)}</div>
                   </div>
                 )}
                 {softList.length > 0 && (
@@ -375,7 +389,7 @@ function PublicProfile() {
               {toolsList.length > 0 && (
                 <div>
                   <SectionHead>Tools & Software</SectionHead>
-                  <div className="flex flex-wrap gap-2">{toolsList.map((t, i) => <span key={i} className="text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-600">{t}</span>)}</div>
+                  <div className="flex flex-wrap gap-2">{toolsList.map((t, i) => <span key={i} className="text-xs font-medium px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 break-words max-w-full">{t}</span>)}</div>
                 </div>
               )}
 
@@ -400,16 +414,6 @@ function PublicProfile() {
       </div>
 
       {/* Floating action buttons — corner, always visible */}
-      <div className="fixed bottom-5 right-5 flex flex-col gap-3 z-50">
-        <button onClick={fetchAiSummary} title="AI Summary"
-          className="w-13 h-13 px-4 py-3 rounded-full shadow-lg text-white text-sm font-bold flex items-center gap-2" style={{ background: teal }}>
-          ✨ <span className="hidden sm:inline">AI Summary</span>
-        </button>
-        <button onClick={handleShare} title="Share"
-          className="w-13 h-13 px-4 py-3 rounded-full shadow-lg text-white text-sm font-bold flex items-center gap-2" style={{ background: navy }}>
-          {copied ? '✓' : '🔗'} <span className="hidden sm:inline">{copied ? 'Copied!' : 'Share'}</span>
-        </button>
-      </div>
     </div>
   )
 }
