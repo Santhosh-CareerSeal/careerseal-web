@@ -20,10 +20,15 @@ function PublicProfile() {
     if (aiSummary || aiLoading) return
     setAiLoading(true); setAiError('')
     try {
-      const res = await axios.get(`${API_URL}/api/public/profile/${gridNumber}/ai-summary`)
+      const token = localStorage.getItem('token')
+      const res = await axios.get(`${API_URL}/api/public/profile/${gridNumber}/ai-summary`, token ? { headers: { Authorization: `Bearer ${token}` } } : {})
       setAiSummary(res.data.summary)
     } catch (e) {
-      setAiError(e.response?.data?.message || 'Could not generate summary right now.')
+      if (e.response?.data?.needsRecruiterLogin) {
+        setAiError('AI summaries are for company/recruiter accounts. Please log in as a company to view.')
+      } else {
+        setAiError(e.response?.data?.message || 'Could not generate summary right now.')
+      }
     } finally { setAiLoading(false) }
   }
   const toggleJob = (i) => setExpandedJobs(e => ({ ...e, [i]: !e[i] }))
@@ -221,20 +226,6 @@ function PublicProfile() {
                   </div>
                 )}
 
-                {eduEntries.length > 0 && (
-                  <div>
-                    <SectionHead>Education</SectionHead>
-                    <div className="flex flex-col gap-3">
-                      {eduEntries.map((e, i) => (
-                        <div key={i} className="border-l-2 pl-3" style={{ borderColor: teal }}>
-                          <p className="text-sm font-bold" style={{ color: navy }}>{e.degree}{e.branch ? ` — ${e.branch}` : ''}</p>
-                          {e.place && <p className="text-xs" style={{ color: teal }}>{e.place}</p>}
-                          <p className="text-xs text-gray-400">{[e.year, e.extra].filter(Boolean).join(' · ')}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
               </div>
 
               {/* Right sidebar (1 col) */}
@@ -255,6 +246,21 @@ function PublicProfile() {
                   <div>
                     <SectionHead>Soft Skills</SectionHead>
                     <ul className="text-sm text-gray-600 list-disc pl-4 flex flex-col gap-1">{softList.map((t, i) => <li key={i}>{t}</li>)}</ul>
+                  </div>
+                )}
+                {/* EduInSidebar */}
+                {eduEntries.length > 0 && (
+                  <div>
+                    <SectionHead>Education</SectionHead>
+                    <div className="flex flex-col gap-3">
+                      {eduEntries.map((e, i) => (
+                        <div key={i} className="border-l-2 pl-3" style={{ borderColor: teal }}>
+                          <p className="text-sm font-bold" style={{ color: navy }}>{e.degree}{e.branch ? ` — ${e.branch}` : ''}</p>
+                          {e.place && <p className="text-xs" style={{ color: teal }}>{e.place}</p>}
+                          <p className="text-xs text-gray-400">{[e.year, e.extra].filter(Boolean).join(' · ')}</p>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 )}
                 {langList.length > 0 && (

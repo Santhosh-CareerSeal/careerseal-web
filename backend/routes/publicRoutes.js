@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken')
 const express = require('express')
 const router = express.Router()
 const { PrismaClient } = require('@prisma/client')
@@ -74,6 +75,12 @@ router.get('/profile/:gridNumber', async (req, res) => {
 // AI candidate summary — generated on demand, cached until profile republished
 router.get('/profile/:gridNumber/ai-summary', async (req, res) => {
   try {
+    // Gate: only logged-in company/recruiter accounts can generate AI summaries
+    const token = req.headers.authorization?.split(' ')[1]
+    if (!token) return res.status(401).json({ message: 'Log in as a company to view AI summaries.', needsRecruiterLogin: true })
+    let decoded
+    try { decoded = jwt.verify(token, process.env.JWT_SECRET) } catch (e) { return res.status(401).json({ message: 'Log in as a company to view AI summaries.', needsRecruiterLogin: true }) }
+    if (decoded.role !== 'company') return res.status(403).json({ message: 'AI summaries are available to company/recruiter accounts only.', needsRecruiterLogin: true })
     const { gridNumber } = req.params
     const student = await prisma.student.findUnique({ where: { gridNumber } })
     if (!student) return res.status(404).json({ message: 'Profile not found' })
