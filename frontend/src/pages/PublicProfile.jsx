@@ -9,6 +9,8 @@ function PublicProfile() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [copied, setCopied] = useState(false)
+  const [expandedJobs, setExpandedJobs] = useState({})
+  const toggleJob = (i) => setExpandedJobs(e => ({ ...e, [i]: !e[i] }))
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -195,24 +197,36 @@ function PublicProfile() {
               {isExperienced && employment.length > 0 && (
                 <div className="bg-white rounded-2xl p-5 shadow-sm">
                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Work Experience</p>
-                  <div className="flex flex-col gap-5">
-                    {employment.map((job, i) => (
-                      <div key={i} className="border-l-2 border-[#0D7377] pl-4">
-                        <p className="text-sm font-bold text-[#1A3C6E]">{job.role || 'Role'}{job.company ? ` — ${job.company}` : ''}</p>
-                        {job.duration && <p className="text-xs text-gray-400 mb-2">{job.duration}</p>}
-                        {(job.projects || []).length > 0 && (
-                          <div className="flex flex-col gap-2 mt-2">
-                            {job.projects.map((pr, pi) => (
-                              <div key={pi} className="bg-gray-50 rounded-lg p-3">
-                                <p className="text-xs font-bold text-[#0D7377]">{pr.title || `Project ${pi + 1}`}</p>
-                                {pr.details && <p className="text-xs text-gray-600 mt-1 leading-relaxed">{pr.details}</p>}
-                                {pr.role && <p className="text-xs text-gray-500 mt-1 leading-relaxed"><span className="font-bold">Role:</span> {pr.role}</p>}
+                  <div className="flex flex-col gap-3">
+                    {employment.map((job, i) => {
+                      const open = expandedJobs[i]
+                      const projCount = (job.projects || []).length
+                      return (
+                        <div key={i} className="border border-gray-100 rounded-xl overflow-hidden">
+                          <button onClick={() => toggleJob(i)} className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <p className="text-sm font-bold text-[#1A3C6E]">{job.role || 'Role'}{job.company ? ` — ${job.company}` : ''}</p>
+                                {job.duration && <p className="text-xs text-gray-400 mt-0.5">{job.duration}</p>}
+                                {projCount > 0 && <p className="text-xs text-[#0D7377] font-bold mt-1">{projCount} project{projCount !== 1 ? 's' : ''}{!open ? ' — tap to view' : ''}</p>}
                               </div>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    ))}
+                              <span className={`text-gray-400 text-lg flex-shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>⌄</span>
+                            </div>
+                          </button>
+                          {open && projCount > 0 && (
+                            <div className="px-4 pb-4 flex flex-col gap-2">
+                              {job.projects.map((pr, pi) => (
+                                <div key={pi} className="bg-gray-50 rounded-lg p-3">
+                                  <p className="text-xs font-bold text-[#0D7377]">{pr.title || `Project ${pi + 1}`}</p>
+                                  {pr.details && <p className="text-xs text-gray-600 mt-1 leading-relaxed whitespace-pre-line">{pr.details}</p>}
+                                  {pr.role && <p className="text-xs text-gray-500 mt-1 leading-relaxed"><span className="font-bold">Role:</span> {pr.role}</p>}
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
                   </div>
                 </div>
               )}
