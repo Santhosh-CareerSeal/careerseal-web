@@ -44,6 +44,7 @@ function PublicProfile() {
 
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
   const skillsList = profile?.technicalSkills ? profile.technicalSkills.split(',').map(s => s.trim()) : []
+  const isExp = profile?.workStatus === 'Experienced'
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -142,7 +143,7 @@ function PublicProfile() {
 
         {/* Education */}
         {(profile.collegeName || profile.schoolName) && (
-          <div className="bg-white rounded-2xl p-5 shadow-sm">
+          <div className="bg-white rounded-2xl p-5 shadow-sm" style={{ order: isExp ? 5 : 0 }}>
             <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Education</p>
             <div className="flex flex-col gap-4">
               {profile.pgCollegeName && (
