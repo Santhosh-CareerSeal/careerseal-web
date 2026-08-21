@@ -35,7 +35,7 @@ function Legal() {
           {activeTab === 'privacy' ? (
             <div className="prose max-w-none">
               <h1 className="text-2xl font-bold text-[#1A3C6E] mb-1">Privacy Policy</h1>
-              <p className="text-gray-400 text-sm mb-6">Last updated: July 2026</p>
+              <p className="text-gray-400 text-sm mb-6">Last updated: December 2026</p>
 
               <div className="space-y-6 text-gray-600 text-sm leading-relaxed">
                 <div>
@@ -49,7 +49,7 @@ function Legal() {
                   <ul className="list-disc pl-5 space-y-1">
                     <li><strong>Account data:</strong> Name, email address, password (hashed, never stored in plain text)</li>
                     <li><strong>Profile data:</strong> Education details, work experience, skills, career goals, profile photo</li>
-                    <li><strong>Identity data:</strong> Aadhaar number, PAN number, passport number (stored encrypted using AES-256-CBC)</li>
+                    <li><strong>Identity data:</strong> Aadhaar number, passport number (stored encrypted using AES-256-CBC)</li>
                     <li><strong>Contact data:</strong> Mobile number (stored encrypted)</li>
                     <li><strong>Exam data:</strong> Skill exam attempts, scores, verified skills, badge validity</li>
                     <li><strong>Documents:</strong> Marksheets, degree certificates uploaded for verification</li>
@@ -76,7 +76,7 @@ function Legal() {
                   <ul className="list-disc pl-5 space-y-1">
                     <li>All data is transmitted over HTTPS (TLS encryption)</li>
                     <li>Passwords are hashed using bcrypt — we cannot recover your password</li>
-                    <li>Sensitive fields (Aadhaar, PAN, passport, phone) are encrypted at rest using AES-256-CBC</li>
+                    <li>Sensitive fields (Aadhaar, passport, phone) are encrypted at rest using AES-256-CBC</li>
                     <li>Database access is restricted by role-based authentication</li>
                     <li>Login attempts are rate-limited to prevent brute force attacks</li>
                     <li>All API requests are logged for security monitoring</li>
@@ -89,7 +89,7 @@ function Legal() {
                     <li><strong>Companies:</strong> When you apply for a job, your public GRID profile is shared with that company. Only verified skills are shown.</li>
                     <li><strong>Your college:</strong> If your college is a GRID partner, your placement status and verified skills may be visible to your college's TPO dashboard.</li>
                     <li><strong>Infrastructure providers:</strong> Supabase (database + storage), Render (backend hosting), Vercel (frontend hosting). All are GDPR-compliant providers.</li>
-                    <li>We do not share your Aadhaar, PAN, passport, or phone number with companies or colleges.</li>
+                    <li>We do not share your Aadhaar, passport, or phone number with companies or colleges.</li>
                   </ul>
                 </div>
 

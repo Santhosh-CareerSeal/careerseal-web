@@ -43,7 +43,7 @@ function ProfileDetails() {
     workStatus: '', currentCompany: '', jobTitle: '', workExperience: '', projects: [], employmentHistory: [],
     preferredJobType: '', preferredWorkLocation: '', noticePeriod: '', expectedSalary: '',
     technicalSkills: '', softSkills: '', languagesKnown: '', certifications: '', toolsAndSoftware: '',
-    hobbies: '', pfAccountNumber: '', aadhaarNumber: '', panNumber: '', passportNumber: '',
+    hobbies: '', pfAccountNumber: '', aadhaarNumber: '', passportNumber: '',
     digiLockerStatus: '', bio: ''
   })
 
@@ -188,7 +188,7 @@ function ProfileDetails() {
             languagesKnown: s.languagesKnown || '', certifications: s.certifications || '',
             toolsAndSoftware: s.toolsAndSoftware || '',
             hobbies: s.hobbies || '', pfAccountNumber: s.pfAccountNumber || '',
-            aadhaarNumber: s.aadhaarNumber || '', panNumber: s.panNumber || '',
+            aadhaarNumber: s.aadhaarNumber || '',
             passportNumber: s.passportNumber || '', digiLockerStatus: s.digiLockerStatus || '',
             bio: s.bio || ''
           }))
@@ -467,7 +467,7 @@ function ProfileDetails() {
 
               <div>
                 <label className={labelClass}>Legal full name <span className="text-red-400">*</span></label>
-                <input type="text" placeholder="Full name as on Aadhaar / PAN / Passport" value={form.legalFullName} onChange={e => set('legalFullName', e.target.value)} className={inputClass} />
+                <input type="text" placeholder="Full name as on Aadhaar / Passport" value={form.legalFullName} onChange={e => set('legalFullName', e.target.value)} className={inputClass} />
                 <p className="text-xs text-gray-400 mt-1">Enter your name exactly as it appears on your government ID</p>
               </div>
 

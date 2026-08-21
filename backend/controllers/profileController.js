@@ -8,7 +8,6 @@ const getProfileDetails = async (req, res) => {
     const student = await prisma.student.findUnique({ where: { userId } })
     if (student) {
       student.aadhaarNumber = decrypt(student.aadhaarNumber)
-      student.panNumber = decrypt(student.panNumber)
       student.passportNumber = decrypt(student.passportNumber)
       student.contactNumber = decrypt(student.contactNumber)
     }
@@ -31,11 +30,10 @@ const completeProfile = async (req, res) => {
       workStatus, currentCompany, jobTitle, workExperience, projects, employmentHistory,
       preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
       technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-      hobbies, pfAccountNumber, aadhaarNumber, panNumber, passportNumber, digiLockerStatus, bio
+      hobbies, pfAccountNumber, aadhaarNumber, passportNumber, digiLockerStatus, bio
     } = req.body
 
     const encryptedAadhaar = encrypt(aadhaarNumber)
-    const encryptedPan = encrypt(panNumber)
     const encryptedPassport = encrypt(passportNumber)
     const encryptedContact = encrypt(contactNumber)
     const parsedCollegeId = (collegeId && collegeId !== 'other' && !isNaN(parseInt(collegeId))) ? parseInt(collegeId) : null
@@ -54,7 +52,7 @@ const completeProfile = async (req, res) => {
         workStatus, currentCompany, jobTitle, workExperience, projects, employmentHistory,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-        hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, panNumber: encryptedPan, passportNumber: encryptedPassport, digiLockerStatus, bio,
+        hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, passportNumber: encryptedPassport, digiLockerStatus, bio,
         education, schoolCollege, skills, profileComplete: true
       },
       create: {
@@ -66,7 +64,7 @@ const completeProfile = async (req, res) => {
         workStatus, currentCompany, jobTitle, workExperience, projects, employmentHistory,
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
-        hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, panNumber: encryptedPan, passportNumber: encryptedPassport, digiLockerStatus, bio,
+        hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, passportNumber: encryptedPassport, digiLockerStatus, bio,
         education, schoolCollege, skills, profileComplete: true
       }
     })
