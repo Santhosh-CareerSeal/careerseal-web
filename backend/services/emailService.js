@@ -68,4 +68,21 @@ const sendVerificationEmail = async (email, name, token) => {
 
 
 
-module.exports = { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail }
+
+const sendContactEmail = async (fromName, fromEmail, subject, message) => {
+  try {
+    await resend.emails.send({
+      from: 'GRID Contact <noreply@thegridcard.com>',
+      to: 'support@thegridcard.com',
+      replyTo: fromEmail,
+      subject: `[Contact] ${subject || 'New message'} — from ${fromName}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:520px;margin:0 auto;padding:24px;background:#f8f9fa;border-radius:16px;"><div style="background:white;border-radius:12px;padding:24px;"><h2 style="color:#1A3C6E;margin:0 0 16px;">New contact message</h2><p style="color:#6b7280;margin:0 0 6px;"><strong>Name:</strong> ${fromName}</p><p style="color:#6b7280;margin:0 0 6px;"><strong>Email:</strong> ${fromEmail}</p><p style="color:#6b7280;margin:0 0 16px;"><strong>Subject:</strong> ${subject || '(none)'}</p><div style="background:#f0f4ff;border-radius:8px;padding:16px;"><p style="color:#333;margin:0;white-space:pre-line;">${message}</p></div></div><p style="color:#9ca3af;font-size:12px;text-align:center;margin-top:16px;">Reply directly to this email to respond to ${fromName}.</p></div>`
+    })
+    return true
+  } catch (error) {
+    console.error('Contact email send error:', error)
+    return false
+  }
+}
+
+module.exports = { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail, sendContactEmail }

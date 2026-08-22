@@ -108,4 +108,28 @@ router.get('/profile/:gridNumber/ai-summary', async (req, res) => {
   }
 })
 
+
+// Contact form — sends the message to support inbox
+router.post('/contact', async (req, res) => {
+  try {
+    const { name, email, subject, message } = req.body
+    if (!name || !email || !message) {
+      return res.status(400).json({ message: 'Please fill in your name, email, and message.' })
+    }
+    // basic email sanity + length caps to prevent abuse
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      return res.status(400).json({ message: 'Please enter a valid email address.' })
+    }
+    if (name.length > 100 || (subject || '').length > 150 || message.length > 3000) {
+      return res.status(400).json({ message: 'One or more fields are too long.' })
+    }
+    const { sendContactEmail } = require('../services/emailService')
+    const sent = await sendContactEmail(name.trim(), email.trim(), (subject || '').trim(), message.trim())
+    if (!sent) return res.status(503).json({ message: 'Could not send your message right now. Please email support@thegridcard.com directly.' })
+    res.json({ message: 'Thanks! Your message has been sent. We\'ll get back to you soon.' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+})
+
 module.exports = router
