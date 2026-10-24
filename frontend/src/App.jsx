@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import Splash from './pages/Splash'
 import Onboarding from './pages/Onboarding'
 import Login from './pages/Login'
+import LoginChooser from './pages/LoginChooser'
 import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import GridCard from './pages/GridCard'
@@ -117,7 +118,9 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/onboarding" element={<Onboarding />} />
-        <Route path="/login" element={<Login />} />
+        <Route path="/login" element={<LoginChooser />} />
+        <Route path="/student-login" element={<Login fixedRole="student" />} />
+        <Route path="/company-login" element={<Login fixedRole="company" />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/grid" element={<GridCard />} />

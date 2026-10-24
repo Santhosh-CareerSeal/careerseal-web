@@ -4,10 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 
-function Login() {
+function Login({ fixedRole }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const [role, setRole] = useState('student')
+  const [role, setRole] = useState(fixedRole || 'student')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -119,6 +119,7 @@ function Login() {
             </div>
           )}
 
+          {!fixedRole && (<>
           {/* Role selection — two big cards */}
           <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Sign in as</p>
           <div className="grid grid-cols-2 gap-3 mb-6">
@@ -149,6 +150,7 @@ function Login() {
               )}
             </button>
           </div>
+          </>)}
 
           <h2 className="text-xl font-bold text-[#1A3C6E] mb-1">Welcome back</h2>
           <p className="text-gray-400 text-sm mb-5">
@@ -188,16 +190,10 @@ function Login() {
           </>)}
           <p className="text-center text-sm text-gray-500 mt-6">
             New to GRID?{' '}
-            <button onClick={() => navigate('/register')} className="text-[#0D7377] font-bold">Join now</button>
+            <button onClick={() => navigate(fixedRole === 'company' ? '/register-company' : fixedRole === 'student' ? '/register-student' : '/register')} className="text-[#0D7377] font-bold">
+              {fixedRole === 'company' ? 'Register company →' : 'Join now'}
+            </button>
           </p>
-
-          {/* Company register hint */}
-          {role === 'company' && (
-            <p className="text-center text-sm text-gray-400 mt-3">
-              Don't have a company account?{' '}
-              <button onClick={() => navigate('/register-company')} className="text-[#0D7377] font-bold">Register company →</button>
-            </p>
-          )}
           <p className="text-center text-xs text-gray-400 mt-6">
             By continuing, you agree to our{' '}
             <button onClick={() => navigate('/terms')} className="text-[#0D7377] hover:underline">Terms</button>
