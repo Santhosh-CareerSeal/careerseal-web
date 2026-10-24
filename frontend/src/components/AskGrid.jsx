@@ -2,6 +2,16 @@ import { useState, useRef, useEffect } from 'react'
 import axios from 'axios'
 import API_URL from '../config'
 
+const FAQS = [
+  { q: 'What is a GRID Card?', a: "A GRID Card is your verified career identity in one place. Your skills are tested through exams and your documents are checked — not just claimed — so your profile means something the moment a recruiter opens it. Every GRID Card carries a unique GRID number and QR code that companies can trust." },
+  { q: 'How do I get started on GRID?', a: "Create your GRID Card, add your education, skills and experience, and upload your documents for verification. Then take AI skill exams to prove what you can do. Once your card is ready, publish it and recruiters can find you." },
+  { q: 'How does GRID verify my skills?', a: "You take AI-generated skill exams on GRID. Pass one, and that skill shows as 'verified' on your GRID Card. Your uploaded documents — education and experience — are checked too, so recruiters see proof instead of claims." },
+  { q: 'How is GRID different from LinkedIn or Naukri?', a: "On other platforms anyone can claim any skill — nothing is checked. GRID verifies what you can actually do, so you stand out in a world full of inflated, AI-written resumes. It's proof, not promises." },
+  { q: 'Does GRID guarantee a job?', a: "No platform can honestly promise that. What GRID does is make your real skills visible and trusted, so you get a fair shot — and every rejection comes with real feedback, so you always know where you stand instead of disappearing into silence." },
+  { q: 'How do companies hire on GRID?', a: "Companies browse skill-verified, document-checked candidates and hire directly — spending far less time sorting real talent from inflated resumes. Fewer fakes to filter means faster hiring and fewer bad hires." },
+  { q: 'Can my college use GRID for placements?', a: "Yes. Colleges can run placement drives on GRID and generate NAAC/NBA-ready reports in a click, while their students get verified GRID Cards that recruiters actually trust." }
+]
+
 function AskGrid() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([
@@ -36,6 +46,11 @@ function AskGrid() {
     } finally { setLoading(false) }
   }
 
+  const askFaq = (f) => {
+    if (loading) return
+    setMessages(m => [...m, { role: 'user', text: f.q }, { role: 'bot', text: f.a }])
+  }
+
   return (
     <>
       {open && (
@@ -55,6 +70,16 @@ function AskGrid() {
                 </div>
               </div>
             ))}
+            {messages.length === 1 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
+                {FAQS.map((f, i) => (
+                  <button key={i} onClick={() => askFaq(f)}
+                    style={{ background: 'white', border: '1px solid #d9e2ec', color: '#0D7377', fontSize: '12px', fontWeight: 600, padding: '7px 11px', borderRadius: '13px', cursor: 'pointer', textAlign: 'left', lineHeight: 1.3, fontFamily: 'system-ui' }}>
+                    {f.q}
+                  </button>
+                ))}
+              </div>
+            )}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <div style={{ padding: '9px 12px', borderRadius: '14px', fontSize: '13px', background: 'white', border: '1px solid #eee', color: '#9ca3af' }}>Thinking…</div>
