@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "postbuild": "node prerender.js || echo '[prerender] skipped (non-fatal) — SPA still deployed'",
+    "postbuild": "npx --yes puppeteer browsers install chrome && node prerender.js || echo '[prerender] skipped (non-fatal) — SPA still deployed'",
     "lint": "eslint .",
     "preview": "vite preview"
   },
