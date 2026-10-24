@@ -82,8 +82,8 @@ function Landing() {
         <p style={{ fontSize: '14px', color: '#8a929c', textAlign: 'center', margin: '0 0 32px' }}>GRID works for everyone in hiring. Pick the one that's you.</p>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '16px' }}>
           {[
-            { icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-5 0-9 2.5-9 6v1h18v-1c0-3.5-4-6-9-6z', tint: '#E1F5EE', iconColor: '#0F6E56', title: 'For students', desc: 'Prove your skills, get a verified GRID Card, and be seen by companies that trust it.', cta: 'Student login', to: '/student-login' },
-            { icon: 'M3 21V7l6-4 6 4v14M9 21v-4h2v4M17 21V11l4 2v8M6 9h.01M6 12h.01M6 15h.01', tint: '#E6F1FB', iconColor: '#185FA5', title: 'For companies', desc: 'Hire skill-verified, document-checked candidates. Spend less time sorting out fakes.', cta: 'Company login', to: '/company-login' },
+            { icon: 'M12 12a5 5 0 100-10 5 5 0 000 10zm0 2c-5 0-9 2.5-9 6v1h18v-1c0-3.5-4-6-9-6z', tint: '#E1F5EE', iconColor: '#0F6E56', title: 'For students', desc: 'Prove your skills, get a verified GRID Card, and be seen by companies that trust it.', cta: 'Join as a student', to: '/register-student' },
+            { icon: 'M3 21V7l6-4 6 4v14M9 21v-4h2v4M17 21V11l4 2v8M6 9h.01M6 12h.01M6 15h.01', tint: '#E6F1FB', iconColor: '#185FA5', title: 'For companies', desc: 'Hire skill-verified, document-checked candidates. Spend less time sorting out fakes.', cta: 'Hire on GRID', to: '/register-company' },
             { icon: 'M12 3L2 8l10 5 10-5-10-5zM4 10v6c0 1 3.5 3 8 3s8-2 8-3v-6', tint: '#EEEDFE', iconColor: '#3C3489', title: 'For colleges', desc: 'Run placements and drives, and generate NAAC/NBA-ready reports in a click.', cta: 'Bring GRID to your college', to: '/college-login' }
           ].map(a => (
             <div key={a.title} style={{ background: '#fff', border: '1px solid #eef0f3', borderRadius: '14px', padding: '22px', display: 'flex', flexDirection: 'column' }}>
