@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate, useNavigationType } from 'react-router-dom'
 import { useEffect } from 'react'
 import Splash from './pages/Splash'
 import Onboarding from './pages/Onboarding'
@@ -108,10 +108,24 @@ function Seo() {
   return null
 }
 
+// Scroll behaviour on navigation: jump to the top when moving forward to a
+// new page, but let the browser restore the previous position on back/forward
+// (POP), so returning to the homepage resumes where you'd scrolled.
+function ScrollManager() {
+  const { pathname } = useLocation()
+  const navType = useNavigationType()
+  useEffect(() => {
+    if (navType === 'POP') return
+    window.scrollTo(0, 0)
+  }, [pathname, navType])
+  return null
+}
+
 function App() {
   return (
     <BrowserRouter>
       <Seo />
+      <ScrollManager />
       <Routes>
         <Route path="/" element={<Splash />} />
         <Route path="/home" element={<Navigate to="/" replace />} />
