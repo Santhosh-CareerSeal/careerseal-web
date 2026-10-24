@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { useEffect } from 'react'
 import Splash from './pages/Splash'
 import Onboarding from './pages/Onboarding'
 import Login from './pages/Login'
@@ -32,9 +33,30 @@ import Landing from './pages/Landing'
 import About from './pages/About'
 import Contact from './pages/Contact'
 
+// Keeps a single <link rel="canonical"> in the <head> updated to the
+// current route, always on the www host. Fixes the "Duplicate without
+// user-selected canonical" warning and keeps www/non-www consistent.
+function Canonical() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    const base = 'https://www.thegridcard.com'
+    const path = pathname === '/' ? '/' : pathname.replace(/\/+$/, '')
+    const href = base + path
+    let link = document.querySelector('link[rel="canonical"]')
+    if (!link) {
+      link = document.createElement('link')
+      link.setAttribute('rel', 'canonical')
+      document.head.appendChild(link)
+    }
+    link.setAttribute('href', href)
+  }, [pathname])
+  return null
+}
+
 function App() {
   return (
     <BrowserRouter>
+      <Canonical />
       <Routes>
         <Route path="/" element={<Splash />} />
         <Route path="/home" element={<Landing />} />

@@ -6,4 +6,4 @@ Disallow: /company-dashboard
 Disallow: /college-portal
 Disallow: /profile
 
-Sitemap: https://thegridcard.com/sitemap.xml
+Sitemap: https://www.thegridcard.com/sitemap.xml
