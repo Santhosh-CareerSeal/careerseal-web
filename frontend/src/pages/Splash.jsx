@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import Landing from './Landing'
 
 const fields = [
   { icon: 'ti-stethoscope', label: 'Doctor' },
@@ -37,27 +38,7 @@ const SPLASH_DURATION = 3000
 
 function Splash() {
   const navigate = useNavigate()
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (!token) return
-    let user = {}
-    try { user = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
-    if (user.role === 'company') return navigate('/company', { replace: true })
-    if (user.role === 'college') return navigate('/college-portal', { replace: true })
-    if (user.role === 'admin') return navigate('/admin', { replace: true })
-    return navigate('/dashboard', { replace: true })
-  }, [])
-
-  useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) return
-    if (localStorage.getItem('grid_splash_seen')) {
-      navigate('/home', { replace: true })
-    } else {
-      localStorage.setItem('grid_splash_seen', '1')
-    }
-  }, [])
+  const [showLanding, setShowLanding] = useState(false)
   const [poppedCount, setPoppedCount] = useState(0)
   const [mottoText, setMottoText] = useState('')
   const [propIndex, setPropIndex] = useState(-1)
@@ -65,7 +46,25 @@ function Splash() {
   const [progress, setProgress] = useState(0)
 
   useEffect(() => {
-    const redirectTimer = setTimeout(() => navigate('/home'), SPLASH_DURATION)
+    const token = localStorage.getItem('token')
+    if (token) {
+      let user = {}
+      try { user = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
+      if (user.role === 'company') return navigate('/company', { replace: true })
+      if (user.role === 'college') return navigate('/college-portal', { replace: true })
+      if (user.role === 'admin') return navigate('/admin', { replace: true })
+      return navigate('/dashboard', { replace: true })
+    }
+
+    // Logged out, returning visitor: skip the splash and show the homepage at "/".
+    if (localStorage.getItem('grid_splash_seen')) {
+      setShowLanding(true)
+      return
+    }
+    // First visit: play the splash once, then reveal the homepage at "/".
+    localStorage.setItem('grid_splash_seen', '1')
+
+    const redirectTimer = setTimeout(() => setShowLanding(true), SPLASH_DURATION)
 
     let popTimer
     const popInterval = Math.floor((SPLASH_DURATION - 600) / fields.length)
@@ -124,6 +123,8 @@ function Splash() {
       cancelAnimationFrame(rafId)
     }
   }, [])
+
+  if (showLanding) return <Landing />
 
   return (
     <div className="min-h-screen bg-[#1A3C6E] flex flex-col items-center justify-center px-6 py-12 overflow-hidden">

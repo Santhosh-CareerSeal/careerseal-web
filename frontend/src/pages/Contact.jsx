@@ -14,7 +14,7 @@ function Contact() {
 
   const homeDest = (() => {
     const token = localStorage.getItem('token')
-    if (!token) return '/home'
+    if (!token) return '/'
     let user = {}
     try { user = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
     if (user.role === 'company') return '/company'

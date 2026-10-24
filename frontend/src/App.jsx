@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom'
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom'
 import { useEffect } from 'react'
 import Splash from './pages/Splash'
 import Onboarding from './pages/Onboarding'
@@ -113,7 +113,7 @@ function App() {
       <Seo />
       <Routes>
         <Route path="/" element={<Splash />} />
-        <Route path="/home" element={<Landing />} />
+        <Route path="/home" element={<Navigate to="/" replace />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/onboarding" element={<Onboarding />} />
