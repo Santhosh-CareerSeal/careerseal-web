@@ -1,29 +1,11 @@
-import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
-
-const FAQS = [
-  { q: 'What is a GRID Card?', a: "A GRID Card is your verified career identity in one place. Your skills are tested through exams and your documents are checked — not just claimed — so your profile means something the moment a recruiter opens it. Every GRID Card carries a unique GRID number and QR code that companies can trust." },
-  { q: 'How do I get started on GRID?', a: "Create your GRID Card, add your education, skills and experience, and upload your documents for verification. Then take AI skill exams to prove what you can do. Once your card is ready, publish it and recruiters can find you." },
-  { q: 'How does GRID verify my skills?', a: "You take AI-generated skill exams on GRID. Pass one, and that skill shows as 'verified' on your GRID Card. Your uploaded documents — education and experience — are checked too, so recruiters see proof instead of claims." },
-  { q: 'How is GRID different from LinkedIn or Naukri?', a: "On other platforms anyone can claim any skill — nothing is checked. GRID verifies what you can actually do, so you stand out in a world full of inflated, AI-written resumes. It's proof, not promises." },
-  { q: 'Does GRID guarantee a job?', a: "No platform can honestly promise that. What GRID does is make your real skills visible and trusted, so you get a fair shot — and every rejection comes with real feedback, so you always know where you stand instead of disappearing into silence." },
-  { q: 'How do companies hire on GRID?', a: "Companies browse skill-verified, document-checked candidates and hire directly — spending far less time sorting real talent from inflated resumes. Fewer fakes to filter means faster hiring and fewer bad hires." },
-  { q: 'Can my college use GRID for placements?', a: "Yes. Colleges can run placement drives on GRID and generate NAAC/NBA-ready reports in a click, while their students get verified GRID Cards that recruiters actually trust." }
-]
-
-const FAQ_SCHEMA = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: FAQS.map(f => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } }))
-}
 
 function Landing() {
   const token = localStorage.getItem('token')
   let loggedUser = {}
   try { loggedUser = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
   const loginDest = loggedUser.role === 'company' ? '/company' : loggedUser.role === 'college' ? '/college-portal' : loggedUser.role === 'admin' ? '/admin' : '/dashboard'
-  const [openFaq, setOpenFaq] = useState(0)
   return (
     <div style={{ background: '#fff', minHeight: '100vh' }}>
       <div style={{ background: '#1A3C6E', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
@@ -113,33 +95,6 @@ function Landing() {
               <Link to={a.to} style={{ display: 'inline-block', textAlign: 'center', background: '#1A3C6E', color: '#fff', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '11px 16px', borderRadius: '9px' }}>{a.cta}</Link>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div id="faq" style={{ background: '#f4f6f9', padding: '3.5rem 1.5rem' }}>
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(FAQ_SCHEMA) }} />
-        <div style={{ maxWidth: '760px', margin: '0 auto' }}>
-          <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', color: '#0D7377', textAlign: 'center', margin: '0 0 10px' }}>COMMON QUESTIONS</p>
-          <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#1A3C6E', textAlign: 'center', margin: '0 0 8px' }}>Questions, answered</h2>
-          <p style={{ fontSize: '14px', color: '#8a929c', textAlign: 'center', margin: '0 0 32px' }}>Everything students, companies and colleges ask before they start.</p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-            {FAQS.map((f, i) => {
-              const open = openFaq === i
-              return (
-                <div key={i} style={{ background: '#fff', border: `1px solid ${open ? '#dce7ee' : '#eef0f3'}`, borderRadius: '14px', overflow: 'hidden', boxShadow: open ? '0 6px 20px rgba(26,60,110,.06)' : 'none' }}>
-                  <button onClick={() => setOpenFaq(open ? -1 : i)} aria-expanded={open} style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', padding: '18px 20px', background: 'none', border: 'none', cursor: 'pointer', textAlign: 'left', fontSize: '16px', fontWeight: 700, color: '#1A3C6E', fontFamily: 'inherit' }}>
-                    <span>{f.q}</span>
-                    <span style={{ flex: '0 0 auto', width: '26px', height: '26px', borderRadius: '50%', background: open ? '#5DCAA5' : '#E1F5EE', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'transform .2s, background .2s', transform: open ? 'rotate(180deg)' : 'none' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D7377" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 9l6 6 6-6"/></svg>
-                    </span>
-                  </button>
-                  {open && (
-                    <div style={{ padding: '0 20px 20px', fontSize: '14px', lineHeight: 1.7, color: '#6b7480' }}>{f.a}</div>
-                  )}
-                </div>
-              )
-            })}
-          </div>
         </div>
       </div>
 
