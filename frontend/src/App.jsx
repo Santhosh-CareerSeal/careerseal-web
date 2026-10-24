@@ -33,22 +33,76 @@ import Landing from './pages/Landing'
 import About from './pages/About'
 import Contact from './pages/Contact'
 
-// Keeps a single <link rel="canonical"> in the <head> updated to the
-// current route, always on the www host. Fixes the "Duplicate without
-// user-selected canonical" warning and keeps www/non-www consistent.
-function Canonical() {
+// Per-route SEO: sets <title>, meta description, canonical, and OG/Twitter
+// title+description based on the current path. One central place for all
+// public pages; private/app routes fall back to the default.
+const SITE = 'https://www.thegridcard.com'
+const DEFAULT_META = {
+  title: 'GRID — Your Career. Verified. Transparent. Guided.',
+  description: 'GRID gives Indian students a verified GRID Card — a skill-tested resume with QR code. Take exams, prove your skills, and land better jobs. Free to join.'
+}
+const ROUTE_META = {
+  '/': DEFAULT_META,
+  '/home': DEFAULT_META,
+  '/about': {
+    title: 'About GRID — Verified Career Identity for Indian Students',
+    description: 'GRID is building a verified career identity for India — skill-tested, transparent profiles that help students and freshers get hired on proof, not just claims.'
+  },
+  '/contact': {
+    title: 'Contact GRID',
+    description: 'Get in touch with the GRID team — questions about your GRID Card, verification, hiring, or partnering your college with GRID.'
+  },
+  '/register': {
+    title: 'Join GRID — Create Your Verified GRID Card',
+    description: 'Sign up free and build your verified GRID Card. Take skill exams, prove what you can do, and get discovered by recruiters. Free for students.'
+  },
+  '/login': {
+    title: 'Log in to GRID',
+    description: 'Log in to your GRID account to manage your verified GRID Card, exams, and career roadmap.'
+  },
+  '/privacy': {
+    title: 'Privacy Policy — GRID',
+    description: 'How GRID collects, uses, and protects your data. Read the GRID privacy policy.'
+  },
+  '/terms': {
+    title: 'Terms of Service — GRID',
+    description: 'The terms that govern your use of GRID and the GRID Card.'
+  }
+}
+
+function setMetaTag(key, content, attr = 'name') {
+  let el = document.querySelector(`meta[${attr}="${key}"]`)
+  if (!el) {
+    el = document.createElement('meta')
+    el.setAttribute(attr, key)
+    document.head.appendChild(el)
+  }
+  el.setAttribute('content', content)
+}
+
+function Seo() {
   const { pathname } = useLocation()
   useEffect(() => {
-    const base = 'https://www.thegridcard.com'
+    const meta = ROUTE_META[pathname] || DEFAULT_META
     const path = pathname === '/' ? '/' : pathname.replace(/\/+$/, '')
-    const href = base + path
+    const url = SITE + path
+
+    document.title = meta.title
+    setMetaTag('description', meta.description)
+    setMetaTag('og:title', meta.title, 'property')
+    setMetaTag('og:description', meta.description, 'property')
+    setMetaTag('og:url', url, 'property')
+    setMetaTag('twitter:title', meta.title)
+    setMetaTag('twitter:description', meta.description)
+    setMetaTag('twitter:url', url)
+
     let link = document.querySelector('link[rel="canonical"]')
     if (!link) {
       link = document.createElement('link')
       link.setAttribute('rel', 'canonical')
       document.head.appendChild(link)
     }
-    link.setAttribute('href', href)
+    link.setAttribute('href', url)
   }, [pathname])
   return null
 }
@@ -56,7 +110,7 @@ function Canonical() {
 function App() {
   return (
     <BrowserRouter>
-      <Canonical />
+      <Seo />
       <Routes>
         <Route path="/" element={<Splash />} />
         <Route path="/home" element={<Landing />} />
