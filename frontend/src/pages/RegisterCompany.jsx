@@ -46,55 +46,52 @@ function RegisterCompany() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row">
+  const props = ['Skill-verified, document-checked candidates', 'Post jobs & manage your pipeline', 'Search verified talent by skill', 'Less screening, fewer bad hires']
+  const fieldCls = 'w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none bg-white transition-colors focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
 
-      {/* Left panel */}
-      <div className="hidden md:flex w-80 bg-[#1A3C6E] flex-col justify-center px-10 py-12 relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-12">
-            <svg width="22" height="22" viewBox="0 0 22 22">
-              <circle cx="11" cy="11" r="11" fill="#0D7377"/>
-              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            </svg>
-            <span className="text-white font-bold text-xl">GRID</span>
-          </div>
-          <h2 className="text-white text-2xl font-bold mb-4">Find verified talent for your company</h2>
-          <p className="text-white/60 text-sm mb-8">Access thousands of verified student profiles with GRID cards across India</p>
+  return (
+    <div className="min-h-screen flex flex-col md:flex-row bg-white">
+
+      {/* Left — value panel (desktop) */}
+      <div className="hidden md:flex md:w-[38%] relative overflow-hidden flex-col text-white px-10 py-12"
+        style={{ background: 'linear-gradient(165deg,#0c1f3d,#3c3489)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 85% 12%, rgba(107,78,219,.5), transparent 55%), radial-gradient(circle at 8% 92%, rgba(13,115,119,.4), transparent 55%)' }}></div>
+        <div className="relative z-10 flex items-center gap-2">
+          <svg width="24" height="24" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <span className="text-xl font-extrabold">GRID</span>
+        </div>
+        <div className="relative z-10 my-auto">
+          <h2 className="text-[26px] font-extrabold leading-tight mb-6" style={{ letterSpacing: '-.01em' }}>Hire verified talent, faster.</h2>
           <div className="flex flex-col gap-3">
-            {['Post jobs in minutes', 'Smart candidate matching', 'View verified GRID profiles', 'Manage hiring pipeline', 'Search talent by skills'].map((f, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className="w-5 h-5 rounded-full bg-[#0D7377] flex items-center justify-center flex-shrink-0">
-                  <svg width="10" height="10" viewBox="0 0 10 10"><path d="M2 5l2.5 2.5L6 2" stroke="white" strokeWidth="1.5" fill="none" strokeLinecap="round"/></svg>
-                </div>
-                <span className="text-white/80 text-sm">{f}</span>
+            {props.map(p => (
+              <div key={p} className="flex items-center gap-3 text-sm text-white/85">
+                <span className="w-[22px] h-[22px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
+                  <svg width="11" height="11" viewBox="0 0 10 10"><path d="M2 5l2.2 2.2L8 2" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round"/></svg>
+                </span>
+                {p}
               </div>
             ))}
           </div>
-          <div className="mt-10 bg-white/10 rounded-xl p-4">
-            <p className="text-white/40 text-xs mb-1">VERIFICATION NOTE</p>
-            <p className="text-white/70 text-xs leading-relaxed">Your company will be verified by GRID within 1 week. You can post jobs immediately. Verified companies get a trust badge visible to all students.</p>
-          </div>
+        </div>
+        <div className="relative z-10 rounded-xl p-4" style={{ background: 'rgba(255,255,255,0.08)' }}>
+          <p className="text-white/40 text-[11px] font-bold tracking-wide mb-1">VERIFICATION NOTE</p>
+          <p className="text-white/70 text-xs leading-relaxed">Your company is verified by GRID within a week. You can post jobs immediately, and verified companies get a trust badge students can see.</p>
         </div>
       </div>
 
-      {/* Right panel */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-10 md:px-16 overflow-y-auto">
+      {/* Right — form */}
+      <div className="flex-1 flex flex-col justify-center px-6 py-10 md:px-14 overflow-y-auto">
         <div className="max-w-md w-full mx-auto">
 
           <div className="flex items-center gap-2 mb-8 md:hidden">
-            <svg width="22" height="22" viewBox="0 0 22 22">
-              <circle cx="11" cy="11" r="11" fill="#0D7377"/>
-              <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
-            </svg>
-            <span className="text-[#1A3C6E] font-bold text-xl">GRID</span>
+            <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+            <span className="text-[#17304f] font-extrabold text-xl">GRID</span>
           </div>
 
-          <h1 className="text-2xl font-bold text-[#1A3C6E] mb-1">Register your company</h1>
+          <h1 className="text-2xl font-extrabold text-[#17304f] mb-1">Register your company</h1>
           <p className="text-gray-400 text-sm mb-6">
             Are you a student or fresher?{' '}
-            <span className="text-[#0D7377] font-bold cursor-pointer" onClick={() => navigate('/register')}>Register as Student →</span>
+            <span className="text-[#6b4edb] font-bold cursor-pointer" onClick={() => navigate('/register-student')}>Register as Student →</span>
           </p>
 
           {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4">{error}</div>}
@@ -107,29 +104,25 @@ function RegisterCompany() {
               <div className="flex flex-col gap-3">
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Company Name *</label>
-                  <input type="text" placeholder="e.g. TechCorp India Pvt Ltd" value={companyName} onChange={e => setCompanyName(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors"/>
+                  <input type="text" placeholder="e.g. TechCorp India Pvt Ltd" value={companyName} onChange={e => setCompanyName(e.target.value)} className={fieldCls} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Industry *</label>
-                  <select value={industry} onChange={e => setIndustry(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors">
+                  <select value={industry} onChange={e => setIndustry(e.target.value)} className={fieldCls}>
                     <option value="">Select industry</option>
                     {industries.map(i => <option key={i} value={i}>{i}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Company Size *</label>
-                  <select value={companySize} onChange={e => setCompanySize(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors">
+                  <select value={companySize} onChange={e => setCompanySize(e.target.value)} className={fieldCls}>
                     <option value="">Select company size</option>
                     {sizes.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Website (optional)</label>
-                  <input type="url" placeholder="https://yourcompany.com" value={website} onChange={e => setWebsite(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors"/>
+                  <input type="url" placeholder="https://yourcompany.com" value={website} onChange={e => setWebsite(e.target.value)} className={fieldCls} />
                 </div>
               </div>
             </div>
@@ -140,26 +133,22 @@ function RegisterCompany() {
               <div className="flex flex-col gap-3">
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Your Full Name *</label>
-                  <input type="text" placeholder="Recruiter's full name" value={recruiterName} onChange={e => setRecruiterName(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors"/>
+                  <input type="text" placeholder="Recruiter's full name" value={recruiterName} onChange={e => setRecruiterName(e.target.value)} className={fieldCls} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Your Designation *</label>
-                  <select value={designation} onChange={e => setDesignation(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors">
+                  <select value={designation} onChange={e => setDesignation(e.target.value)} className={fieldCls}>
                     <option value="">Select your role</option>
                     {designations.map(d => <option key={d} value={d}>{d}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Work Email *</label>
-                  <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors"/>
+                  <input type="email" placeholder="you@company.com" value={email} onChange={e => setEmail(e.target.value)} className={fieldCls} />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Password *</label>
-                  <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)}
-                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#0D7377] bg-white transition-colors"/>
+                  <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} className={fieldCls} />
                 </div>
               </div>
             </div>
@@ -167,19 +156,24 @@ function RegisterCompany() {
             {/* Verification notice */}
             <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex gap-2">
               <span className="text-lg flex-shrink-0">⏳</span>
-              <p className="text-xs text-amber-800 leading-relaxed">Your company will be verified by GRID within 1 week. You can post jobs immediately after registration. You will receive an email and notification once verified.</p>
+              <p className="text-xs text-amber-800 leading-relaxed">Your company will be verified by GRID within a week. You can post jobs immediately — you'll get an email and notification once verified.</p>
             </div>
 
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors disabled:opacity-50">
-              {loading ? 'Creating account...' : 'Register Company →'}
+              className="w-full text-white py-3 rounded-xl font-bold disabled:opacity-50 transition-opacity"
+              style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
+              {loading ? 'Creating account…' : 'Register Company →'}
             </button>
 
+            <p className="text-center text-sm text-gray-400">
+              Already registered?{' '}
+              <span className="text-[#6b4edb] font-bold cursor-pointer" onClick={() => navigate('/company-login')}>Sign in</span>
+            </p>
             <p className="text-center text-xs text-gray-400">
               By registering, you agree to GRID's{' '}
-              <span onClick={() => navigate('/terms')} className="text-[#0D7377] cursor-pointer hover:underline">Terms of Service</span>
+              <span onClick={() => navigate('/terms')} className="text-[#6b4edb] cursor-pointer hover:underline">Terms of Service</span>
               {' '}and{' '}
-              <span onClick={() => navigate('/privacy')} className="text-[#0D7377] cursor-pointer hover:underline">Privacy Policy</span>
+              <span onClick={() => navigate('/privacy')} className="text-[#6b4edb] cursor-pointer hover:underline">Privacy Policy</span>
             </p>
           </div>
         </div>
