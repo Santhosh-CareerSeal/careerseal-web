@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import getHomeDest from '../utils/homeDest'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Footer from '../components/Footer'
@@ -18,7 +19,7 @@ function Sidebar({ active, setActive, college, navigate }) {
   ]
   return (
     <div style={{ width: '200px', background: '#0f1e3d', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0, minHeight: '100vh' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }} onClick={() => navigate(getHomeDest())}>
         <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
         <span style={{ color: 'white', fontSize: '13px', fontWeight: '700' }}>GRID</span>
       </div>

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
+import getHomeDest from '../utils/homeDest'
 
 function Landing() {
   const token = localStorage.getItem('token')
@@ -9,12 +10,12 @@ function Landing() {
   return (
     <div style={{ background: '#fff', minHeight: '100vh' }}>
       <div style={{ background: '#1A3C6E', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <Link to={getHomeDest()} style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#5DCAA5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5l9-9" stroke="#1A3C6E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </span>
           <span style={{ color: '#fff', fontWeight: 700, fontSize: '17px' }}>GRID</span>
-        </div>
+        </Link>
         <div style={{ display: 'flex', gap: '10px' }}>
           {token ? (
             <Link to={loginDest} style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Go to dashboard</Link>

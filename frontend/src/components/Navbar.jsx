@@ -2,6 +2,7 @@ import { useState } from 'react'
 import axios from 'axios'
 import API_URL from '../config'
 import { useNavigate, useLocation } from 'react-router-dom'
+import getHomeDest from '../utils/homeDest'
 
 function Navbar({ student, user }) {
   const navigate = useNavigate()
@@ -42,7 +43,7 @@ function Navbar({ student, user }) {
     <div className="bg-[#1A3C6E] relative z-50">
       {/* Main navbar */}
       <div className="px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/dashboard')}>
+        <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(getHomeDest())}>
           <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <h1 className="text-white text-base font-bold">GRID</h1>
         </div>
