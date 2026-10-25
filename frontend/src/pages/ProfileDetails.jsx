@@ -7,6 +7,14 @@ import API_URL from '../config'
 import { supabase } from '../supabaseClient'
 
 const TABS = ['Personal', 'Education', 'Profession', 'Skills', 'Others', 'Documents']
+const STEP_META = [
+  { title: 'Basic Details', sub: "Let's get you started" },
+  { title: 'Education', sub: 'Your degree & marks' },
+  { title: 'Experience', sub: 'Internships & work' },
+  { title: 'Skills', sub: 'Prove what you can do' },
+  { title: 'Other Details', sub: 'Languages, links & more' },
+  { title: 'Photo & Documents', sub: 'Upload & verify' },
+]
 
 function ProfileDetails() {
   const navigate = useNavigate()
@@ -340,9 +348,9 @@ function ProfileDetails() {
     } finally { setSaving(false) }
   }
 
-  const inputClass = "border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm w-full"
+  const inputClass = "border border-gray-300 rounded-xl px-4 py-3 outline-none focus:border-[#6b4edb] focus:ring-2 focus:ring-[#6b4edb]/15 text-sm w-full transition-colors"
   const labelClass = "text-xs font-bold text-gray-500 uppercase tracking-wide mb-1 block"
-  const sectionTitle = "text-base font-bold text-[#1A3C6E] mb-4 pl-3 border-l-4 border-[#0D7377] leading-tight"
+  const sectionTitle = "text-base font-bold text-[#1A3C6E] mb-4 pl-3 border-l-4 border-[#6b4edb] leading-tight"
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -393,62 +401,61 @@ function ProfileDetails() {
           </div>
         </div>
       )}
-      <div className="bg-[#1A3C6E] px-6 py-4 flex items-center justify-between">
+      <div className="px-6 py-4 flex items-center justify-between" style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
         <div className="flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <h1 className="text-white font-bold text-lg">GRID</h1>
         </div>
-        <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white">← Dashboard</button>
-          <button onClick={() => navigate('/roadmap')} className="text-[#5DCAA5] text-sm font-bold hover:text-white transition-colors">AI Roadmap →</button>
+        <div className="flex items-center gap-5">
+          <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white transition-colors">← Dashboard</button>
+          <button onClick={() => navigate('/roadmap')} className="text-[#9fe1cb] text-sm font-bold hover:text-white transition-colors">AI Roadmap →</button>
+        </div>
       </div>
 
-      <div className="max-w-3xl mx-auto px-6 py-8">
-        <div className="profileHero rounded-2xl p-5 mb-5 flex items-center gap-4" style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)' }}>
-          <div className="w-16 h-16 rounded-full bg-white/15 flex items-center justify-center overflow-hidden flex-shrink-0 border-2 border-white/25">
-            {(photoPreview || form.photoUrl) ? (
-              <img src={photoPreview || form.photoUrl} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-white text-xl font-bold">{(form.legalFullName || 'G').charAt(0).toUpperCase()}</span>
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-white font-bold text-xl truncate">{form.legalFullName || 'My Profile'}</p>
-            <p className="text-white/60 text-xs mt-0.5">{form.degree ? form.degree + (form.branch ? ' · ' + form.branch : '') : 'Complete your profile to get discovered by companies'}</p>
-            <div className="flex items-center gap-2 mt-2 flex-wrap">
-              <span className="bg-white/15 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">{completionPct}% complete</span>
-              {emailVerified && <span className="bg-[#5DCAA5]/20 text-[#5DCAA5] text-[10px] font-bold px-2 py-0.5 rounded-full">Email verified</span>}
-              {hasVerifiedSkill && <span className="bg-[#5DCAA5]/20 text-[#5DCAA5] text-[10px] font-bold px-2 py-0.5 rounded-full">Skill verified</span>}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
+        <div className="flex flex-col md:flex-row gap-6">
+
+          {/* Left — stepper rail */}
+          <aside className="md:w-64 flex-shrink-0">
+            <div className="md:sticky md:top-6 rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
+              <div className="flex flex-col gap-0.5">
+                {STEP_META.map((s, i) => {
+                  const done = tabComplete(i)
+                  const active = activeTab === i
+                  return (
+                    <button key={s.title} onClick={() => setActiveTab(i)} className="flex items-start gap-3 text-left py-2 px-1 rounded-xl hover:bg-white/5 transition-colors">
+                      <span className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
+                        style={{ background: active ? 'linear-gradient(135deg,#6b4edb,#0d7377)' : done ? '#5dcaa5' : 'rgba(255,255,255,0.12)', color: active ? '#fff' : done ? '#0c2a22' : 'rgba(255,255,255,0.6)', boxShadow: active ? '0 0 0 4px rgba(107,78,219,0.3)' : 'none' }}>
+                        {done && !active ? '✓' : i + 1}
+                      </span>
+                      <span className="min-w-0 pt-0.5">
+                        <span className={`block text-sm font-bold leading-tight ${active ? 'text-white' : done ? 'text-white/80' : 'text-white/55'}`}>{s.title}</span>
+                        <span className={`block text-[11px] mt-0.5 ${active ? 'text-[#9fe1cb]' : 'text-white/35'}`}>{s.sub}</span>
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+              <div className="mt-4 pt-4 border-t border-white/12">
+                <div className="flex items-center justify-between mb-1.5">
+                  <span className="text-[11px] font-bold text-white/75">Profile {completionPct}%</span>
+                  <span className="text-[10px] text-white/40">{filledCount}/{REQUIRED_FIELDS.length}{!hasVerifiedSkill ? ' · skill' : ''}{!hasDocument ? ' · doc' : ''}</span>
+                </div>
+                <div className="bg-white/12 rounded-full h-1.5 overflow-hidden">
+                  <div className="h-1.5 rounded-full transition-all duration-500" style={{ width: completionPct + '%', background: completionPct === 100 ? '#5dcaa5' : 'linear-gradient(90deg,#6b4edb,#5dcaa5)' }}></div>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-6">
-          <div className="flex items-center justify-between mb-2">
-            <p className="text-sm font-bold text-[#1A3C6E]">Profile {completionPct}% complete</p>
-            <p className="text-xs text-gray-400">{filledCount}/{REQUIRED_FIELDS.length} details{!hasVerifiedSkill ? ' · skill pending' : ''}{!hasDocument ? ' · document pending' : ''}</p>
-          </div>
-          <div className="bg-gray-100 rounded-full h-2 overflow-hidden">
-            <div className="h-2 rounded-full transition-all duration-500" style={{ width: completionPct + '%', background: completionPct === 100 ? '#0D7377' : 'linear-gradient(90deg, #1A3C6E, #5DCAA5)' }}></div>
-          </div>
-          <p className="text-xs mt-2 font-medium" style={{ color: completionPct === 100 ? '#0D7377' : '#9ca3af' }}>
-            {completionPct === 100 ? 'Your profile is complete — publish it to GRID!' : completionPct >= 60 ? 'Almost there — verified profiles get noticed faster.' : 'A complete profile is 3x more likely to be discovered by recruiters.'}
-          </p>
-        </div>
+          </aside>
 
-        <div className="flex bg-white rounded-2xl border border-gray-100 p-1 mb-6 overflow-x-auto">
-          {TABS.map((tab, i) => (
-            <button key={tab} onClick={() => setActiveTab(i)}
-              className={`flex-1 py-2 px-3 rounded-xl text-sm font-bold transition-all whitespace-nowrap flex items-center justify-center gap-1 ${activeTab === i ? 'bg-[#1A3C6E] text-white' : 'text-gray-400 hover:text-gray-600'}`}>
-              {tab}
-              {tabComplete(i) && <span className={activeTab === i ? 'text-[#5DCAA5]' : 'text-[#0D7377]'}>✓</span>}
-            </button>
-          ))}
-        </div>
+          {/* Right — form column */}
+          <div className="flex-1 min-w-0">
 
-        {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-sm">{error}</div>}
-        {success && <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-green-700 text-sm">{success}</div>}
-        {gridMsg && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4 text-blue-700 text-sm">{gridMsg}</div>}
+            {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-sm">{error}</div>}
+            {success && <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-green-700 text-sm">{success}</div>}
+            {gridMsg && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4 text-blue-700 text-sm">{gridMsg}</div>}
 
-        <div className="bg-white rounded-2xl p-6 shadow-sm">
+            <div className="bg-white rounded-2xl p-6 shadow-sm">
 
           {/* PERSONAL */}
           {activeTab === 0 && (
@@ -516,9 +523,6 @@ function ProfileDetails() {
                 </div>
               </div>
 
-              <button onClick={() => saveAndGo(1)} disabled={savingStep} className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors mt-2">
-                {savingStep ? 'Saving...' : 'Save & Next: Education →'}
-              </button>
             </div>
           )}
 
@@ -616,10 +620,6 @@ function ProfileDetails() {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-2">
-                <button onClick={() => setActiveTab(0)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Personal</button>
-                <button onClick={() => saveAndGo(2)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Profession →'}</button>
-              </div>
             </div>
           )}
 
@@ -730,10 +730,6 @@ function ProfileDetails() {
                 <div><label className={labelClass}>Expected salary (LPA)</label><input type="text" placeholder="e.g. 5-8 LPA" value={form.expectedSalary} onChange={e => set('expectedSalary', e.target.value)} className={inputClass} /></div>
               </div>
 
-              <div className="flex gap-3 mt-2">
-                <button onClick={() => setActiveTab(1)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Education</button>
-                <button onClick={() => saveAndGo(3)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Skills →'}</button>
-              </div>
             </div>
           )}
 
@@ -772,10 +768,6 @@ function ProfileDetails() {
               <div><label className={labelClass}>Tools and software</label><input type="text" placeholder="e.g. VS Code, Figma, Git, Postman" value={form.toolsAndSoftware} onChange={e => set('toolsAndSoftware', e.target.value)} className={inputClass} /></div>
               <div><label className={labelClass}>Languages known</label><input type="text" placeholder="e.g. English, Hindi, Telugu" value={form.languagesKnown} onChange={e => set('languagesKnown', e.target.value)} className={inputClass} /></div>
               <div><label className={labelClass}>Certifications</label><textarea placeholder="e.g. AWS Certified Developer - 2024, Google Analytics - 2023" value={form.certifications} onChange={e => set('certifications', e.target.value)} className={`${inputClass} h-20`} /></div>
-              <div className="flex gap-3 mt-2">
-                <button onClick={() => setActiveTab(2)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Profession</button>
-                <button onClick={() => saveAndGo(4)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Others →'}</button>
-              </div>
             </div>
           )}
 
@@ -831,12 +823,6 @@ function ProfileDetails() {
                 </div>
               </div>
 
-              <div className="flex gap-3 mt-2">
-                <button onClick={() => setActiveTab(3)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Skills</button>
-                <button onClick={() => saveAndGo(5)} disabled={savingStep} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">{savingStep ? 'Saving...' : 'Save & Next: Documents →'}</button>
-              </div>
-
-              
             </div>
           )}
           {activeTab === 5 && (
@@ -892,24 +878,33 @@ function ProfileDetails() {
                   )
                 })}
               </div>
-              <div className="flex gap-3 mt-2">
-                <button onClick={() => setActiveTab(4)} className="flex-1 border border-gray-300 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">← Others</button>
-              </div>
             </div>
           )}
-          <div className="border-t border-gray-100 pt-5 mt-4">
-            {activeTab === 5 ? (
+          <div className="border-t border-gray-100 pt-5 mt-6">
+            {activeTab < 5 ? (
+              <div className="flex gap-3">
+                <button onClick={() => setActiveTab(activeTab - 1)} disabled={activeTab === 0}
+                  className="px-5 py-3 rounded-xl font-bold border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                  ← Go Back
+                </button>
+                <button onClick={() => saveAndGo(activeTab + 1)} disabled={savingStep}
+                  className="flex-1 text-white py-3 rounded-xl font-bold disabled:opacity-50 transition-opacity"
+                  style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
+                  {savingStep ? 'Saving…' : 'Save & Continue →'}
+                </button>
+              </div>
+            ) : (
               <div>
-                <div className="bg-gradient-to-br from-[#1A3C6E] to-[#0D7377] rounded-2xl p-5 mb-4 text-white">
+                <div className="rounded-2xl p-5 mb-4 text-white" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
                   <p className="text-base font-bold mb-2">🚀 Ready to go live?</p>
                   <p className="text-sm text-white/85 leading-relaxed mb-2">
                     Moving to GRID publishes your profile as your shareable GRID Card — one verified identity that companies across India and beyond can discover, view, and trust. This is what puts you in front of recruiters.
                   </p>
                   <p className="text-sm text-white/85 leading-relaxed">
-                    You can update your published card <span className="font-bold text-[#5DCAA5]">3 times a month</span>, so publish when your profile's ready. You can always edit your details anytime.
+                    You can update your published card <span className="font-bold text-[#9fe1cb]">3 times a month</span>, so publish when your profile's ready. You can always edit your details anytime.
                   </p>
                   {updatesRemaining !== null && updatesRemaining > 0 && (
-                    <p className="text-xs font-bold text-[#5DCAA5] mt-3">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
+                    <p className="text-xs font-bold text-[#9fe1cb] mt-3">{updatesRemaining} update{updatesRemaining !== 1 ? 's' : ''} remaining this month</p>
                   )}
                   {updatesRemaining === 0 && (
                     <div className="mt-3 bg-white/10 rounded-xl p-3">
@@ -919,18 +914,21 @@ function ProfileDetails() {
                   )}
                 </div>
                 <div className="flex gap-3 items-center">
+                  <button onClick={() => setActiveTab(4)} className="px-5 py-3 rounded-xl font-bold border border-gray-300 text-gray-600 hover:bg-gray-50 transition-colors">← Go Back</button>
                   <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 border-2 border-[#1A3C6E] text-[#1A3C6E] py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">
-                    {saving || uploadingPhoto ? 'Saving...' : 'Save Profile'}
+                    {saving || uploadingPhoto ? 'Saving…' : 'Save Profile'}
                   </button>
-                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'bg-[#0D7377] text-white hover:bg-[#0a5f63]'}`}>
+                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'text-white'}`} style={updatesRemaining === 0 ? undefined : { background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
                     Move to GRID →
                   </button>
                 </div>
-                {gridMsg && <p className="text-sm text-center mt-3 font-bold text-[#0D7377]">{gridMsg}</p>}
+                {gridMsg && <p className="text-sm text-center mt-3 font-bold text-[#0d7377]">{gridMsg}</p>}
               </div>
-            ) : null}
+            )}
           </div>
 
+            </div>
+          </div>
         </div>
       </div>
     </div>
