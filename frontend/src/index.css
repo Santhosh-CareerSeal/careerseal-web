@@ -1,1 +1,19 @@
 @import "tailwindcss";
+
+/* GRID design tokens — usable as bg-navy, text-teal, border-purple, etc.
+   Palette roles: navy = trust, teal/mint = growth, purple = premium,
+   gold = verified only. Font: Plus Jakarta Sans site-wide. */
+@theme {
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --color-navy: #1a3c6e;
+  --color-navy-deep: #0c1f3d;
+  --color-teal: #0d7377;
+  --color-mint: #5dcaa5;
+  --color-mint-soft: #9fe1cb;
+  --color-purple: #6b4edb;
+  --color-purple-deep: #3c3489;
+  --color-purple-soft: #efedff;
+  --color-gold: #e4b24a;
+  --color-ink: #17304f;
+}
