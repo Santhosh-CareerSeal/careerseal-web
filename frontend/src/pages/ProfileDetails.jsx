@@ -457,10 +457,14 @@ function ProfileDetails() {
 
             <div className="bg-white rounded-2xl p-6 shadow-sm">
 
+          <div className="mb-5 pb-4 border-b border-gray-100">
+            <h2 className="text-xl font-extrabold text-[#17304f]">{STEP_META[activeTab].title}</h2>
+            <p className="text-sm text-gray-400 mt-0.5">{STEP_META[activeTab].sub}</p>
+          </div>
+
           {/* PERSONAL */}
           {activeTab === 0 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>👤 Personal details</p>
 
               <div className="flex flex-col items-center mb-2">
                 <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden mb-3">
@@ -485,13 +489,14 @@ function ProfileDetails() {
                 </div>
                 <div>
                   <label className={labelClass}>Gender</label>
-                  <select value={form.gender} onChange={e => set('gender', e.target.value)} className={inputClass}>
-                    <option value="">Select gender</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Other</option>
-                    <option>Prefer not to say</option>
-                  </select>
+                  <div className="grid grid-cols-3 gap-2">
+                    {['Male', 'Female', 'Other'].map(g => (
+                      <button key={g} type="button" onClick={() => set('gender', g)}
+                        className={`py-3 rounded-xl text-sm font-bold border-2 transition-all ${form.gender === g ? 'border-[#6b4edb] bg-[#efedff] text-[#6b4edb]' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+                        {g}
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
 
@@ -626,7 +631,6 @@ function ProfileDetails() {
           {/* PROFESSION */}
           {activeTab === 2 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>💼 Profession details</p>
 
               <div>
                 <label className={labelClass}>Work status</label>
@@ -736,7 +740,6 @@ function ProfileDetails() {
           {/* SKILLS */}
           {activeTab === 3 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>⚡ Skills and expertise</p>
               <div><label className={labelClass}>Technical skills</label><input type="text" placeholder="e.g. React, Node.js, Python, SQL" value={form.technicalSkills} onChange={e => set('technicalSkills', e.target.value)} className={inputClass} /><p className="text-xs text-gray-400 mt-1">Separate with commas</p></div>
               {form.technicalSkills && (
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
@@ -774,7 +777,6 @@ function ProfileDetails() {
           {/* OTHERS */}
           {activeTab === 4 && (
             <div className="flex flex-col gap-4">
-              <p className={sectionTitle}>📌 Other details</p>
               <div><label className={labelClass}>Bio / Summary</label><textarea placeholder="Write 2-3 lines about yourself, your goals and what you bring to the table..." value={form.bio} onChange={e => set('bio', e.target.value)} className={`${inputClass} h-24`} /></div>
               <div><label className={labelClass}>Hobbies</label><input type="text" placeholder="e.g. Chess, Photography, Reading" value={form.hobbies} onChange={e => set('hobbies', e.target.value)} className={inputClass} /></div>
 
@@ -828,7 +830,6 @@ function ProfileDetails() {
           {activeTab === 5 && (
             <div className="space-y-4">
               <div>
-                <p className="text-lg font-bold text-[#1A3C6E] mb-1">Documents</p>
                 <p className="text-xs text-gray-400 mb-3">Upload your certificates for verification. PDF, JPG or PNG, max 5MB each. Your documents are private and only shared when you apply to a company.</p>
               </div>
               {docMsg && <p className="text-xs font-bold text-[#0D7377]">{docMsg}</p>}
