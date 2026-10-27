@@ -359,7 +359,7 @@ function ProfileDetails() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen flex flex-col md:flex-row bg-white">
       {cropModalOpen && (
         <div className="fixed inset-0 bg-black/70 z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl w-full max-w-md overflow-hidden">
@@ -401,61 +401,61 @@ function ProfileDetails() {
           </div>
         </div>
       )}
-      <div className="px-6 py-4 flex items-center justify-between" style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
-        <div className="flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-          <h1 className="text-white font-bold text-lg">GRID</h1>
+      {/* Left — blue panel (full height, edge-to-edge) */}
+      <aside className="md:w-[320px] lg:w-[360px] flex-shrink-0 flex flex-col text-white px-7 py-8 md:min-h-screen relative overflow-hidden"
+        style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 82% 6%, rgba(107,78,219,.35), transparent 55%)' }}></div>
+
+        <div className="relative z-10 flex items-center gap-2 mb-9">
+          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <span className="text-xl font-extrabold">GRID</span>
         </div>
-        <div className="flex items-center gap-5">
-          <button onClick={() => navigate('/dashboard')} className="text-white/60 text-sm hover:text-white transition-colors">← Dashboard</button>
-          <button onClick={() => navigate('/roadmap')} className="text-[#9fe1cb] text-sm font-bold hover:text-white transition-colors">AI Roadmap →</button>
+
+        <div className="relative z-10 flex flex-col gap-0.5">
+          <div className="absolute left-[21px] top-5 bottom-5 w-0.5 bg-white/10" aria-hidden="true"></div>
+          {STEP_META.map((s, i) => {
+            const done = tabComplete(i)
+            const active = activeTab === i
+            return (
+              <button key={s.title} onClick={() => setActiveTab(i)} className="flex items-start gap-3 text-left py-2.5 px-1 rounded-xl hover:bg-white/5 transition-colors">
+                <span className="relative flex-shrink-0 w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold"
+                  style={{ background: active ? 'linear-gradient(135deg,#6b4edb,#0d7377)' : done ? '#5dcaa5' : '#16305a', color: active ? '#fff' : done ? '#0c2a22' : 'rgba(255,255,255,0.55)', boxShadow: active ? '0 0 0 4px rgba(107,78,219,0.3)' : 'none' }}>
+                  {done && !active ? '✓' : i + 1}
+                </span>
+                <span className="min-w-0 pt-1">
+                  <span className={`block text-sm font-bold leading-tight ${active ? 'text-white' : done ? 'text-white/80' : 'text-white/55'}`}>{s.title}</span>
+                  <span className={`block text-[11px] mt-0.5 ${active ? 'text-[#9fe1cb]' : 'text-white/35'}`}>{s.sub}</span>
+                </span>
+              </button>
+            )
+          })}
         </div>
-      </div>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6">
-        <div className="flex flex-col md:flex-row gap-6">
+        <div className="relative z-10 mt-7 pt-5 border-t border-white/12">
+          <div className="flex items-center justify-between mb-1.5">
+            <span className="text-[11px] font-bold text-white/75">Profile {completionPct}%</span>
+            <span className="text-[10px] text-white/40">{filledCount}/{REQUIRED_FIELDS.length}{!hasVerifiedSkill ? ' · skill' : ''}{!hasDocument ? ' · doc' : ''}</span>
+          </div>
+          <div className="bg-white/12 rounded-full h-1.5 overflow-hidden">
+            <div className="h-1.5 rounded-full transition-all duration-500" style={{ width: completionPct + '%', background: completionPct === 100 ? '#5dcaa5' : 'linear-gradient(90deg,#6b4edb,#5dcaa5)' }}></div>
+          </div>
+        </div>
 
-          {/* Left — stepper rail */}
-          <aside className="md:w-64 flex-shrink-0">
-            <div className="md:sticky md:top-6 rounded-2xl p-5 text-white" style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
-              <div className="flex flex-col gap-0.5">
-                {STEP_META.map((s, i) => {
-                  const done = tabComplete(i)
-                  const active = activeTab === i
-                  return (
-                    <button key={s.title} onClick={() => setActiveTab(i)} className="flex items-start gap-3 text-left py-2 px-1 rounded-xl hover:bg-white/5 transition-colors">
-                      <span className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-                        style={{ background: active ? 'linear-gradient(135deg,#6b4edb,#0d7377)' : done ? '#5dcaa5' : 'rgba(255,255,255,0.12)', color: active ? '#fff' : done ? '#0c2a22' : 'rgba(255,255,255,0.6)', boxShadow: active ? '0 0 0 4px rgba(107,78,219,0.3)' : 'none' }}>
-                        {done && !active ? '✓' : i + 1}
-                      </span>
-                      <span className="min-w-0 pt-0.5">
-                        <span className={`block text-sm font-bold leading-tight ${active ? 'text-white' : done ? 'text-white/80' : 'text-white/55'}`}>{s.title}</span>
-                        <span className={`block text-[11px] mt-0.5 ${active ? 'text-[#9fe1cb]' : 'text-white/35'}`}>{s.sub}</span>
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-              <div className="mt-4 pt-4 border-t border-white/12">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[11px] font-bold text-white/75">Profile {completionPct}%</span>
-                  <span className="text-[10px] text-white/40">{filledCount}/{REQUIRED_FIELDS.length}{!hasVerifiedSkill ? ' · skill' : ''}{!hasDocument ? ' · doc' : ''}</span>
-                </div>
-                <div className="bg-white/12 rounded-full h-1.5 overflow-hidden">
-                  <div className="h-1.5 rounded-full transition-all duration-500" style={{ width: completionPct + '%', background: completionPct === 100 ? '#5dcaa5' : 'linear-gradient(90deg,#6b4edb,#5dcaa5)' }}></div>
-                </div>
-              </div>
-            </div>
-          </aside>
+        <div className="relative z-10 mt-auto pt-8 flex items-center justify-between text-xs">
+          <button onClick={() => navigate('/dashboard')} className="text-white/55 hover:text-white transition-colors">← Dashboard</button>
+          <button onClick={() => navigate('/roadmap')} className="text-[#9fe1cb] font-bold hover:text-white transition-colors">AI Roadmap →</button>
+        </div>
+      </aside>
 
-          {/* Right — form column */}
-          <div className="flex-1 min-w-0">
+      {/* Right — white form area (full height) */}
+      <div className="flex-1 min-w-0 bg-white">
+        <div className="max-w-2xl mx-auto px-6 sm:px-10 py-8 md:py-12">
 
-            {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-sm">{error}</div>}
-            {success && <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-green-700 text-sm">{success}</div>}
-            {gridMsg && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4 text-blue-700 text-sm">{gridMsg}</div>}
+          {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-sm">{error}</div>}
+          {success && <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-green-700 text-sm">{success}</div>}
+          {gridMsg && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4 text-blue-700 text-sm">{gridMsg}</div>}
 
-            <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div>
 
           <div className="mb-5 pb-4 border-b border-gray-100">
             <h2 className="text-xl font-extrabold text-[#17304f]">{STEP_META[activeTab].title}</h2>
@@ -932,7 +932,6 @@ function ProfileDetails() {
           </div>
         </div>
       </div>
-    </div>
   )
 }
 
