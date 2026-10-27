@@ -127,18 +127,19 @@ function Splash() {
   if (showLanding) return <Landing />
 
   return (
-    <div className="min-h-screen bg-[#1A3C6E] flex flex-col items-center justify-center px-6 py-12 overflow-hidden">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 overflow-hidden relative" style={{ background: 'linear-gradient(135deg,#0c1f3d,#3c3489)' }}>
+      <div className="absolute inset-0 pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 32%, rgba(107,78,219,.4), transparent 60%)' }}></div>
 
-      <div className="flex items-center gap-2 mb-1">
+      <div className="relative z-10 flex items-center gap-2 mb-1">
         <svg width="22" height="22" viewBox="0 0 22 22">
-          <circle cx="11" cy="11" r="11" fill="#0D7377" />
-          <path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          <circle cx="11" cy="11" r="11" fill="#6b4edb" />
+          <path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
         </svg>
         <h1 className="text-white text-3xl font-bold">GRID</h1>
       </div>
-      <p className="text-[#0D7377] text-sm tracking-wider mb-5 h-4">{mottoText}</p>
+      <p className="relative z-10 text-[#9fe1cb] text-sm tracking-wider mb-5 h-4">{mottoText}</p>
 
-      <div className="relative w-full max-w-[340px] h-[175px]">
+      <div className="relative z-10 w-full max-w-[340px] h-[175px]">
         {fields.slice(0, poppedCount).map((field, i) => {
           const [x, y] = positions[i % positions.length]
           return (
@@ -156,7 +157,7 @@ function Splash() {
         })}
       </div>
 
-      <div className={`flex items-center gap-2 text-white text-base font-bold h-5 my-4 transition-opacity duration-300 ${propVisible ? 'opacity-100' : 'opacity-0'}`}>
+      <div className={`relative z-10 flex items-center gap-2 text-white text-base font-bold h-5 my-4 transition-opacity duration-300 ${propVisible ? 'opacity-100' : 'opacity-0'}`}>
         {propIndex >= 0 ? (
           <>
             <i className={`ti ${valueProps[propIndex].icon}`}></i>
@@ -165,8 +166,8 @@ function Splash() {
         ) : null}
       </div>
 
-      <div className="w-full max-w-[260px] h-[3px] bg-white/15 rounded-full overflow-hidden">
-        <div className="h-full bg-[#0D7377] rounded-full" style={{ width: `${progress}%` }}></div>
+      <div className="relative z-10 w-full max-w-[260px] h-[3px] bg-white/15 rounded-full overflow-hidden">
+        <div className="h-full rounded-full" style={{ width: `${progress}%`, background: 'linear-gradient(90deg,#6b4edb,#5dcaa5)' }}></div>
       </div>
 
     </div>
