@@ -9,27 +9,28 @@ function Landing() {
   const loginDest = loggedUser.role === 'company' ? '/company' : loggedUser.role === 'college' ? '/college-portal' : loggedUser.role === 'admin' ? '/admin' : '/dashboard'
   return (
     <div style={{ background: '#fff', minHeight: '100vh' }}>
-      <div style={{ background: '#1A3C6E', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
+      <div style={{ background: 'linear-gradient(135deg,#0c1f3d,#3c3489)', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <Link to={getHomeDest()} style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-          <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#5DCAA5', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5l9-9" stroke="#1A3C6E" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#6b4edb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5l9-9" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </span>
           <span style={{ color: '#fff', fontWeight: 700, fontSize: '17px' }}>GRID</span>
         </Link>
         <div style={{ display: 'flex', gap: '10px' }}>
           {token ? (
-            <Link to={loginDest} style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Go to dashboard</Link>
+            <Link to={loginDest} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: '#fff', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Go to dashboard</Link>
           ) : (
             <>
               <Link to="/login" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 14px' }}>Log in</Link>
-              <Link to="/register" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Get started</Link>
+              <Link to="/register" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: '#fff', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Get started</Link>
             </>
           )}
         </div>
       </div>
 
-      <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)', padding: '4rem 1.5rem 4.5rem', textAlign: 'center', color: '#fff' }}>
-        <div style={{ maxWidth: '720px', margin: '0 auto' }}>
+      <div style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)', padding: '4rem 1.5rem 4.5rem', textAlign: 'center', color: '#fff', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', background: 'radial-gradient(ellipse at 20% 15%, rgba(107,78,219,.45), transparent 55%), radial-gradient(ellipse at 85% 85%, rgba(13,115,119,.4), transparent 55%)' }}></div>
+        <div style={{ maxWidth: '720px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
           <p style={{ fontSize: '12px', fontWeight: 600, letterSpacing: '0.1em', color: '#9FE1CB', margin: '0 0 16px' }}>YOUR CAREER. VERIFIED. TRANSPARENT. GUIDED.</p>
           <h1 style={{ fontSize: 'clamp(30px, 6vw, 46px)', fontWeight: 800, lineHeight: 1.15, margin: '0 0 18px' }}>Talent is everywhere.<br/>Proof of it isn't.</h1>
           <p style={{ fontSize: '16px', lineHeight: 1.7, color: 'rgba(255,255,255,0.85)', margin: '0 0 28px', maxWidth: '560px', marginLeft: 'auto', marginRight: 'auto' }}>
@@ -44,7 +45,7 @@ function Landing() {
       </div>
 
       <div id="about" style={{ padding: '3.5rem 1.5rem', maxWidth: '760px', margin: '0 auto' }}>
-        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', color: '#0D7377', margin: '0 0 10px' }}>WHY GRID EXISTS</p>
+        <p style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.08em', color: '#6b4edb', margin: '0 0 10px' }}>WHY GRID EXISTS</p>
         <p style={{ fontSize: '15px', color: '#5b6470', lineHeight: 1.8, margin: '0 0 24px' }}>
           Every year, capable students get passed over because a resume can't prove what they can actually do — and companies waste weeks sorting real from fake. GRID fixes both. We verify every student's skills through exams and check their documents, so a profile means something the moment a recruiter opens it. No inflated resumes. No silent rejections. No one left guessing.
         </p>
@@ -99,7 +100,7 @@ function Landing() {
         </div>
       </div>
 
-      <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)', padding: '3rem 1.5rem', textAlign: 'center', color: '#fff' }}>
+      <div style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)', padding: '3rem 1.5rem', textAlign: 'center', color: '#fff' }}>
         <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 10px' }}>Your verified career starts here</h2>
         <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', margin: '0 0 22px' }}>Join GRID free and build a career identity companies trust.</p>
         <Link to="/register-student" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 30px', borderRadius: '10px' }}>Create your GRID Card</Link>
