@@ -181,7 +181,7 @@ function Dashboard() {
         </p>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto">
+      <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto min-h-screen md:items-start">
 
         {/* Left sidebar — identity only */}
         <div className="hidden md:flex w-60 flex-shrink-0 flex-col gap-3">
@@ -330,7 +330,7 @@ function Dashboard() {
           </div>
 
           {/* Quick actions */}
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div onClick={() => navigate('/jobs')} className="rounded-xl p-4 cursor-pointer transition-transform hover:-translate-y-0.5" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
               <i className="ti ti-briefcase text-white text-xl mb-2 block" aria-hidden="true"></i>
               <p className="text-white font-bold text-sm">Browse jobs</p>
@@ -340,6 +340,16 @@ function Dashboard() {
               <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#6b4edb]" style={{ background: '#efedff' }}><i className="ti ti-chart-bar text-xl" aria-hidden="true"></i></span>
               <p className="text-[#1A3C6E] font-bold text-sm">Track applications</p>
               <p className="text-gray-400 text-xs mt-1">View your pipeline</p>
+            </div>
+            <div onClick={() => navigate('/exams')} className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-sm transition-shadow border border-gray-100">
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#0d7377]" style={{ background: '#e1f1f1' }}><i className="ti ti-certificate text-xl" aria-hidden="true"></i></span>
+              <p className="text-[#1A3C6E] font-bold text-sm">Take a skill exam</p>
+              <p className="text-gray-400 text-xs mt-1">Get your skills verified</p>
+            </div>
+            <div onClick={() => navigate('/roadmap')} className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-sm transition-shadow border border-gray-100">
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#9a7322]" style={{ background: '#fdf3dc' }}><i className="ti ti-route text-xl" aria-hidden="true"></i></span>
+              <p className="text-[#1A3C6E] font-bold text-sm">AI Career Roadmap</p>
+              <p className="text-gray-400 text-xs mt-1">Your personalised path</p>
             </div>
           </div>
 
