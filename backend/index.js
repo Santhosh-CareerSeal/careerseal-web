@@ -68,6 +68,17 @@ app.get('/', async (req, res) => {
   }
 })
 
+
+// Keep-alive: runs a real DB query so Supabase free tier doesn't auto-pause from inactivity
+app.get('/api/health', async (req, res) => {
+  try {
+    await prisma.$queryRaw`SELECT 1`
+    res.json({ status: 'ok', database: 'active', time: new Date().toISOString() })
+  } catch (error) {
+    res.status(500).json({ status: 'error', database: 'unreachable' })
+  }
+})
+
 app.use('/api/auth', authLimiter, authRoutes)
 app.use('/api/dashboard', dashboardRoutes)
 app.use('/api/jobs', jobRoutes)
