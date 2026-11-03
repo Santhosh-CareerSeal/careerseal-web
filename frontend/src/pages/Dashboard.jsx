@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react'
 import Navbar from '../components/Navbar'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
-import API_URL from '../config'
 import Footer from '../components/Footer'
+import API_URL from '../config'
 
 const TIPS = [
   "Tailor your skills section for each job — profiles with matching skills get 3x more shortlists.",
@@ -78,12 +78,6 @@ function Dashboard() {
     fetchDashboard()
   }, [])
 
-  const handleLogout = () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    navigate('/login')
-  }
-
   const getMissingFields = () => {
     if (!student) return []
     const checks = [
@@ -124,11 +118,7 @@ function Dashboard() {
       d.setDate(d.getDate() - i)
       const dateStr = d.toDateString()
       const count = applications.filter(app => new Date(app.createdAt).toDateString() === dateStr).length
-      days.push({
-        label: d.toLocaleDateString('en-IN', { weekday: 'short' }),
-        count,
-        isToday: i === 0
-      })
+      days.push({ label: d.toLocaleDateString('en-IN', { weekday: 'short' }), count, isToday: i === 0 })
     }
     return days
   }
@@ -138,11 +128,6 @@ function Dashboard() {
   const recentApps = applications.slice(0, 3)
   const weeklyTrend = getWeeklyTrend()
   const maxVal = Math.max(...weeklyTrend.map(d => d.count), 1)
-
-  const activityFeed = applications.slice(0, 4).map(app => ({
-    text: `Applied to ${app.job?.title}`,
-    time: new Date(app.createdAt).toLocaleDateString('en-IN')
-  }))
 
   const handleResendVerification = async () => {
     setResendMsg('Sending...')
@@ -187,72 +172,50 @@ function Dashboard() {
         </div>
       )}
 
-      {/* Tip of the day — full width */}
-      <div className="bg-[#0D7377] px-6 py-2.5 flex items-center gap-3">
-        <i className="ti ti-bulb text-white text-base flex-shrink-0" aria-hidden="true"></i>
-        <p className="text-white text-sm">
-          <span className="font-bold">Tip of the day · {today.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}: </span>
+      {/* Tip of the day — slim purple strip */}
+      <div className="px-6 py-2 flex items-center gap-2.5" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 60%,#0d7377)' }}>
+        <i className="ti ti-bulb text-white text-sm flex-shrink-0" aria-hidden="true"></i>
+        <p className="text-white text-xs md:text-sm">
+          <span className="font-bold">Tip · {today.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}: </span>
           {tip}
         </p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto">
 
-        {/* Left sidebar */}
-        <div className="hidden md:flex w-56 flex-shrink-0 flex-col gap-3">
+        {/* Left sidebar — identity only */}
+        <div className="hidden md:flex w-60 flex-shrink-0 flex-col gap-3">
 
-          {/* Profile card */}
-          <div className="bg-[#1A3C6E] rounded-2xl p-5 flex flex-col items-center gap-3">
+          <div className="rounded-2xl p-5 flex flex-col items-center gap-3" style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
             {student?.photoUrl ? (
-              <img src={student.photoUrl} alt="Profile" className="w-16 h-16 rounded-full object-cover border-2 border-white/20" />
+              <img src={student.photoUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover border-2 border-white/20" />
             ) : (
-              <div className="w-16 h-16 rounded-full bg-[#0D7377] flex items-center justify-center text-white text-2xl font-bold border-2 border-white/20">
+              <div className="w-20 h-20 rounded-full flex items-center justify-center text-white text-2xl font-bold border-2 border-white/20" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
                 {capitalize(user?.name).charAt(0)}
               </div>
             )}
             <div className="text-center">
-              <p className="text-white font-bold text-sm">{capitalize(user?.name)}</p>
-              <p className="text-[#5DCAA5] text-xs mt-1">{student?.education || 'Add education'}</p>
+              <p className="text-white font-bold text-base">{capitalize(user?.name)}</p>
+              <p className="text-[#9fe1cb] text-xs mt-1">{student?.education || 'Add education'}</p>
             </div>
             <div className="bg-white/10 rounded-xl p-3 w-full">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-white/50 text-xs">Profile strength</p>
-                <p className="text-[#5DCAA5] text-xs font-bold">{strength}%</p>
+                <p className="text-[#9fe1cb] text-xs font-bold">{strength}%</p>
               </div>
               <div className="bg-white/10 rounded-full h-1.5">
-                <div className="bg-[#5DCAA5] h-1.5 rounded-full transition-all" style={{ width: `${strength}%` }}></div>
+                <div className="h-1.5 rounded-full transition-all" style={{ width: `${strength}%`, background: 'linear-gradient(90deg,#6b4edb,#5dcaa5)' }}></div>
               </div>
             </div>
-            <div className="w-full flex flex-col gap-2">
-              <div className="bg-white/10 rounded-lg px-3 py-2 flex justify-between">
-                <span className="text-white/50 text-xs">Applications</span>
-                <span className="text-white text-xs font-bold">{stats.totalApplications}</span>
-              </div>
-              <div className="bg-white/10 rounded-lg px-3 py-2 flex justify-between">
-                <span className="text-white/50 text-xs">Interviews</span>
-                <span className="text-white text-xs font-bold">{stats.interviews}</span>
-              </div>
-              <div className="bg-white/10 rounded-lg px-3 py-2 flex justify-between">
-                <span className="text-white/50 text-xs">Profile views</span>
-                <span className="text-white text-xs font-bold">{stats.profileViews}</span>
-              </div>
+            <div className="w-full flex gap-2">
+              <button onClick={() => navigate('/profile-details')} className="flex-1 bg-white text-[#1A3C6E] text-xs font-bold py-2 rounded-lg hover:bg-gray-100 transition-colors">Edit profile</button>
+              <button onClick={() => navigate('/grid')} className="flex-1 text-white text-xs font-bold py-2 rounded-lg border border-white/20 hover:bg-white/10 transition-colors" style={{ background: 'rgba(255,255,255,0.1)' }}>GRID Card</button>
             </div>
           </div>
 
-          {/* My Profile */}
-          <div onClick={() => navigate('/profile-details')} className="bg-white rounded-2xl p-4 border border-gray-100 cursor-pointer hover:shadow-sm transition-shadow">
-            <div className="flex items-center gap-2 mb-1">
-              <i className="ti ti-user text-[#1A3C6E] text-base" aria-hidden="true"></i>
-              <p className="text-[#1A3C6E] font-bold text-sm">My Profile</p>
-            </div>
-            <p className="text-gray-400 text-xs">Edit resume and profile details</p>
-            <p className="text-[#0D7377] text-xs font-bold mt-2">Edit →</p>
-          </div>
-
-          {/* Verification badges */}
           <div className="bg-white rounded-2xl p-4 border border-gray-100">
             <div className="flex items-center gap-2 mb-3">
-              <i className="ti ti-award text-[#1A3C6E] text-base" aria-hidden="true"></i>
+              <i className="ti ti-award text-[#6b4edb] text-base" aria-hidden="true"></i>
               <p className="text-[#1A3C6E] font-bold text-sm">Verification</p>
             </div>
             <div className="flex flex-col gap-2">
@@ -269,7 +232,7 @@ function Dashboard() {
                 <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Pending</span>
               </div>
             </div>
-            <button onClick={() => navigate('/grid')} className="text-[#0D7377] text-xs font-bold mt-3 block">Verify on GRID →</button>
+            <button onClick={() => navigate('/grid')} className="text-[#6b4edb] text-xs font-bold mt-3 block">Verify on GRID →</button>
           </div>
 
         </div>
@@ -277,7 +240,6 @@ function Dashboard() {
         {/* Right main content */}
         <div className="flex-1 flex flex-col gap-3">
 
-          {/* Missing fields nudge */}
           {missingFields.length > 0 && (
             <div onClick={() => navigate('/profile-details')} className="bg-amber-50 border border-amber-200 rounded-xl p-4 cursor-pointer hover:bg-amber-100 transition-colors">
               <div className="flex justify-between items-start">
@@ -297,108 +259,60 @@ function Dashboard() {
             </div>
           )}
 
-          {/* Stat cards */}
-          <div className="grid grid-cols-3 gap-3">
+          {/* Metrics strip */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div className="bg-white rounded-xl p-4 border border-gray-100">
               <p className="text-gray-400 text-xs mb-1">New jobs matched</p>
-              <p className="text-[#1A3C6E] text-2xl font-bold">8</p>
-              <p className="text-[#0D7377] text-xs mt-1">today</p>
+              <p className="text-[#0d7377] text-2xl font-bold">8</p>
+              <p className="text-gray-400 text-xs mt-1">today</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <p className="text-gray-400 text-xs mb-1">Total applied</p>
-              <p className="text-amber-500 text-2xl font-bold">{stats.totalApplications}</p>
+              <p className="text-gray-400 text-xs mb-1">Applications</p>
+              <p className="text-[#1A3C6E] text-2xl font-bold">{stats.totalApplications}</p>
               <p className="text-gray-400 text-xs mt-1">all time</p>
             </div>
             <div className="bg-white rounded-xl p-4 border border-gray-100">
               <p className="text-gray-400 text-xs mb-1">Interviews</p>
-              <p className="text-[#0D7377] text-2xl font-bold">{stats.interviews}</p>
+              <p className="text-[#0d7377] text-2xl font-bold">{stats.interviews}</p>
               <p className="text-gray-400 text-xs mt-1">scheduled</p>
             </div>
-          </div>
-
-          {/* Trend chart + Activity feed */}
-          <div className="grid grid-cols-2 gap-3">
-
-            {/* Real weekly trend */}
             <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <div className="flex items-center justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <i className="ti ti-trending-up text-[#1A3C6E] text-base" aria-hidden="true"></i>
-                  <p className="text-[#1A3C6E] font-bold text-sm">This week's applications</p>
-                </div>
-                <span className="text-xs text-gray-400">{weeklyTrend.reduce((a, b) => a + b.count, 0)} total</span>
-              </div>
-              {applications.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-20 gap-2">
-                  <div className="flex items-end gap-1 h-12 w-full">
-                    {weeklyTrend.map((d, i) => (
-                      <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                        <div className="w-full rounded-t-sm bg-gray-100" style={{ height: '32px' }}></div>
-                        <span className="text-gray-300" style={{ fontSize: '9px' }}>{d.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-gray-400 text-xs">Apply to jobs to see your trend</p>
-                </div>
-              ) : (
-                <div className="flex items-end gap-1 h-20">
-                  {weeklyTrend.map((d, i) => (
-                    <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                      <div
-                        className="w-full rounded-t-sm transition-all"
-                        style={{
-                          height: `${Math.max((d.count / maxVal) * 56, 4)}px`,
-                          background: d.isToday ? '#0D7377' : '#1A3C6E',
-                          opacity: d.count === 0 ? 0.15 : 1
-                        }}
-                      ></div>
-                      <span style={{ fontSize: '9px' }} className={d.isToday ? 'text-[#0D7377] font-bold' : 'text-gray-400'}>{d.label}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Activity feed */}
-            <div className="bg-white rounded-xl p-4 border border-gray-100">
-              <div className="flex items-center gap-2 mb-3">
-                <i className="ti ti-bell text-[#1A3C6E] text-base" aria-hidden="true"></i>
-                <p className="text-[#1A3C6E] font-bold text-sm">Recent activity</p>
-              </div>
-              {activityFeed.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-16 gap-1">
-                  <p className="text-gray-400 text-xs text-center">No activity yet</p>
-                  <p className="text-gray-300 text-xs text-center">Start applying to see activity here</p>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-3">
-                  {activityFeed.map((activity, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <div className="w-1.5 h-1.5 rounded-full bg-[#0D7377] flex-shrink-0 mt-1.5"></div>
-                      <div>
-                        <p className="text-xs text-gray-700">{activity.text}</p>
-                        <p className="text-xs text-gray-400">{activity.time}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+              <p className="text-gray-400 text-xs mb-1">Profile views</p>
+              <p className="text-[#6b4edb] text-2xl font-bold">{stats.profileViews}</p>
+              <p className="text-gray-400 text-xs mt-1">this month</p>
             </div>
           </div>
 
-          {/* Recent applications */}
+          {/* Consolidated activity */}
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <div className="flex justify-between items-center mb-3">
-              <p className="text-[#1A3C6E] font-bold text-sm">Recent applications</p>
-              <button onClick={() => navigate('/tracker')} className="text-[#0D7377] text-xs font-bold">View all →</button>
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <i className="ti ti-trending-up text-[#6b4edb] text-base" aria-hidden="true"></i>
+                <p className="text-[#1A3C6E] font-bold text-sm">Your activity</p>
+              </div>
+              <button onClick={() => navigate('/tracker')} className="text-[#6b4edb] text-xs font-bold">View all →</button>
             </div>
+
+            <div className="flex items-end gap-1 h-16 mb-1">
+              {weeklyTrend.map((d, i) => (
+                <div key={i} className="flex-1 flex flex-col items-center gap-1">
+                  <div className="w-full rounded-t-sm transition-all" style={{
+                    height: `${Math.max((d.count / maxVal) * 48, 4)}px`,
+                    background: d.isToday ? 'linear-gradient(180deg,#6b4edb,#0d7377)' : '#1A3C6E',
+                    opacity: d.count === 0 ? 0.12 : 1
+                  }}></div>
+                  <span style={{ fontSize: '9px' }} className={d.isToday ? 'text-[#6b4edb] font-bold' : 'text-gray-400'}>{d.label}</span>
+                </div>
+              ))}
+            </div>
+
             {recentApps.length === 0 ? (
-              <div className="text-center py-6">
-                <p className="text-gray-400 text-sm mb-3">No applications yet</p>
-                <button onClick={() => navigate('/jobs')} className="bg-[#1A3C6E] text-white text-xs font-bold px-4 py-2 rounded-xl">Browse jobs</button>
+              <div className="text-center py-5 border-t border-gray-100 mt-2">
+                <p className="text-gray-400 text-sm mb-3">No applications yet — start applying and your pipeline, interviews and weekly trend all show up here.</p>
+                <button onClick={() => navigate('/jobs')} className="text-white text-xs font-bold px-5 py-2.5 rounded-xl" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>Browse jobs →</button>
               </div>
             ) : (
-              <div className="flex flex-col">
+              <div className="flex flex-col border-t border-gray-100 mt-2 pt-1">
                 {recentApps.map((app, i) => {
                   const s = statusColor(app.status)
                   return (
@@ -417,33 +331,30 @@ function Dashboard() {
 
           {/* Quick actions */}
           <div className="grid grid-cols-2 gap-3">
-            <div onClick={() => navigate('/jobs')} className="bg-[#0D7377] rounded-xl p-4 cursor-pointer hover:bg-[#0a5f63] transition-colors">
+            <div onClick={() => navigate('/jobs')} className="rounded-xl p-4 cursor-pointer transition-transform hover:-translate-y-0.5" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
               <i className="ti ti-briefcase text-white text-xl mb-2 block" aria-hidden="true"></i>
               <p className="text-white font-bold text-sm">Browse jobs</p>
               <p className="text-white/60 text-xs mt-1">Find your next opportunity</p>
             </div>
             <div onClick={() => navigate('/tracker')} className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-sm transition-shadow border border-gray-100">
-              <i className="ti ti-chart-bar text-[#1A3C6E] text-xl mb-2 block" aria-hidden="true"></i>
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#6b4edb]" style={{ background: '#efedff' }}><i className="ti ti-chart-bar text-xl" aria-hidden="true"></i></span>
               <p className="text-[#1A3C6E] font-bold text-sm">Track applications</p>
               <p className="text-gray-400 text-xs mt-1">View your pipeline</p>
             </div>
           </div>
 
-          {/* Upcoming interviews */}
-          <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <div className="flex items-center gap-2 mb-3">
-              <i className="ti ti-calendar-event text-[#1A3C6E] text-base" aria-hidden="true"></i>
-              <p className="text-[#1A3C6E] font-bold text-sm">Upcoming interviews</p>
-            </div>
-            {stats.interviews === 0 ? (
-              <p className="text-gray-400 text-xs py-2">No interviews scheduled yet. Keep applying!</p>
-            ) : (
+          {stats.interviews > 0 && (
+            <div className="bg-white rounded-xl p-4 border border-gray-100">
+              <div className="flex items-center gap-2 mb-3">
+                <i className="ti ti-calendar-event text-[#6b4edb] text-base" aria-hidden="true"></i>
+                <p className="text-[#1A3C6E] font-bold text-sm">Upcoming interviews</p>
+              </div>
               <div className="bg-green-50 border border-green-100 rounded-xl p-3">
                 <p className="text-green-800 font-bold text-sm">Interview scheduled</p>
                 <p className="text-green-600 text-xs mt-1">Check your email for details</p>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
         </div>
       </div>
