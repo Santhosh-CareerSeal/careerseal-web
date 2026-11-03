@@ -3,8 +3,14 @@ import { Link } from 'react-router-dom'
 import axios from 'axios'
 import Footer from '../components/Footer'
 import API_URL from '../config'
+import usePageMeta from '../hooks/usePageMeta'
 
 function Contact() {
+  usePageMeta({
+    title: 'Contact GRID',
+    description: 'Get in touch with the GRID team — questions, partnerships, or support for your verified GRID Card.',
+    canonical: 'https://www.thegridcard.com/contact',
+  })
   const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' })
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)

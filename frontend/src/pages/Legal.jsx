@@ -1,9 +1,16 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta'
 
 function Legal() {
   const [activeTab, setActiveTab] = useState('privacy')
   const navigate = useNavigate()
+  const isTerms = useLocation().pathname === '/terms'
+  usePageMeta({
+    title: isTerms ? 'Terms of Service — GRID' : 'Privacy Policy — GRID',
+    description: isTerms ? 'GRID Terms of Service — the rules for using GRID and your verified GRID Card.' : 'GRID Privacy Policy — how GRID collects, uses, and protects your data.',
+    canonical: isTerms ? 'https://www.thegridcard.com/terms' : 'https://www.thegridcard.com/privacy',
+  })
 
   return (
     <div className="min-h-screen bg-gray-50">

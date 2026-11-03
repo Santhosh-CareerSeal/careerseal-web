@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta'
 
 const cards = [
   {
@@ -16,6 +17,11 @@ const cards = [
 ]
 
 function Register() {
+  usePageMeta({
+    title: 'Join GRID — Create your verified career identity',
+    description: 'Sign up on GRID as a student, company, or college. Students build a skill-verified GRID Card; companies hire verified talent. Free to start.',
+    canonical: 'https://www.thegridcard.com/register',
+  })
   const navigate = useNavigate()
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden"

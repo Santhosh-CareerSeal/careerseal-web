@@ -1,7 +1,13 @@
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
+import usePageMeta from '../hooks/usePageMeta'
 
 function About() {
+  usePageMeta({
+    title: 'About GRID — Why verified career identities matter',
+    description: "GRID verifies every student's skills and documents so companies can trust a profile the moment they open it. Learn why GRID exists.",
+    canonical: 'https://www.thegridcard.com/about',
+  })
   const homeDest = (() => {
     const token = localStorage.getItem('token')
     if (!token) return '/'

@@ -1,8 +1,14 @@
 import { Link } from 'react-router-dom'
 import Footer from '../components/Footer'
 import getHomeDest from '../utils/homeDest'
+import usePageMeta from '../hooks/usePageMeta'
 
 function Landing() {
+  usePageMeta({
+    title: 'GRID — Your Career. Verified. Transparent. Guided.',
+    description: 'GRID gives Indian students a verified GRID Card — a skill-tested resume with QR code. Take exams, prove your skills, and get hired. Free to join.',
+    canonical: 'https://www.thegridcard.com/',
+  })
   const token = localStorage.getItem('token')
   let loggedUser = {}
   try { loggedUser = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
