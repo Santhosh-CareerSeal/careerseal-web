@@ -40,19 +40,18 @@ function Navbar({ student, user }) {
   }
 
   return (
-    <div className="bg-[#1A3C6E] relative z-50">
+    <div className="relative z-50" style={{ background: 'linear-gradient(135deg,#0c1f3d,#3c3489)' }}>
       {/* Main navbar */}
       <div className="px-4 py-3 flex justify-between items-center">
         <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate(getHomeDest())}>
-          <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <h1 className="text-white text-base font-bold">GRID</h1>
         </div>
 
-        {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-4">
           {navItems.map(item => (
             <button key={item.path} onClick={() => navigate(item.path)}
-              className={`text-sm font-medium transition-colors ${isActive(item.path) ? 'text-white border-b-2 border-[#0D7377] pb-0.5' : 'text-white/60 hover:text-white'}`}>
+              className={`text-sm font-medium transition-colors ${isActive(item.path) ? 'text-white border-b-2 border-[#9fe1cb] pb-0.5' : 'text-white/60 hover:text-white'}`}>
               {item.label}
             </button>
           ))}
@@ -60,9 +59,9 @@ function Navbar({ student, user }) {
           <div className="relative">
             <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-1 focus:outline-none">
               {student?.photoUrl ? (
-                <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
+                <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
               ) : (
-                <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
                   {user?.name?.charAt(0)?.toUpperCase() || 'S'}
                 </div>
               )}
@@ -88,12 +87,11 @@ function Navbar({ student, user }) {
           <div className="w-px h-4 bg-white/20 mx-1"></div>
         </div>
 
-        {/* Mobile: avatar + hamburger */}
         <div className="flex md:hidden items-center gap-3">
           {student?.photoUrl ? (
-            <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#0D7377]" />
+            <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
           ) : (
-            <div className="w-8 h-8 bg-[#0D7377] rounded-full flex items-center justify-center text-white font-bold text-sm">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
               {user?.name?.charAt(0)?.toUpperCase() || 'S'}
             </div>
           )}
@@ -107,7 +105,6 @@ function Navbar({ student, user }) {
         </div>
       </div>
 
-      {/* Mobile dropdown menu */}
       {menuOpen && (
         <div className="md:hidden bg-[#0f1e3d] border-t border-white/10">
           {navItems.map(item => (
