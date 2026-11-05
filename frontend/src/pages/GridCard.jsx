@@ -21,15 +21,15 @@ const CAREER_FIELDS = [
 
 const TAG_STYLES = {
   teal: { background: 'rgba(13,115,119,0.2)', border: '1px solid rgba(13,115,119,0.5)', color: 'rgba(93,202,165,0.95)' },
-  amber: { background: 'rgba(239,159,39,0.15)', border: '1px solid rgba(239,159,39,0.4)', color: 'rgba(239,159,39,0.95)' },
+  amber: { background: 'rgba(107,78,219,0.2)', border: '1px solid rgba(107,78,219,0.5)', color: 'rgba(179,160,247,0.98)' },
   white: { background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.75)' },
-  blue: { background: 'rgba(26,60,110,0.5)', border: '1px solid rgba(93,115,200,0.4)', color: 'rgba(150,180,255,0.95)' },
+  blue: { background: 'rgba(93,202,165,0.14)', border: '1px solid rgba(93,202,165,0.4)', color: 'rgba(159,225,203,0.95)' },
 }
 
 const BOLTS = [0, 45, 90, 135, 180, 225, 270, 315]
 const BOLT_COLORS = [
-  'rgba(13,115,119,0.6)', 'rgba(239,159,39,0.5)', 'rgba(255,255,255,0.3)', 'rgba(93,202,165,0.5)',
-  'rgba(13,115,119,0.6)', 'rgba(239,159,39,0.5)', 'rgba(255,255,255,0.3)', 'rgba(93,202,165,0.5)'
+  'rgba(13,115,119,0.6)', 'rgba(107,78,219,0.55)', 'rgba(255,255,255,0.3)', 'rgba(93,202,165,0.5)',
+  'rgba(13,115,119,0.6)', 'rgba(107,78,219,0.55)', 'rgba(255,255,255,0.3)', 'rgba(93,202,165,0.5)'
 ]
 
 function GridCard() {
@@ -107,21 +107,21 @@ function GridCard() {
       // ── FRONT ──
       const grad = ctx.createLinearGradient(0, 0, CW, CH)
       grad.addColorStop(0, '#1A3C6E')
-      grad.addColorStop(0.6, '#0D2A52')
+      grad.addColorStop(0.55, '#3c3489')
       grad.addColorStop(1, '#0D7377')
       drawRR(0, 0, CW, CH, 40); ctx.fillStyle = grad; ctx.fill()
 
       const glow = ctx.createRadialGradient(CW - 100, -80, 0, CW - 100, -80, 380)
-      glow.addColorStop(0, 'rgba(13,115,119,0.25)'); glow.addColorStop(1, 'transparent')
+      glow.addColorStop(0, 'rgba(107,78,219,0.28)'); glow.addColorStop(1, 'transparent')
       ctx.fillStyle = glow; ctx.fillRect(0, 0, CW, CH)
 
       // ROW 1 — GRID brand + GRID CARD
-      ctx.fillStyle = '#0D7377'
+      ctx.fillStyle = '#6b4edb'
       ctx.beginPath(); ctx.arc(50, 56, 18, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = '#1A3C6E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round'
       ctx.beginPath(); ctx.moveTo(42, 57); ctx.lineTo(47, 62); ctx.lineTo(58, 50); ctx.stroke()
       ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.font = '600 22px system-ui'; ctx.textAlign = 'left'
-      ctx.fillText('CAREERSEAL', 76, 63)
+      ctx.fillText('GRID', 76, 63)
       ctx.fillStyle = 'rgba(255,255,255,0.25)'; ctx.font = '16px system-ui'; ctx.textAlign = 'right'
       ctx.fillText('GRID CARD', CW - 50, 63)
 
@@ -130,7 +130,7 @@ function GridCard() {
       const photoX = 50 + photoSize / 2
       const photoY = CH / 2
 
-      ctx.fillStyle = '#0D7377'
+      ctx.fillStyle = '#6b4edb'
       ctx.beginPath(); ctx.arc(photoX, photoY, photoSize / 2 + 4, 0, Math.PI * 2); ctx.fill()
 
       if (student?.photoUrl) {
@@ -179,12 +179,12 @@ function GridCard() {
 
       ctx.fillStyle = 'rgba(0,0,0,0.55)'; ctx.fillRect(0, BY, CW, 72)
 
-      ctx.fillStyle = '#0D7377'
+      ctx.fillStyle = '#6b4edb'
       ctx.beginPath(); ctx.arc(62, BY + 130, 16, 0, Math.PI * 2); ctx.fill()
-      ctx.strokeStyle = '#1A3C6E'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'
+      ctx.strokeStyle = '#ffffff'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'
       ctx.beginPath(); ctx.moveTo(55, BY + 131); ctx.lineTo(59, BY + 135); ctx.lineTo(69, BY + 125); ctx.stroke()
       ctx.fillStyle = 'rgba(255,255,255,0.5)'; ctx.font = '600 18px system-ui'; ctx.textAlign = 'left'
-      ctx.fillText('CAREERSEAL', 86, BY + 136)
+      ctx.fillText('GRID', 86, BY + 136)
 
       ctx.fillStyle = 'white'; ctx.font = 'bold 52px system-ui'
       ctx.fillText('Scan to view', 60, BY + 220)
@@ -220,13 +220,13 @@ function GridCard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen flex items-center justify-center" style={{ background: '#060e1f' }}>
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0e20' }}>
       <p className="text-white text-xl font-bold">Loading GRID...</p>
     </div>
   )
 
   return (
-    <div className="min-h-screen" style={{ background: '#060e1f', fontFamily: 'system-ui, sans-serif' }}>
+    <div className="min-h-screen" style={{ background: '#0a0e20', fontFamily: 'system-ui, sans-serif' }}>
       <style>{`
         @keyframes pulse1{0%{opacity:0.8;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
         @keyframes pulse2{0%{opacity:0.6;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.8)}}
@@ -243,7 +243,7 @@ function GridCard() {
       {/* Navbar */}
       <div style={{ background: 'rgba(255,255,255,0.04)', borderBottom: '1px solid rgba(255,255,255,0.08)', padding: '12px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }} onClick={() => navigate('/dashboard')}>
-          <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span style={{ color: 'white', fontWeight: '700', fontSize: 'clamp(12px, 3.5vw, 16px)' }}>GRID</span>
         </div>
         <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
@@ -257,15 +257,15 @@ function GridCard() {
         <div style={{ position: 'relative', minHeight: 'calc(100vh - 57px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
 
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 50% 50%, rgba(13,115,119,0.2) 0%, rgba(26,60,110,0.15) 40%, transparent 70%)' }}></div>
-          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 70%, rgba(239,159,39,0.08) 0%, transparent 50%)' }}></div>
+          <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 70%, rgba(107,78,219,0.12) 0%, transparent 50%)' }}></div>
           <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 70% 30%, rgba(93,202,165,0.08) 0%, transparent 50%)' }}></div>
 
-          <div className="energy-ring" style={{ width: '300px', height: '300px', border: '1.5px solid #0D7377', animation: 'pulse1 2.5s ease-out infinite' }}></div>
+          <div className="energy-ring" style={{ width: '300px', height: '300px', border: '1.5px solid #6b4edb', animation: 'pulse1 2.5s ease-out infinite' }}></div>
           <div className="energy-ring" style={{ width: '380px', height: '380px', border: '1.5px solid #1A3C6E', animation: 'pulse2 2.5s ease-out infinite 0.5s' }}></div>
-          <div className="energy-ring" style={{ width: '460px', height: '460px', border: '1.5px solid #EF9F27', animation: 'pulse3 2.5s ease-out infinite 1s' }}></div>
+          <div className="energy-ring" style={{ width: '460px', height: '460px', border: '1.5px solid #0D7377', animation: 'pulse3 2.5s ease-out infinite 1s' }}></div>
           <div className="energy-ring" style={{ width: '540px', height: '540px', border: '1px solid rgba(255,255,255,0.25)', animation: 'pulse4 2.5s ease-out infinite 1.5s' }}></div>
           <div className="energy-ring" style={{ width: '620px', height: '620px', border: '1px solid rgba(93,202,165,0.2)', animation: 'pulse5 3s ease-out infinite 0.8s' }}></div>
-          <div className="energy-ring" style={{ width: '700px', height: '700px', border: '1px solid rgba(239,159,39,0.15)', animation: 'pulse1 3.5s ease-out infinite 1.3s' }}></div>
+          <div className="energy-ring" style={{ width: '700px', height: '700px', border: '1px solid rgba(107,78,219,0.18)', animation: 'pulse1 3.5s ease-out infinite 1.3s' }}></div>
 
           {BOLTS.map((angle, i) => (
             <div key={i} className="bolt" style={{ height: '200px', background: `linear-gradient(to bottom, ${BOLT_COLORS[i]}, transparent)`, transform: `rotate(${angle}deg)`, animationDelay: `${i * 0.25}s` }}></div>
@@ -278,17 +278,17 @@ function GridCard() {
           {/* ATM Card — 3 row layout */}
           <div
             onClick={() => setFlipped(true)}
-            style={{ position: 'relative', zIndex: 10, width: 'min(360px, 85vw)', height: 'min(216px, 51vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #0D2A52 60%, #0D7377 100%)', padding: 'clamp(12px, 4vw, 20px) clamp(14px, 5vw, 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(13,115,119,0.3), 0 0 120px rgba(13,115,119,0.1)', border: '1px solid rgba(13,115,119,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
+            style={{ position: 'relative', zIndex: 10, width: 'min(360px, 85vw)', height: 'min(216px, 51vw)', borderRadius: '16px', background: 'linear-gradient(135deg, #1A3C6E 0%, #3c3489 55%, #0D7377 100%)', padding: 'clamp(12px, 4vw, 20px) clamp(14px, 5vw, 24px)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', cursor: 'pointer', boxShadow: '0 0 60px rgba(107,78,219,0.35), 0 0 120px rgba(107,78,219,0.12)', border: '1px solid rgba(107,78,219,0.5)', transition: 'transform 0.2s', overflow: 'hidden' }}
             onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.03)'}
             onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
           >
-            <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(13,115,119,0.15)', transform: 'translate(40px,-40px)' }}></div>
+            <div style={{ position: 'absolute', top: 0, right: 0, width: '200px', height: '200px', borderRadius: '50%', background: 'rgba(107,78,219,0.16)', transform: 'translate(40px,-40px)' }}></div>
 
             {/* Row 1 — GRID brand + GRID CARD */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                <span style={{ color: 'rgba(255,255,255,0.55)', fontSize: '9px', letterSpacing: '2px', fontWeight: '600' }}>CAREERSEAL</span>
+                <svg width="14" height="14" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '9px', letterSpacing: '2px', fontWeight: '700' }}>GRID</span>
               </div>
               <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: '9px' }}>GRID CARD</span>
             </div>
@@ -298,7 +298,7 @@ function GridCard() {
               {student?.photoUrl ? (
                 <img src={student.photoUrl} alt="Profile" style={{ width: 'clamp(36px, 10vw, 56px)', height: 'clamp(36px, 10vw, 56px)', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }} />
               ) : (
-                <div style={{ width: 'clamp(36px, 10vw, 56px)', height: 'clamp(36px, 10vw, 56px)', borderRadius: '50%', background: '#0D7377', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 'clamp(14px, 5vw, 22px)', fontWeight: '700', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }}>
+                <div style={{ width: 'clamp(36px, 10vw, 56px)', height: 'clamp(36px, 10vw, 56px)', borderRadius: '50%', background: 'linear-gradient(135deg,#6b4edb,#0d7377)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: 'clamp(14px, 5vw, 22px)', fontWeight: '700', border: '2px solid rgba(255,255,255,0.25)', flexShrink: 0 }}>
                   {getInitials(user?.name)}
                 </div>
               )}
@@ -325,7 +325,7 @@ function GridCard() {
 
           <div style={{ position: 'relative', zIndex: 10, marginTop: '20px', textAlign: 'center' }}>
             <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: '0 0 12px' }}>Your verified identity unlocks every opportunity</p>
-            <button onClick={handleDownload} disabled={downloading} style={{ background: '#0D7377', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 28px', fontSize: '13px', fontWeight: '600', cursor: downloading ? 'not-allowed' : 'pointer', opacity: downloading ? 0.7 : 1 }}>
+            <button onClick={handleDownload} disabled={downloading} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 28px', fontSize: '13px', fontWeight: '700', cursor: downloading ? 'not-allowed' : 'pointer', opacity: downloading ? 0.7 : 1 }}>
               {downloading ? 'Generating...' : 'Download Card'}
             </button>
           </div>
@@ -333,17 +333,17 @@ function GridCard() {
       ) : (
         <div style={{ minHeight: 'calc(100vh - 57px)', background: '#f4f5f7', padding: '30px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', maxWidth: '794px', marginBottom: '16px' }}>
-            <button onClick={() => setFlipped(false)} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '8px 18px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>← Back to GRID</button>
+            <button onClick={() => setFlipped(false)} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '8px 18px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>← Back to GRID</button>
             <p style={{ color: '#6b7280', fontSize: '12px' }}>A4 Resume View · Not editable</p>
           </div>
           <div style={{ width: '100%', overflowX: 'auto', overflowY: 'auto', WebkitOverflowScrolling: 'touch', maxWidth: '100vw' }}>
           <div style={{ width: '794px', background: 'white', borderRadius: '8px', overflow: 'hidden', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', display: 'flex', minHeight: '1000px', transformOrigin: 'top left' }}>
-            <div style={{ width: '260px', background: '#1A3C6E', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '20px', flexShrink: 0 }}>
+            <div style={{ width: '260px', background: 'linear-gradient(170deg,#0c1f3d,#3c3489)', padding: '32px 24px', display: 'flex', flexDirection: 'column', gap: '20px', flexShrink: 0 }}>
               <div style={{ textAlign: 'center' }}>
                 {student?.photoUrl ? (
                   <img src={student.photoUrl} alt="Profile" style={{ width: '100px', height: '100px', borderRadius: '50%', objectFit: 'cover', margin: '0 auto 14px', border: '3px solid rgba(255,255,255,0.2)', display: 'block' }} />
                 ) : (
-                  <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: '#0D7377', margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '40px', fontWeight: '600' }}>
+                  <div style={{ width: '100px', height: '100px', borderRadius: '50%', background: 'linear-gradient(135deg,#6b4edb,#0d7377)', margin: '0 auto 14px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '40px', fontWeight: '600' }}>
                     {getInitials(user?.name)}
                   </div>
                 )}
@@ -380,8 +380,8 @@ function GridCard() {
                 </div>
               )}
               <div style={{ marginTop: 'auto' }}>
-                <div style={{ background: '#0D7377', borderRadius: '8px', padding: '8px 12px', textAlign: 'center', marginBottom: '6px' }}>
-                  <p style={{ color: 'white', fontSize: '9px', letterSpacing: '1.5px', margin: 0, fontWeight: '600' }}>GRID VERIFIED</p>
+                <div style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', borderRadius: '8px', padding: '8px 12px', textAlign: 'center', marginBottom: '6px' }}>
+                  <p style={{ color: 'white', fontSize: '9px', letterSpacing: '1.5px', margin: 0, fontWeight: '700' }}>GRID VERIFIED</p>
                 </div>
                 <p style={{ color: 'rgba(255,255,255,0.3)', fontSize: '8px', textAlign: 'center', margin: 0, wordBreak: 'break-all' }}>{gridCard?.gridNumber}</p>
               </div>
