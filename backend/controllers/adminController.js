@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 const { PrismaClient } = require('@prisma/client')
+const { sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService')
 const prisma = new PrismaClient()
 
 // Admin login
@@ -467,4 +468,150 @@ const changeAdminPassword = async (req, res) => {
   }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake }
+// ========== Admin roles: customer-support actions & request flow (step 3) ==========
+
+// Resend verification email to any user (staff + super)
+const adminResendVerification = async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId)
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    if (user.emailVerified) return res.status(400).json({ message: 'Email already verified' })
+    const crypto = require('crypto')
+    const verificationToken = crypto.randomBytes(32).toString('hex')
+    await prisma.user.update({ where: { id: userId }, data: { verificationToken } })
+    await sendVerificationEmail(user.email, user.name, verificationToken)
+    res.json({ message: 'Verification email sent to ' + user.email })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+// Manually mark a user's email verified (staff + super)
+const adminVerifyEmail = async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId)
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    await prisma.user.update({ where: { id: userId }, data: { emailVerified: true, verificationToken: null } })
+    res.json({ message: user.email + ' marked as verified' })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+// Trigger a password-reset code (OTP email) for a user (staff + super). Staff never sees/sets the password.
+const adminSendPasswordReset = async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId)
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000)
+    await prisma.user.update({ where: { id: userId }, data: { otp, otpExpiry } })
+    await sendPasswordResetEmail(user.email, user.name, otp)
+    res.json({ message: 'Password reset code sent to ' + user.email })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+// Activate / deactivate a customer account (super only)
+const setUserActive = async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId)
+    const { active } = req.body
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user) return res.status(404).json({ message: 'User not found' })
+    if (user.role === 'admin') return res.status(400).json({ message: 'Admin accounts cannot be deactivated here' })
+    const updated = await prisma.user.update({ where: { id: userId }, data: { isActive: active !== false } })
+    res.json({ message: updated.isActive ? 'Account activated' : 'Account deactivated', isActive: updated.isActive })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+// ---- Staff management (super only) ----
+const listStaff = async (req, res) => {
+  try {
+    const staff = await prisma.user.findMany({
+      where: { role: 'admin', adminRole: 'staff' },
+      select: { id: true, name: true, email: true, isActive: true, createdAt: true },
+      orderBy: { createdAt: 'desc' }
+    })
+    res.json({ staff })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+const createStaff = async (req, res) => {
+  try {
+    const { name, email, password } = req.body
+    if (!name || !email || !password) return res.status(400).json({ message: 'Name, email and password are required' })
+    if (password.length < 8) return res.status(400).json({ message: 'Password must be at least 8 characters' })
+    const existing = await prisma.user.findUnique({ where: { email } })
+    if (existing) return res.status(400).json({ message: 'A user with this email already exists' })
+    const passwordHash = await bcrypt.hash(password, 10)
+    const staff = await prisma.user.create({
+      data: { name, email, passwordHash, role: 'admin', adminRole: 'staff', emailVerified: true }
+    })
+    res.json({ message: 'Staff login created for ' + email, staff: { id: staff.id, name: staff.name, email: staff.email } })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+const removeStaff = async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId)
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user || user.adminRole !== 'staff') return res.status(404).json({ message: 'Staff member not found' })
+    await prisma.user.delete({ where: { id: userId } })
+    res.json({ message: 'Staff member removed' })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+// ---- Requests: staff raises, super resolves ----
+const createAdminRequest = async (req, res) => {
+  try {
+    const { type, targetType, targetId, targetLabel, reason } = req.body
+    if (!type || !targetType || !targetId) return res.status(400).json({ message: 'type, targetType and targetId are required' })
+    const requester = await prisma.user.findUnique({ where: { id: req.user.userId } })
+    const request = await prisma.adminRequest.create({
+      data: {
+        type, targetType, targetId: parseInt(targetId),
+        targetLabel: targetLabel || null, reason: reason || null,
+        requestedById: req.user.userId, requestedByName: requester?.name || null
+      }
+    })
+    res.json({ message: 'Request sent to the super admin', request })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+const listAdminRequests = async (req, res) => {
+  try {
+    const status = req.query.status || 'pending'
+    const where = status === 'all' ? {} : { status }
+    const requests = await prisma.adminRequest.findMany({ where, orderBy: { createdAt: 'desc' } })
+    const pendingCount = await prisma.adminRequest.count({ where: { status: 'pending' } })
+    res.json({ requests, pendingCount })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+const resolveAdminRequest = async (req, res) => {
+  try {
+    const requestId = parseInt(req.params.requestId)
+    const { action } = req.body // 'approve' | 'reject'
+    const request = await prisma.adminRequest.findUnique({ where: { id: requestId } })
+    if (!request) return res.status(404).json({ message: 'Request not found' })
+    if (request.status !== 'pending') return res.status(400).json({ message: 'This request is already ' + request.status })
+
+    if (action === 'approve') {
+      const id = request.targetId
+      switch (request.type) {
+        case 'deactivate_user': await prisma.user.update({ where: { id }, data: { isActive: false } }); break
+        case 'activate_user': await prisma.user.update({ where: { id }, data: { isActive: true } }); break
+        case 'verify_company': await prisma.company.update({ where: { id }, data: { mcaStatus: 'verified' } }); break
+        case 'vet_college': await prisma.college.update({ where: { id }, data: { vetted: true } }); break
+        case 'resolve_fraud': await prisma.fraudFlag.update({ where: { id }, data: { status: 'resolved', reviewedBy: 'Super admin (via request)', reviewedAt: new Date() } }); break
+        default: return res.status(400).json({ message: 'Unknown request type: ' + request.type })
+      }
+    }
+    const updated = await prisma.adminRequest.update({
+      where: { id: requestId },
+      data: { status: action === 'approve' ? 'approved' : 'rejected', resolvedById: req.user.userId, resolvedAt: new Date() }
+    })
+    res.json({ message: action === 'approve' ? 'Request approved and action applied' : 'Request rejected', request: updated })
+  } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
+}
+
+module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
