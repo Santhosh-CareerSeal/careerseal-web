@@ -284,7 +284,7 @@ export default function CompanyDashboard() {
             {rejectError && <p style={{ fontSize: '12px', color: '#dc2626', fontWeight: '600', margin: '0 0 10px' }}>{rejectError}</p>}
             <div style={{ display: 'flex', gap: '10px' }}>
               <button onClick={() => setRejectModal(null)} style={{ flex: 1, background: '#f8f9fa', color: '#6b7280', border: '1px solid #eee', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Cancel</button>
-              <button onClick={submitRejection} disabled={rejectSaving} style={{ flex: 1, background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: rejectSaving ? 0.7 : 1 }}>
+              <button onClick={submitRejection} disabled={rejectSaving} style={{ flex: 1, background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: rejectSaving ? 0.7 : 1 }}>
                 {rejectSaving ? 'Saving...' : 'Confirm rejection'}
               </button>
             </div>
@@ -302,7 +302,7 @@ export default function CompanyDashboard() {
                 <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.name}! 👋</p>
                 <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>{stats?.totalApplications > 0 ? `You have ${candidates.filter(a => a.status === 'applied').length} new applications to review` : 'Post your first job to start receiving applications'}</p>
               </div>
-              <button onClick={() => setActive('post-job')} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ Post New Job</button>
+              <button onClick={() => setActive('post-job')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ Post New Job</button>
             </div>
 
             {/* Stat cards */}
@@ -372,7 +372,7 @@ export default function CompanyDashboard() {
                 {jobs.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '24px' }}>
                     <p style={{ fontSize: '13px', color: '#9ca3af', marginBottom: '8px' }}>No jobs posted yet</p>
-                    <button onClick={() => setActive('post-job')} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Post your first job</button>
+                    <button onClick={() => setActive('post-job')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '8px', padding: '8px 16px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>Post your first job</button>
                   </div>
                 ) : (
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
@@ -477,7 +477,7 @@ export default function CompanyDashboard() {
               </div>
 
               <button onClick={handlePostJob} disabled={jobLoading}
-                style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', opacity: jobLoading ? 0.7 : 1 }}>
+                style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', opacity: jobLoading ? 0.7 : 1 }}>
                 {jobLoading ? 'Posting...' : 'Post Job →'}
               </button>
             </div>
@@ -553,14 +553,14 @@ export default function CompanyDashboard() {
                 <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>My Job Postings</p>
                 <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>{jobs.length} jobs posted</p>
               </div>
-              <button onClick={() => setActive('post-job')} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ Post New Job</button>
+              <button onClick={() => setActive('post-job')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ Post New Job</button>
             </div>
 
             {jobs.length === 0 ? (
               <div style={{ background: 'white', borderRadius: '16px', padding: '48px', textAlign: 'center', border: '1px solid #eee' }}>
                 <p style={{ fontSize: '40px', marginBottom: '12px' }}>📋</p>
                 <p style={{ fontSize: '15px', fontWeight: '700', color: '#1A3C6E', marginBottom: '8px' }}>No jobs posted yet</p>
-                <button onClick={() => setActive('post-job')} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>Post your first job</button>
+                <button onClick={() => setActive('post-job')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}>Post your first job</button>
               </div>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
@@ -584,7 +584,7 @@ export default function CompanyDashboard() {
                       {job.openings && <span style={{ background: '#f8f9fa', color: '#6b7280', fontSize: '10px', padding: '2px 8px', borderRadius: '20px' }}>{job.openings} opening{job.openings > 1 ? 's' : ''}</span>}
                     </div>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                      <button onClick={() => setActive('candidates')} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '8px', padding: '6px 14px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}>View Applicants</button>
+                      <button onClick={() => setActive('candidates')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '8px', padding: '6px 14px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}>View Applicants</button>
                       {(job.status === 'active' || !job.status) ? (
                         <button onClick={() => handleUpdateJobStatus(job.id, 'paused')} style={{ background: '#FFF9C4', color: '#854F0B', border: '1px solid #EF9F27', borderRadius: '8px', padding: '6px 14px', fontSize: '11px', fontWeight: '600', cursor: 'pointer' }}>Pause</button>
                       ) : (
@@ -625,7 +625,7 @@ export default function CompanyDashboard() {
                   <option>Student</option><option>Fresher</option><option>Experienced</option>
                 </select>
               </div>
-              <button onClick={handleSearchTalent} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Search</button>
+              <button onClick={handleSearchTalent} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '8px', padding: '10px 20px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Search</button>
             </div>
 
             {talent.length === 0 ? (
@@ -792,7 +792,7 @@ export default function CompanyDashboard() {
                   )}
                 </div>
               ))}
-              <button onClick={handleUpdateProfile} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
+              <button onClick={handleUpdateProfile} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: '700', cursor: 'pointer' }}>
                 Save Profile →
               </button>
             </div>
@@ -826,7 +826,7 @@ export default function CompanyDashboard() {
                     <label style={{ fontSize: '10px', fontWeight: '700', color: '#6b7280', display: 'block', marginBottom: '6px' }}>NEW PASSWORD</label>
                     <input type="password" placeholder="Enter new password" style={{ width: '100%', border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
                   </div>
-                  <button style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Update Password</button>
+                  <button style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Update Password</button>
                   <div style={{ borderTop: '1px solid #fee2e2', paddingTop: '16px' }}>
                     <p style={{ fontSize: '13px', fontWeight: '700', color: '#dc2626', margin: '0 0 6px' }}>Danger Zone</p>
                     <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 10px' }}>Deleting your account will remove all jobs, candidates and data permanently.</p>

@@ -74,7 +74,7 @@ function AskGrid() {
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '2px' }}>
                 {FAQS.map((f, i) => (
                   <button key={i} onClick={() => askFaq(f)}
-                    style={{ background: 'white', border: '1px solid #d9e2ec', color: '#0D7377', fontSize: '12px', fontWeight: 600, padding: '7px 11px', borderRadius: '13px', cursor: 'pointer', textAlign: 'left', lineHeight: 1.3, fontFamily: 'system-ui' }}>
+                    style={{ background: 'white', border: '1px solid #e3e0f7', color: '#6b4edb', fontSize: '12px', fontWeight: 600, padding: '7px 11px', borderRadius: '13px', cursor: 'pointer', textAlign: 'left', lineHeight: 1.3, fontFamily: 'system-ui' }}>
                     {f.q}
                   </button>
                 ))}
@@ -92,7 +92,7 @@ function AskGrid() {
               placeholder="Ask about GRID…" maxLength={500}
               style={{ flex: 1, border: '1.5px solid #eee', borderRadius: '10px', padding: '9px 12px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
             <button onClick={send} disabled={loading || !input.trim()}
-              style={{ background: '#0D7377', color: 'white', border: 'none', borderRadius: '10px', padding: '0 14px', fontSize: '13px', fontWeight: 700, cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.5 : 1 }}>Send</button>
+              style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '0 14px', fontSize: '13px', fontWeight: 700, cursor: loading || !input.trim() ? 'not-allowed' : 'pointer', opacity: loading || !input.trim() ? 0.5 : 1 }}>Send</button>
           </div>
         </div>
       )}
@@ -101,7 +101,7 @@ function AskGrid() {
         @keyframes agBounce { 0%,20%,50%,80%,100% { transform: translateY(0) } 40% { transform: translateY(-12px) } 60% { transform: translateY(-6px) } }
       `}</style>
       <button onClick={() => { setOpen(o => !o); setNudged(true) }} aria-label="Ask GRID"
-        style={{ position: 'fixed', bottom: '20px', right: '20px', height: isMobile ? '56px' : '52px', width: isMobile ? '56px' : 'auto', padding: isMobile ? '0' : (open ? '0 18px' : '0 20px 0 7px'), borderRadius: isMobile ? '50%' : '26px', background: '#0D7377', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(0,0,0,0.22)', cursor: 'pointer', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '0' : '10px', animation: (isMobile && !open && !nudged) ? 'agBounce 2s ease-in-out infinite' : 'none' }}>
+        style={{ position: 'fixed', bottom: '20px', right: '20px', height: isMobile ? '56px' : '52px', width: isMobile ? '56px' : 'auto', padding: isMobile ? '0' : (open ? '0 18px' : '0 20px 0 7px'), borderRadius: isMobile ? '50%' : '26px', background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(107,78,219,0.3)', cursor: 'pointer', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '0' : '10px', animation: (isMobile && !open && !nudged) ? 'agBounce 2s ease-in-out infinite' : 'none' }}>
         {open ? (
           <span style={{ fontSize: '15px', fontWeight: 700 }}>Close</span>
         ) : (

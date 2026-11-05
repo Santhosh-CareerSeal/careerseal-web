@@ -385,7 +385,7 @@ export default function CollegePortal() {
                 <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Schedule and manage placement drives at your college</p>
               </div>
               {!driveForm && (
-                <button onClick={() => { setDriveMsg(''); setDriveForm({ ...emptyDrive }) }} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ New Drive</button>
+                <button onClick={() => { setDriveMsg(''); setDriveForm({ ...emptyDrive }) }} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ New Drive</button>
               )}
             </div>
 
@@ -585,7 +585,7 @@ export default function CollegePortal() {
                 <input type="password" placeholder="New password" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
                 <input type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
                 {pwMsg && <p style={{ fontSize: '12px', color: pwMsg.includes('success') || pwMsg.includes('updated') ? '#0D7377' : '#dc2626', margin: '2px 0' }}>{pwMsg}</p>}
-                <button onClick={handleChangePassword} disabled={pwLoading} style={{ background: '#1A3C6E', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: pwLoading ? 0.6 : 1 }}>{pwLoading ? 'Updating...' : 'Update Password'}</button>
+                <button onClick={handleChangePassword} disabled={pwLoading} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: pwLoading ? 0.6 : 1 }}>{pwLoading ? 'Updating...' : 'Update Password'}</button>
               </div>
             </div>
           </div>
