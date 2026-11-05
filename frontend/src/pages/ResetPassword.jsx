@@ -61,7 +61,7 @@ function ResetPassword() {
                 className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
             </div>
             <button onClick={handleReset} disabled={loading}
-              className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors disabled:opacity-50">
+              className="grid-shine w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors disabled:opacity-50">
               {loading ? 'Resetting...' : 'Reset Password →'}
             </button>
           </div>

@@ -46,7 +46,7 @@ function Contact() {
     }
   }
 
-  const inputClass = 'w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm focus:border-[#0D7377] focus:outline-none transition-colors'
+  const inputClass = 'w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm shadow-sm focus:border-[#0D7377] focus:outline-none transition-colors'
 
   return (
     <div className="min-h-screen bg-transparent flex flex-col">
@@ -93,7 +93,7 @@ function Contact() {
             {error && <p className="text-sm text-red-500">{error}</p>}
 
             <button onClick={handleSubmit} disabled={sending}
-              className="bg-[#0D7377] text-white font-bold py-3 rounded-xl hover:bg-[#0a5f63] transition-colors disabled:opacity-50">
+              className="grid-shine bg-[#0D7377] text-white font-bold py-3 rounded-xl hover:bg-[#0a5f63] transition-colors disabled:opacity-50">
               {sending ? 'Sending...' : 'Send message'}
             </button>
 

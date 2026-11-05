@@ -919,7 +919,7 @@ function ProfileDetails() {
                   <button onClick={handleSave} disabled={saving || uploadingPhoto} className="flex-1 border-2 border-[#1A3C6E] text-[#1A3C6E] py-3 rounded-xl font-bold hover:bg-gray-50 transition-colors">
                     {saving || uploadingPhoto ? 'Saving…' : 'Save Profile'}
                   </button>
-                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'text-white'}`} style={updatesRemaining === 0 ? undefined : { background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
+                  <button onClick={handleMoveToGrid} disabled={saving || updatesRemaining === 0} className={`flex-1 py-3 rounded-xl font-bold transition-colors ${updatesRemaining === 0 ? 'bg-gray-200 text-gray-400 cursor-not-allowed' : 'text-white grid-shine'}`} style={updatesRemaining === 0 ? undefined : { background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
                     Move to GRID →
                   </button>
                 </div>

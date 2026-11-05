@@ -102,7 +102,7 @@ function Login({ fixedRole }) {
     : { h: 'Build a career identity companies trust.', props: ['Skills tested, not just claimed', 'A verified GRID Card with a QR code', 'Real feedback on every rejection'] }
   const registerDest = isCompany ? '/register-company' : fixedRole === 'student' ? '/register-student' : '/register'
 
-  const inputCls = 'w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
+  const inputCls = 'w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none transition-colors shadow-sm focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -164,7 +164,7 @@ function Login({ fixedRole }) {
             <PasswordField placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} autoComplete="off" />
             <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#6b4edb] font-bold -mt-1">Forgot password?</button>
             <button onClick={handleSubmit} disabled={loading}
-              className="text-white py-3 rounded-xl font-bold mt-1 disabled:opacity-50 transition-opacity"
+              className="grid-shine text-white py-3 rounded-xl font-bold mt-1 disabled:opacity-50 transition-opacity"
               style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
               {loading ? 'Please wait…' : 'Sign In →'}
             </button>

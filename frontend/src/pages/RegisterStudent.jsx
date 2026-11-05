@@ -61,7 +61,7 @@ function RegisterStudent() {
   const handleKeyDown = (e) => { if (e.key === 'Enter') handleSubmit() }
 
   const props = ['Skills tested, not just claimed', 'A verified GRID Card with a QR code', 'AI career roadmap & smart job matching', 'Real feedback on every rejection']
-  const inputCls = 'w-full border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none transition-colors focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
+  const inputCls = 'w-full bg-white border-2 border-gray-200 rounded-xl px-4 py-3 text-sm outline-none transition-colors shadow-sm focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">

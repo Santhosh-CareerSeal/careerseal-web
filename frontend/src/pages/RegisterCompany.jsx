@@ -48,7 +48,7 @@ function RegisterCompany() {
   }
 
   const props = ['Skill-verified, document-checked candidates', 'Post jobs & manage your pipeline', 'Search verified talent by skill', 'Less screening, fewer bad hires']
-  const fieldCls = 'w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none bg-white transition-colors focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
+  const fieldCls = 'w-full border-2 border-gray-200 rounded-xl px-4 py-2.5 text-sm outline-none bg-white shadow-sm transition-colors focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -161,7 +161,7 @@ function RegisterCompany() {
             </div>
 
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full text-white py-3 rounded-xl font-bold disabled:opacity-50 transition-opacity"
+              className="grid-shine w-full text-white py-3 rounded-xl font-bold disabled:opacity-50 transition-opacity"
               style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
               {loading ? 'Creating account…' : 'Register Company →'}
             </button>

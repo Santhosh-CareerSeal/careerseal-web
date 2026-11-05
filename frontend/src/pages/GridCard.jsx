@@ -325,7 +325,7 @@ function GridCard() {
 
           <div style={{ position: 'relative', zIndex: 10, marginTop: '20px', textAlign: 'center' }}>
             <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '12px', margin: '0 0 12px' }}>Your verified identity unlocks every opportunity</p>
-            <button onClick={handleDownload} disabled={downloading} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 28px', fontSize: '13px', fontWeight: '700', cursor: downloading ? 'not-allowed' : 'pointer', opacity: downloading ? 0.7 : 1 }}>
+            <button onClick={handleDownload} disabled={downloading} className="grid-shine" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 28px', fontSize: '13px', fontWeight: '700', cursor: downloading ? 'not-allowed' : 'pointer', opacity: downloading ? 0.7 : 1 }}>
               {downloading ? 'Generating...' : 'Download Card'}
             </button>
           </div>

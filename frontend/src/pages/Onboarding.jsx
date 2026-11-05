@@ -24,7 +24,7 @@ function Onboarding() {
       </div>
 
       <div className="flex flex-col gap-4 w-full max-w-sm">
-        <button onClick={() => navigate('/login')} className="bg-[#0D7377] text-white py-4 rounded-2xl text-lg font-bold hover:bg-[#0a5f63] transition-colors">
+        <button onClick={() => navigate('/login')} className="grid-shine bg-[#0D7377] text-white py-4 rounded-2xl text-lg font-bold hover:bg-[#0a5f63] transition-colors">
           Get Started
         </button>
         <button onClick={() => navigate('/login')} className="border-2 border-white/30 text-white py-4 rounded-2xl text-lg font-bold hover:border-white transition-colors">
