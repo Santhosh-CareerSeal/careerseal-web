@@ -120,7 +120,7 @@ function JobTracker() {
             <h1 className="text-xl font-bold text-[#1A3C6E]">My Applications</h1>
             <p className="text-gray-400 text-sm">{applications.length} total applications</p>
           </div>
-          <button onClick={() => navigate('/jobs')} className="bg-[#1A3C6E] text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-[#0D7377] transition-colors">
+          <button onClick={() => navigate('/jobs')} className="bg-[#6b4edb] text-white text-sm font-bold px-4 py-2 rounded-xl hover:bg-[#5538c9] transition-colors">
             Browse Jobs →
           </button>
         </div>
@@ -143,7 +143,7 @@ function JobTracker() {
         {/* Filter chips */}
         <div className="flex gap-2 mb-4 flex-wrap">
           <button onClick={() => setFilter('all')}
-            className={`text-xs font-bold px-4 py-2 rounded-full border-2 transition-all ${filter === 'all' ? 'bg-[#1A3C6E] text-white border-[#1A3C6E]' : 'border-gray-200 text-gray-500 hover:border-[#1A3C6E]'}`}>
+            className={`text-xs font-bold px-4 py-2 rounded-full border-2 transition-all ${filter === 'all' ? 'bg-[#6b4edb] text-white border-[#1A3C6E]' : 'border-gray-200 text-gray-500 hover:border-[#1A3C6E]'}`}>
             All ({applications.length})
           </button>
           {STAGES.map(s => (
@@ -164,7 +164,7 @@ function JobTracker() {
             <p className="text-gray-400 text-sm mb-6">
               {filter === 'all' ? 'Apply to jobs to track your progress here' : 'Keep applying — your next opportunity is out there!'}
             </p>
-            <button onClick={() => navigate('/jobs')} className="bg-[#1A3C6E] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#0D7377] transition-colors">
+            <button onClick={() => navigate('/jobs')} className="bg-[#6b4edb] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#5538c9] transition-colors">
               Browse Jobs →
             </button>
           </div>
@@ -205,7 +205,7 @@ function JobTracker() {
                       <span className="text-xs font-bold text-[#085041]">🎉 Congratulations!</span>
                     )}
                     {app.status === 'interview' && (
-                      <span className="text-xs font-bold text-[#0D7377]">📅 Interview scheduled</span>
+                      <span className="text-xs font-bold text-[#6b4edb]">📅 Interview scheduled</span>
                     )}
                   </div>
                   {app.status === 'rejected' && app.rejectionReason && (

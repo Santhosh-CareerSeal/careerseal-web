@@ -393,7 +393,7 @@ function ProfileDetails() {
                   Cancel
                 </button>
                 <button onClick={handleCropSave}
-                  className="flex-1 py-2.5 rounded-xl bg-[#1A3C6E] text-white font-bold text-sm hover:bg-[#0D7377]">
+                  className="flex-1 py-2.5 rounded-xl bg-[#6b4edb] text-white font-bold text-sm hover:bg-[#5538c9]">
                   Save Photo
                 </button>
               </div>
@@ -470,7 +470,7 @@ function ProfileDetails() {
                 <div className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden mb-3">
                   {photoPreview ? <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" /> : <span className="text-gray-400 text-xs text-center px-2">No photo</span>}
                 </div>
-                <label className="text-[#0D7377] text-sm font-bold cursor-pointer">
+                <label className="text-[#6b4edb] text-sm font-bold cursor-pointer">
                   {photoFile ? 'Change photo' : 'Upload photo'}
                   <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
                 </label>
@@ -577,7 +577,7 @@ function ProfileDetails() {
                         onBlur={() => setTimeout(() => setShowCollegeList(false), 200)}
                         className={inputClass} />
                       {form.collegeId && (
-                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#0D7377]">✓ Linked</span>
+                        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-bold text-[#6b4edb]">✓ Linked</span>
                       )}
                       {showCollegeList && form.collegeName && !form.collegeId && (() => {
                         const matches = colleges.filter(c => c.collegeName.toLowerCase().includes(form.collegeName.toLowerCase())).slice(0, 6)
@@ -659,7 +659,7 @@ function ProfileDetails() {
                   {(form.employmentHistory || []).map((j, idx) => (
                     <div key={idx} className="bg-white border border-gray-100 rounded-xl p-3 mb-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-[#0D7377]">Company {idx + 1}</span>
+                        <span className="text-xs font-bold text-[#6b4edb]">Company {idx + 1}</span>
                         <button type="button" onClick={() => removeJob(idx)} className="text-xs text-red-500 hover:text-red-700 font-bold">Remove</button>
                       </div>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-2">
@@ -670,7 +670,7 @@ function ProfileDetails() {
                       <div className="border-t border-gray-100 pt-2">
                         <div className="flex items-center justify-between mb-2">
                           <span className="text-xs font-bold text-gray-500">Projects at {j.company || 'this company'}</span>
-                          <button type="button" onClick={() => addJobProject(idx)} className="text-xs font-bold px-2 py-1 rounded-lg bg-[#1A3C6E] text-white hover:bg-[#0D7377]">+ Project</button>
+                          <button type="button" onClick={() => addJobProject(idx)} className="text-xs font-bold px-2 py-1 rounded-lg bg-[#6b4edb] text-white hover:bg-[#5538c9]">+ Project</button>
                         </div>
                         {(!j.projects || j.projects.length === 0) && (
                           <p className="text-xs text-gray-300 italic pb-2">No projects added for this company yet.</p>
@@ -678,7 +678,7 @@ function ProfileDetails() {
                         {(j.projects || []).map((pr, pi) => (
                           <div key={pi} className="bg-gray-50 border border-gray-100 rounded-lg p-2 mb-2">
                             <div className="flex items-center justify-between mb-1">
-                              <span className="text-[11px] font-bold text-[#0D7377]">Project {pi + 1}</span>
+                              <span className="text-[11px] font-bold text-[#6b4edb]">Project {pi + 1}</span>
                               <button type="button" onClick={() => removeJobProject(idx, pi)} className="text-[11px] text-red-400 hover:text-red-600 font-bold">Remove</button>
                             </div>
                             <input type="text" placeholder="Project title" value={pr.title} onChange={e => updateJobProject(idx, pi, 'title', e.target.value)} className={`${inputClass} mb-2`} />
@@ -705,7 +705,7 @@ function ProfileDetails() {
                   {(form.projects || []).map((pr, idx) => (
                     <div key={idx} className="bg-white border border-gray-100 rounded-xl p-3 mb-3">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs font-bold text-[#0D7377]">Project {idx + 1}</span>
+                        <span className="text-xs font-bold text-[#6b4edb]">Project {idx + 1}</span>
                         <button type="button" onClick={() => removeProject(idx)} className="text-xs text-red-500 hover:text-red-700 font-bold">Remove</button>
                       </div>
                       <input type="text" placeholder="Project title (e.g. E-commerce website)" value={pr.title} onChange={e => updateProject(idx, 'title', e.target.value)} className={`${inputClass} mb-2`} />
@@ -745,7 +745,7 @@ function ProfileDetails() {
                 <div className="bg-gray-50 rounded-xl p-4 border border-gray-100">
                   <div className="flex items-center justify-between mb-3">
                     <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Skill verification status</p>
-                    <button onClick={() => navigate('/exams')} className="text-xs text-[#0D7377] font-bold hover:underline">Go to Skill Exams →</button>
+                    <button onClick={() => navigate('/exams')} className="text-xs text-[#6b4edb] font-bold hover:underline">Go to Skill Exams →</button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {form.technicalSkills.split(',').map(s => s.trim()).filter(Boolean).map((skill, i) => {
@@ -804,9 +804,9 @@ function ProfileDetails() {
                       <p className="text-sm font-bold text-gray-700">Email</p>
                       <p className="text-xs text-gray-400">{emailVerified ? 'Your email is verified' : 'Check your inbox for the verification link'}</p>
                       {!emailVerified && (
-                        <button onClick={handleResendVerification} className="text-xs text-[#0D7377] font-bold underline mt-1">Resend verification email</button>
+                        <button onClick={handleResendVerification} className="text-xs text-[#6b4edb] font-bold underline mt-1">Resend verification email</button>
                       )}
-                      {resendMsg && <p className="text-xs text-[#0D7377] mt-1">{resendMsg}</p>}
+                      {resendMsg && <p className="text-xs text-[#6b4edb] mt-1">{resendMsg}</p>}
                     </div>
                     {emailVerified ? (
                       <span className="text-xs font-bold px-3 py-1 rounded-full bg-green-100 text-green-800">✓ Verified</span>
@@ -832,7 +832,7 @@ function ProfileDetails() {
               <div>
                 <p className="text-xs text-gray-400 mb-3">Upload your certificates for verification. PDF, JPG or PNG, max 5MB each. Your documents are private and only shared when you apply to a company.</p>
               </div>
-              {docMsg && <p className="text-xs font-bold text-[#0D7377]">{docMsg}</p>}
+              {docMsg && <p className="text-xs font-bold text-[#6b4edb]">{docMsg}</p>}
               <div className="space-y-3">
                 {DOC_TYPES.map(dt => {
                   const uploaded = documents.filter(d => d.docType === dt.key)
@@ -842,7 +842,7 @@ function ProfileDetails() {
                       <div className="flex items-center justify-between mb-2">
                         <p className="text-sm font-bold text-gray-700">{dt.label}{dt.multiple && <span className="text-[10px] font-normal text-gray-400 ml-1">(you can add more than one)</span>}</p>
                         {canUpload ? (
-                          <label className="text-xs font-bold text-[#0D7377] cursor-pointer hover:underline whitespace-nowrap">
+                          <label className="text-xs font-bold text-[#6b4edb] cursor-pointer hover:underline whitespace-nowrap">
                             {docUploading === dt.key ? 'Uploading...' : (uploaded.length > 0 && dt.multiple ? '+ Add another' : '+ Upload')}
                             <input type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden" disabled={docUploading === dt.key}
                               onChange={e => { if (e.target.files[0]) handleDocUpload(dt.key, e.target.files[0], docLabels[dt.key]); e.target.value = ''; setDocLabels(p => ({ ...p, [dt.key]: '' })) }} />

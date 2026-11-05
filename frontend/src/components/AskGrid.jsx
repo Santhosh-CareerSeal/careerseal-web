@@ -55,7 +55,7 @@ function AskGrid() {
     <>
       {open && (
         <div style={{ position: 'fixed', bottom: '90px', right: '20px', width: '340px', maxWidth: 'calc(100vw - 40px)', height: '460px', maxHeight: 'calc(100vh - 140px)', background: 'white', borderRadius: '18px', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', zIndex: 9998, overflow: 'hidden', fontFamily: 'system-ui, sans-serif' }}>
-          <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <p style={{ color: 'white', fontWeight: 700, fontSize: '14px', margin: 0 }}>Ask GRID</p>
               <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', margin: '2px 0 0' }}>Here to help with GRID</p>

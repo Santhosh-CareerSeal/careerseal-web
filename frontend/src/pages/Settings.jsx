@@ -101,7 +101,7 @@ function Settings() {
           <div>
             <p className="text-lg font-bold text-[#1A3C6E]">{user?.name}</p>
             <p className="text-gray-400 text-sm">{user?.email}</p>
-            <p className="text-[#0D7377] text-xs font-bold mt-0.5">{student?.workStatus} · {student?.gridNumber || 'No GRID yet'}</p>
+            <p className="text-[#6b4edb] text-xs font-bold mt-0.5">{student?.workStatus} · {student?.gridNumber || 'No GRID yet'}</p>
           </div>
         </div>
 
@@ -109,7 +109,7 @@ function Settings() {
         <div className="bg-white rounded-2xl p-1.5 border border-gray-100 flex gap-1 mb-5">
           {tabs.map(tab => (
             <button key={tab.id} onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
+              className={`flex-1 flex items-center justify-center gap-1 py-2.5 rounded-xl text-xs font-bold transition-all ${activeTab === tab.id ? 'bg-[#6b4edb] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
               <span>{tab.icon}</span><span className="hidden sm:inline">{tab.label}</span>
             </button>
           ))}
@@ -137,7 +137,7 @@ function Settings() {
                     className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377]" />
                 </div>
                 <button onClick={handlePasswordChange} disabled={accountLoading}
-                  className="bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm disabled:opacity-50">
+                  className="bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm disabled:opacity-50">
                   {accountLoading ? 'Updating...' : 'Update Password'}
                 </button>
               </div>
@@ -202,7 +202,7 @@ function Settings() {
               ))}
             </div>
             <button onClick={() => { setNotifMsg('Preferences saved!'); setTimeout(() => setNotifMsg(''), 3000) }}
-              className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm mt-4">
+              className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm mt-4">
               Save Preferences
             </button>
           </div>
@@ -238,7 +238,7 @@ function Settings() {
                 ))}
               </div>
               <button onClick={() => { setPrivacyMsg('Privacy settings saved!'); setTimeout(() => setPrivacyMsg(''), 3000) }}
-                className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm mt-4">
+                className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm mt-4">
                 Save Privacy Settings
               </button>
             </div>
@@ -255,7 +255,7 @@ function Settings() {
             <div className="bg-white rounded-2xl p-5 border-2 border-[#1A3C6E]">
               <div className="flex justify-between items-center mb-2">
                 <p className="text-base font-bold text-[#1A3C6E]">Free Plan</p>
-                <span className="bg-[#1A3C6E] text-white text-xs px-3 py-1 rounded-full font-bold">Current</span>
+                <span className="bg-[#6b4edb] text-white text-xs px-3 py-1 rounded-full font-bold">Current</span>
               </div>
               <p className="text-xs text-gray-400 mb-4">You are on the free plan</p>
               <div className="flex flex-col gap-2">
@@ -274,7 +274,7 @@ function Settings() {
               <div className="absolute top-0 right-0 bg-[#0D7377] text-white text-xs font-bold px-3 py-1 rounded-bl-xl">Recommended</div>
               <div className="flex justify-between items-center mb-2">
                 <p className="text-base font-bold text-[#1A3C6E]">Student Pro</p>
-                <p className="text-xl font-bold text-[#0D7377]">₹499<span className="text-xs text-gray-400">/year</span></p>
+                <p className="text-xl font-bold text-[#6b4edb]">₹499<span className="text-xs text-gray-400">/year</span></p>
               </div>
               <div className="flex flex-col gap-2 mb-5">
                 {['Priority job matching', 'Unlimited roadmap regenerations', 'Resume builder', 'Interview prep resources', 'Verified Pro badge'].map((f, i) => (
@@ -306,7 +306,7 @@ function Settings() {
                   </div>
                 ))}
               </div>
-              <button className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#0D7377] transition-colors">
+              <button className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold text-sm hover:bg-[#5538c9] transition-colors">
                 Upgrade to Career Plus — ₹999/year
               </button>
             </div>

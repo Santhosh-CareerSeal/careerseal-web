@@ -271,7 +271,7 @@ function AdminPanel() {
     <div className="min-h-screen bg-transparent">
       <div className="bg-[#0f1e3d] px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold">GRID Admin</span>
         </div>
         <button onClick={handleLogout} className="text-white/50 text-sm hover:text-white">Logout</button>
@@ -281,14 +281,14 @@ function AdminPanel() {
         <div className="adminSidebar bg-white rounded-2xl p-2 border border-gray-100 flex-shrink-0 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible md:w-52 w-full md:sticky md:top-6">
           {TABS.map(t => (
             <button key={t.id} onClick={() => setActive(t.id)}
-              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap flex items-center gap-2 md:w-full ${active === t.id ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E] hover:bg-gray-50'}`}>
+              className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap flex items-center gap-2 md:w-full ${active === t.id ? 'bg-[#6b4edb] text-white' : 'text-gray-500 hover:text-[#1A3C6E] hover:bg-gray-50'}`}>
               <span>{t.icon}</span> <span>{t.label}</span>
             </button>
           ))}
         </div>
         <div className="flex-1 min-w-0">
 
-        {msg && <p className={`text-sm mb-4 ${msg.includes('success') ? 'text-[#0D7377]' : 'text-red-500'}`}>{msg}</p>}
+        {msg && <p className={`text-sm mb-4 ${msg.includes('success') ? 'text-[#6b4edb]' : 'text-red-500'}`}>{msg}</p>}
 
         {active === 'dashboard' && stats && (
           <div>
@@ -339,7 +339,7 @@ function AdminPanel() {
                     <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-1.5">
                       {s.breakdown.map((b, j) => (
                         <div key={j} onClick={(e) => { e.stopPropagation(); if (b.go) b.go() }}
-                          className={`flex items-center justify-between text-xs ${b.go ? 'cursor-pointer text-[#0D7377] hover:underline font-bold' : 'text-gray-500'}`}>
+                          className={`flex items-center justify-between text-xs ${b.go ? 'cursor-pointer text-[#6b4edb] hover:underline font-bold' : 'text-gray-500'}`}>
                           <span>{b.label}</span>
                           <span className="font-bold">{b.value}</span>
                         </div>
@@ -359,7 +359,7 @@ function AdminPanel() {
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-xl font-bold text-[#1A3C6E]">Colleges ({colleges.length})</h1>
               <button onClick={() => setShowAddCollege(!showAddCollege)}
-                className="bg-[#1A3C6E] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#0D7377]">
+                className="bg-[#6b4edb] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#5538c9]">
                 {showAddCollege ? 'Cancel' : '+ Add College'}
               </button>
             </div>
@@ -416,7 +416,7 @@ function AdminPanel() {
                     <p className="text-xs text-gray-400">TPO: {c.tpoName || '—'} · {c.tpoEmail}</p>
                   </div>
                   <button onClick={() => toggleVetted(c.id)}
-                    className="text-xs font-bold text-[#0D7377] hover:underline whitespace-nowrap">
+                    className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
                     {c.vetted ? 'Un-vet' : 'Mark vetted'}
                   </button>
                 </div>
@@ -436,7 +436,7 @@ function AdminPanel() {
                 { id: 'pending', label: 'Pending', count: companies.filter(c => c.mcaStatus !== 'verified').length }
               ].map(f => (
                 <button key={f.id} onClick={() => setCompanyFilter(f.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${companyFilter === f.id ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${companyFilter === f.id ? 'bg-[#6b4edb] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
                   {f.label} ({f.count})
                 </button>
               ))}
@@ -462,10 +462,10 @@ function AdminPanel() {
                       {[c.industry, c.companySize, c.location].filter(Boolean).join(' · ') || '—'} · {c.jobCount} jobs
                     </p>
                     <p className="text-xs text-gray-400">Recruiter: {c.recruiterName || '—'} · {c.recruiterEmail}</p>
-                    {c.website && <p className="text-[10px] text-[#0D7377]">{c.website}</p>}
+                    {c.website && <p className="text-[10px] text-[#6b4edb]">{c.website}</p>}
                   </div>
                   <button onClick={() => toggleCompanyVerify(c.id)}
-                    className="text-xs font-bold text-[#0D7377] hover:underline whitespace-nowrap">
+                    className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
                     {c.mcaStatus === 'verified' ? 'Un-verify' : 'Verify'}
                   </button>
                 </div>
@@ -486,9 +486,9 @@ function AdminPanel() {
                 <input type="password" placeholder="New password (min 8 characters)" value={pwNew} onChange={e => setPwNew(e.target.value)} className={inputCls} />
                 <input type="password" placeholder="Confirm new password" value={pwConfirm} onChange={e => setPwConfirm(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleChangePassword()} className={inputCls} />
-                {pwMsg && <p className={`text-xs ${pwMsg.includes('updated') || pwMsg.includes('success') ? 'text-[#0D7377]' : 'text-red-500'}`}>{pwMsg}</p>}
+                {pwMsg && <p className={`text-xs ${pwMsg.includes('updated') || pwMsg.includes('success') ? 'text-[#6b4edb]' : 'text-red-500'}`}>{pwMsg}</p>}
                 <button onClick={handleChangePassword} disabled={pwSaving}
-                  className="bg-[#1A3C6E] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#0D7377] disabled:opacity-50 mt-1">
+                  className="bg-[#6b4edb] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#5538c9] disabled:opacity-50 mt-1">
                   {pwSaving ? 'Updating...' : 'Update Password'}
                 </button>
               </div>
@@ -503,7 +503,7 @@ function AdminPanel() {
             <div className="flex gap-2 mb-4 flex-wrap">
               {['all', 'applied', 'shortlisted', 'hired', 'rejected'].map(f => (
                 <button key={f} onClick={() => setAppFilter(f)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${appFilter === f ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${appFilter === f ? 'bg-[#6b4edb] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
                   {f}{f !== 'all' && appCounts[f] ? ` (${appCounts[f]})` : ''}
                 </button>
               ))}
@@ -521,7 +521,7 @@ function AdminPanel() {
                       </span>
                     </div>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      applied to <span className="font-bold">{a.jobTitle}</span> at <span className="text-[#0D7377] font-bold">{a.companyName}</span>
+                      applied to <span className="font-bold">{a.jobTitle}</span> at <span className="text-[#6b4edb] font-bold">{a.companyName}</span>
                     </p>
                     <p className="text-[10px] text-gray-400">{a.gridNumber}{a.collegeName ? ' · ' + a.collegeName : ''} · {a.studentEmail}</p>
                   </div>
@@ -538,7 +538,7 @@ function AdminPanel() {
             <div className="flex gap-2 mb-4 flex-wrap">
               {['all', 'self_uploaded', 'verified'].map(f => (
                 <button key={f} onClick={() => setDocFilter(f)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${docFilter === f ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${docFilter === f ? 'bg-[#6b4edb] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
                   {f === 'all' ? 'All' : f === 'verified' ? 'Verified' : 'Pending'}
                 </button>
               ))}
@@ -572,7 +572,7 @@ function AdminPanel() {
             <div className="flex gap-2 mb-4 flex-wrap">
               {['open', 'resolved', 'dismissed', 'all'].map(f => (
                 <button key={f} onClick={() => setFlagFilter(f)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${flagFilter === f ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${flagFilter === f ? 'bg-[#6b4edb] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
                   {f}
                 </button>
               ))}
@@ -630,7 +630,7 @@ function AdminPanel() {
             <div className="flex gap-2 mb-4 flex-wrap">
               {[['unanswered','Needs answer'],['answered','Answered'],['offtopic','Off-topic'],['all','All']].map(([k, lbl]) => (
                 <button key={k} onClick={() => setAskFilter(k)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${askFilter === k ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold ${askFilter === k ? 'bg-[#6b4edb] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
                   {lbl}
                 </button>
               ))}
@@ -670,7 +670,7 @@ function AdminPanel() {
             <div className="flex gap-2 mb-4 flex-wrap">
               {['all', 'student', 'company', 'college', 'admin'].map(r => (
                 <button key={r} onClick={() => setUserFilter(r)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${userFilter === r ? 'bg-[#1A3C6E] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
+                  className={`px-3 py-1.5 rounded-lg text-xs font-bold capitalize ${userFilter === r ? 'bg-[#6b4edb] text-white' : 'bg-white text-gray-500 border border-gray-200'}`}>
                   {r}
                 </button>
               ))}

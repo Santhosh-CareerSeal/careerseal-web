@@ -46,7 +46,7 @@ function VerifyEmailLink() {
             </div>
             <h2 className="text-xl font-bold text-[#1A3C6E] mb-2">Email Verified! ✓</h2>
             <p className="text-gray-500 text-sm mb-6">{message}</p>
-            <button onClick={() => navigate('/dashboard')} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
+            <button onClick={() => navigate('/dashboard')} className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors">
               Go to Dashboard →
             </button>
           </>
@@ -58,7 +58,7 @@ function VerifyEmailLink() {
             </div>
             <h2 className="text-xl font-bold text-[#1A3C6E] mb-2">Verification Failed</h2>
             <p className="text-gray-500 text-sm mb-6">{message}</p>
-            <button onClick={() => navigate('/dashboard')} className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">
+            <button onClick={() => navigate('/dashboard')} className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors">
               Go to Dashboard
             </button>
           </>

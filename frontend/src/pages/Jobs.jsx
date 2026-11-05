@@ -171,7 +171,7 @@ function Jobs() {
       <Navbar student={student} user={user} />
 
       {/* Hero search */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%)' }} className="px-4 pt-4 pb-10">
+      <div style={{ background: 'linear-gradient(135deg, #1a3c6e 0%, #6b4edb 55%, #0d7377 100%)' }} className="px-4 pt-4 pb-10">
         <p className="text-white/70 text-sm mb-1">👋 {greeting()}, {capitalize(user?.name)}</p>
         <p className="text-white text-2xl font-bold mb-5">Find your next opportunity</p>
         <div className="flex flex-col sm:flex-row gap-3 bg-white/15 backdrop-blur-sm rounded-2xl p-2">
@@ -207,7 +207,7 @@ function Jobs() {
           <button
             key={chip}
             onClick={() => setActiveChip(chip)}
-            className={`flex-shrink-0 border-2 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${activeChip === chip ? 'bg-[#1A3C6E] text-white border-[#1A3C6E]' : 'border-gray-200 text-gray-500 hover:border-[#1A3C6E] hover:text-[#1A3C6E]'}`}
+            className={`flex-shrink-0 border-2 rounded-full px-4 py-1.5 text-xs font-bold transition-all ${activeChip === chip ? 'bg-[#6b4edb] text-white border-[#1A3C6E]' : 'border-gray-200 text-gray-500 hover:border-[#1A3C6E] hover:text-[#1A3C6E]'}`}
           >
             {chip}
           </button>
@@ -257,7 +257,7 @@ function Jobs() {
             <p className="text-sm text-gray-500">
               Showing <span className="font-bold text-[#1A3C6E]">{filteredJobs.length} jobs</span>
               {search && ` for "${search}"`}
-              {student?.technicalSkills && <span className="text-[#0D7377]"> · sorted by match score</span>}
+              {student?.technicalSkills && <span className="text-[#6b4edb]"> · sorted by match score</span>}
             </p>
             <select value={sortBy} onChange={e => setSortBy(e.target.value)} className="border border-gray-200 rounded-xl px-3 py-2 text-xs text-gray-600 outline-none bg-white">
               <option value="match">Best match first</option>
@@ -270,7 +270,7 @@ function Jobs() {
               <div className="text-6xl mb-4">🔍</div>
               <p className="text-gray-600 font-bold mb-2">No jobs found</p>
               <p className="text-gray-400 text-sm mb-4">Try different search terms or clear your filters</p>
-              <button onClick={() => { setSearch(''); setLocation(''); setActiveChip('All jobs') }} className="bg-[#1A3C6E] text-white text-xs font-bold px-4 py-2 rounded-xl">Clear search</button>
+              <button onClick={() => { setSearch(''); setLocation(''); setActiveChip('All jobs') }} className="bg-[#6b4edb] text-white text-xs font-bold px-4 py-2 rounded-xl">Clear search</button>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
@@ -370,7 +370,7 @@ function Jobs() {
                         <button
                           onClick={() => handleApply(job.id)}
                           disabled={isApplying}
-                          className="bg-[#1A3C6E] text-white text-xs font-bold px-5 py-2 rounded-xl hover:bg-[#0D7377] transition-colors flex-shrink-0"
+                          className="bg-[#6b4edb] text-white text-xs font-bold px-5 py-2 rounded-xl hover:bg-[#5538c9] transition-colors flex-shrink-0"
                         >
                           {isApplying ? 'Applying...' : 'Apply now →'}
                         </button>

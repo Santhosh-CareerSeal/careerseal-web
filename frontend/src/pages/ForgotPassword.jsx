@@ -28,7 +28,7 @@ function ForgotPassword() {
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 50%, rgba(13,115,119,0.15), transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(26,60,110,0.2), transparent 60%)' }}></div>
       <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold text-xl">GRID</span>
         </div>
         <div className="bg-white rounded-2xl p-8">
@@ -49,7 +49,7 @@ function ForgotPassword() {
                 className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
             </div>
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors disabled:opacity-50">
+              className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors disabled:opacity-50">
               {loading ? 'Sending...' : 'Send Reset Code →'}
             </button>
             <button onClick={() => navigate('/login')} className="text-gray-400 text-sm text-center hover:text-[#1A3C6E]">

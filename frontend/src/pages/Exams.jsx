@@ -181,7 +181,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
                 Browse Courses →
               </button>
             ) : null}
-            <button onClick={() => onFinish(result.passed)} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm">
+            <button onClick={() => onFinish(result.passed)} className="flex-1 bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm">
               Back to Skills
             </button>
           </div>
@@ -291,7 +291,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
           </button>
           {current < questions.length - 1 ? (
             <button onClick={() => setCurrent(current + 1)}
-              className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors text-sm">
+              className="flex-1 bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm">
               Next →
             </button>
           ) : (
@@ -417,7 +417,7 @@ function Exams() {
       <Navbar student={student} user={user} />
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%)' }} className="px-6 py-8">
+      <div style={{ background: 'linear-gradient(135deg, #1a3c6e 0%, #6b4edb 55%, #0d7377 100%)' }} className="px-6 py-8">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-white text-2xl font-bold mb-1">Skill Verification Exams</h1>
           <p className="text-white/60 text-sm mb-4">Verify your skills to make them active on your GRID profile</p>
@@ -447,7 +447,7 @@ function Exams() {
             <div className="text-5xl mb-4">🎯</div>
             <p className="text-[#1A3C6E] font-bold text-lg mb-2">No skills added yet</p>
             <p className="text-gray-400 text-sm mb-6">Add your technical skills in Profile Details to start verifying them</p>
-            <button onClick={() => navigate('/profile-details')} className="bg-[#1A3C6E] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#0D7377] transition-colors">
+            <button onClick={() => navigate('/profile-details')} className="bg-[#6b4edb] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#5538c9] transition-colors">
               Add Skills →
             </button>
           </div>
@@ -455,7 +455,7 @@ function Exams() {
           <>
             <div className="flex items-center justify-between mb-4">
               <p className="text-sm font-bold text-[#1A3C6E]">Your Skills ({totalCount})</p>
-              <button onClick={() => navigate('/profile-details')} className="text-xs text-[#0D7377] font-bold hover:underline">+ Add more skills</button>
+              <button onClick={() => navigate('/profile-details')} className="text-xs text-[#6b4edb] font-bold hover:underline">+ Add more skills</button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 gap-4">
@@ -530,7 +530,7 @@ function Exams() {
                         </button>
                       ) : item.canRetake ? (
                         <button onClick={() => handleStartExam(item.examKey)} disabled={loadingExam}
-                          className={`w-full py-2.5 rounded-xl font-bold text-sm transition-colors ${item.status === 'verified' ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' : 'bg-[#1A3C6E] text-white hover:bg-[#0D7377]'}`}>
+                          className={`w-full py-2.5 rounded-xl font-bold text-sm transition-colors ${item.status === 'verified' ? 'bg-gray-100 text-gray-500 hover:bg-gray-200' : 'bg-[#6b4edb] text-white hover:bg-[#5538c9]'}`}>
                           {loadingExam ? 'Loading...' : item.status === 'verified' ? 'Renew Verification' : item.attemptCount > 0 ? `Retry Exam (Attempt ${item.attemptCount + 1}/4)` : 'Take Exam →'}
                         </button>
                       ) : (

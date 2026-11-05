@@ -35,7 +35,7 @@ function CollegeLogin() {
 
       <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-center gap-2 mb-10">
-          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold text-xl">GRID</span>
           <span className="text-white/30 text-sm ml-1">for Colleges</span>
         </div>
@@ -59,7 +59,7 @@ function CollegeLogin() {
             </div>
 
             <button onClick={handleLogin} disabled={loading}
-              className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors disabled:opacity-50">
+              className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors disabled:opacity-50">
               {loading ? 'Signing in...' : 'Sign In →'}
             </button>
           </div>

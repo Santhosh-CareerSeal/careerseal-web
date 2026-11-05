@@ -18,7 +18,7 @@ function Legal() {
       <div className="bg-[#1A3C6E] px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => navigate('/')}>
-            <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+            <svg width="18" height="18" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
             <span className="text-white font-bold text-lg">GRID</span>
           </div>
           <button onClick={() => navigate(-1)} className="text-white/60 text-sm hover:text-white">← Back</button>
@@ -29,11 +29,11 @@ function Legal() {
         {/* Tabs */}
         <div className="flex gap-2 mb-6 bg-white rounded-2xl p-1.5 border border-gray-100">
           <button onClick={() => setActiveTab('privacy')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'privacy' ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
+            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'privacy' ? 'bg-[#6b4edb] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
             Privacy Policy
           </button>
           <button onClick={() => setActiveTab('terms')}
-            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'terms' ? 'bg-[#1A3C6E] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
+            className={`flex-1 py-2.5 rounded-xl text-sm font-bold transition-all ${activeTab === 'terms' ? 'bg-[#6b4edb] text-white' : 'text-gray-500 hover:text-[#1A3C6E]'}`}>
             Terms of Service
           </button>
         </div>
@@ -125,7 +125,7 @@ function Legal() {
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">9. Contact us</h2>
                   <p>For any privacy-related queries or to exercise your rights, contact us at:<br/>
-                  Email: <span className="text-[#0D7377]">privacy@thegridcard.com</span><br/>
+                  Email: <span className="text-[#6b4edb]">privacy@thegridcard.com</span><br/>
                   Address: Hyderabad, Telangana, India</p>
                 </div>
               </div>
@@ -213,7 +213,7 @@ function Legal() {
                 <div>
                   <h2 className="text-base font-bold text-[#1A3C6E] mb-2">11. Contact</h2>
                   <p>For any queries regarding these terms:<br/>
-                  Email: <span className="text-[#0D7377]">legal@thegridcard.com</span><br/>
+                  Email: <span className="text-[#6b4edb]">legal@thegridcard.com</span><br/>
                   Address: Hyderabad, Telangana, India</p>
                 </div>
               </div>

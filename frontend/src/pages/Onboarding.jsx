@@ -6,7 +6,7 @@ function Onboarding() {
   return (
     <div className="min-h-screen bg-[#1A3C6E] flex flex-col items-center justify-center px-8">
       <h1 className="text-5xl font-bold text-white mb-4">GRID</h1>
-      <p className="text-[#0D7377] text-lg mb-16 tracking-widest uppercase">Shape your future</p>
+      <p className="text-[#6b4edb] text-lg mb-16 tracking-widest uppercase">Shape your future</p>
 
       <div className="flex flex-col gap-6 w-full max-w-sm mb-16">
         <div className="bg-white/10 rounded-2xl p-6 text-white">
@@ -31,11 +31,11 @@ function Onboarding() {
           I already have an account
         </button>
         <div className="flex items-center justify-center gap-4 mt-2">
-          <button onClick={() => navigate('/college-login')} className="text-white/40 text-xs hover:text-[#0D7377] transition-colors">
+          <button onClick={() => navigate('/college-login')} className="text-white/40 text-xs hover:text-[#6b4edb] transition-colors">
             For Colleges →
           </button>
           <span className="text-white/20 text-xs">·</span>
-          <button onClick={() => navigate('/register-company')} className="text-white/40 text-xs hover:text-[#0D7377] transition-colors">
+          <button onClick={() => navigate('/register-company')} className="text-white/40 text-xs hover:text-[#6b4edb] transition-colors">
             For Companies →
           </button>
         </div>

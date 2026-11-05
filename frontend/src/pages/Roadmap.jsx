@@ -269,7 +269,7 @@ function Roadmap() {
 
         {step === 'questions' && (
           <div>
-            <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)' }} className="rounded-2xl p-6 mb-6">
+            <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)' }} className="rounded-2xl p-6 mb-6">
               <div className="flex items-center gap-3 mb-3">
                 <span className="text-3xl">🤖</span>
                 <div>
@@ -287,7 +287,7 @@ function Roadmap() {
               <div className="flex flex-col gap-3">
                 {questions[currentQ].options.map((opt, i) => (
                   <button key={i} onClick={() => handleAnswer(questions[currentQ].id, opt)}
-                    className="border-2 border-gray-100 rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 hover:border-[#0D7377] hover:bg-[#0D7377]/5 hover:text-[#1A3C6E] transition-all">
+                    className="border-2 border-gray-100 rounded-xl px-4 py-3 text-left text-sm font-medium text-gray-700 hover:border-[#0D7377] hover:bg-[#5538c9]/5 hover:text-[#1A3C6E] transition-all">
                     {opt}
                   </button>
                 ))}
@@ -298,7 +298,7 @@ function Roadmap() {
 
         {step === 'location_insight' && (
           <div>
-            <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)' }} className="rounded-2xl p-6 mb-6 flex items-center gap-3">
+            <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)' }} className="rounded-2xl p-6 mb-6 flex items-center gap-3">
               <span className="text-3xl">🌍</span>
               <div>
                 <p className="text-white font-bold text-lg">Work Location Insight</p>
@@ -314,7 +314,7 @@ function Roadmap() {
               <div className="bg-white rounded-2xl p-6 shadow-sm">
                 <p className="text-gray-700 text-sm leading-relaxed whitespace-pre-line mb-6">{locationInsight}</p>
                 <div className="flex gap-3">
-                  <button onClick={() => handleLocationDecision(true)} className="flex-1 bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors">Continue →</button>
+                  <button onClick={() => handleLocationDecision(true)} className="flex-1 bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors">Continue →</button>
                   <button onClick={() => { setStep('questions'); setCurrentQ(3) }} className="flex-1 border-2 border-gray-200 text-gray-600 py-3 rounded-xl font-bold hover:border-[#1A3C6E] transition-colors">Change my answer</button>
                 </div>
               </div>
@@ -324,7 +324,7 @@ function Roadmap() {
 
         {step === 'careers' && (
           <div>
-            <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)' }} className="rounded-2xl p-6 mb-6">
+            <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)' }} className="rounded-2xl p-6 mb-6">
               <div className="flex items-center gap-3">
                 <span className="text-3xl">🎯</span>
                 <div>
@@ -395,7 +395,7 @@ function Roadmap() {
               </div>
             ) : displayRoadmap ? (
               <div>
-                <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)' }} className="rounded-2xl p-6 mb-4">
+                <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)' }} className="rounded-2xl p-6 mb-4">
                   <div className="flex justify-between items-start mb-4">
                     <div>
                       <p className="text-white/60 text-xs mb-1">YOUR PERSONALIZED ROADMAP</p>
@@ -453,7 +453,7 @@ function Roadmap() {
                           <div className="flex items-center gap-2">
                             <span className="text-xs text-gray-400">{milestone.duration}</span>
                             {milestone.status === 'done' && <span className="bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full font-bold">✓ Done</span>}
-                            {milestone.status === 'current' && <span className="bg-[#1A3C6E] text-white text-xs px-2 py-0.5 rounded-full font-bold">▶ Now</span>}
+                            {milestone.status === 'current' && <span className="bg-[#6b4edb] text-white text-xs px-2 py-0.5 rounded-full font-bold">▶ Now</span>}
                             {milestone.status === 'upcoming' && <span className="bg-gray-100 text-gray-500 text-xs px-2 py-0.5 rounded-full">Upcoming</span>}
                           </div>
                         </div>

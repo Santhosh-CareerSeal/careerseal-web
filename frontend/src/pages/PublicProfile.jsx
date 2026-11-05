@@ -120,7 +120,7 @@ function PublicProfile() {
       {/* Floating GRID bar */}
       <div className="bg-[#1A3C6E] px-5 py-3 flex items-center justify-between sm:max-w-4xl sm:mx-auto sm:rounded-t-2xl">
         <div className="flex items-center gap-2">
-          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold text-lg">GRID</span>
         </div>
         <div className="flex items-center gap-2">
@@ -412,7 +412,7 @@ function PublicProfile() {
         {/* Verified footer */}
         <div className="bg-[#1A3C6E] px-6 py-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-1">
-            <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+            <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
             <span className="text-white font-bold text-sm">GRID</span>
           </div>
           <p className="text-white/50 text-xs">This profile is verified by GRID · {profile.gridNumber}</p>

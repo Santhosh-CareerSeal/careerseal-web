@@ -78,7 +78,7 @@ function Courses() {
       <Navbar student={student} user={user} />
 
       {/* Hero */}
-      <div style={{ background: 'linear-gradient(135deg, #1A3C6E 0%, #0D7377 100%)' }} className="px-6 py-8">
+      <div style={{ background: 'linear-gradient(135deg, #1a3c6e 0%, #6b4edb 55%, #0d7377 100%)' }} className="px-6 py-8">
         <div className="max-w-5xl mx-auto">
           <h1 className="text-white text-2xl font-bold mb-1">Courses</h1>
           <p className="text-white/60 text-sm mb-4">Free courses curated based on your skills and career roadmap</p>
@@ -110,7 +110,7 @@ function Courses() {
           <div className="h-5 w-px bg-gray-200"></div>
           {CATEGORIES.map(cat => (
             <button key={cat} onClick={() => setCategory(cat)}
-              className={`text-xs font-bold px-4 py-2 rounded-full border-2 transition-all ${category === cat ? 'bg-[#1A3C6E] text-white border-[#1A3C6E]' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
+              className={`text-xs font-bold px-4 py-2 rounded-full border-2 transition-all ${category === cat ? 'bg-[#6b4edb] text-white border-[#1A3C6E]' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}>
               {cat}
             </button>
           ))}
@@ -124,7 +124,7 @@ function Courses() {
               {showRecommended ? 'Add skills to your profile or complete your roadmap to get recommendations' : 'Try a different category'}
             </p>
             {showRecommended && (
-              <button onClick={() => setShowRecommended(false)} className="bg-[#1A3C6E] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#0D7377] transition-colors">
+              <button onClick={() => setShowRecommended(false)} className="bg-[#6b4edb] text-white text-sm font-bold px-6 py-3 rounded-xl hover:bg-[#5538c9] transition-colors">
                 Browse All Courses
               </button>
             )}
@@ -161,7 +161,7 @@ function Courses() {
                       </div>
                     ) : course.status === 'started' ? (
                       <>
-                        <button onClick={() => window.open(course.url, '_blank')} className="flex-1 bg-[#1A3C6E] text-white text-xs font-bold py-2 rounded-xl hover:bg-[#0D7377] transition-colors">
+                        <button onClick={() => window.open(course.url, '_blank')} className="flex-1 bg-[#6b4edb] text-white text-xs font-bold py-2 rounded-xl hover:bg-[#5538c9] transition-colors">
                           Continue
                         </button>
                         <button onClick={() => handleMarkComplete(course)} className="px-3 bg-green-50 text-green-700 text-xs font-bold rounded-xl border border-green-200 hover:bg-green-100 transition-colors">
@@ -169,7 +169,7 @@ function Courses() {
                         </button>
                       </>
                     ) : (
-                      <button onClick={() => handleStartCourse(course)} className="flex-1 bg-[#1A3C6E] text-white text-xs font-bold py-2 rounded-xl hover:bg-[#0D7377] transition-colors">
+                      <button onClick={() => handleStartCourse(course)} className="flex-1 bg-[#6b4edb] text-white text-xs font-bold py-2 rounded-xl hover:bg-[#5538c9] transition-colors">
                         Start Course →
                       </button>
                     )}

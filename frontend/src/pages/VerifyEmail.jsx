@@ -106,7 +106,7 @@ function VerifyEmail() {
       <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse at 30% 50%, rgba(13,115,119,0.15), transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(26,60,110,0.2), transparent 60%)' }}></div>
       <div className="relative z-10 w-full max-w-md">
         <div className="flex items-center justify-center gap-2 mb-8">
-          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold text-xl">GRID</span>
         </div>
         <div className="bg-white rounded-2xl p-8">
@@ -114,7 +114,7 @@ function VerifyEmail() {
             <div className="text-5xl mb-4">{mode === 'forgot' ? '🔑' : '📧'}</div>
             <h1 className="text-xl font-bold text-[#1A3C6E] mb-2">{mode === 'forgot' ? 'Reset password' : 'Verify your email'}</h1>
             <p className="text-gray-400 text-sm">We sent a 6-digit code to</p>
-            <p className="text-[#0D7377] font-bold text-sm">{email}</p>
+            <p className="text-[#6b4edb] font-bold text-sm">{email}</p>
           </div>
 
           {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl mb-4 text-center">{error}</div>}
@@ -135,13 +135,13 @@ function VerifyEmail() {
           </div>
 
           <button onClick={() => handleVerify(otp.join(''))} disabled={loading || otp.some(d => !d)}
-            className="w-full bg-[#1A3C6E] text-white py-3 rounded-xl font-bold hover:bg-[#0D7377] transition-colors disabled:opacity-50 mb-4">
+            className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors disabled:opacity-50 mb-4">
             {loading ? 'Verifying...' : 'Verify →'}
           </button>
 
           <div className="text-center">
             {canResend ? (
-              <button onClick={handleResend} disabled={resending} className="text-[#0D7377] font-bold text-sm hover:underline disabled:opacity-50">
+              <button onClick={handleResend} disabled={resending} className="text-[#6b4edb] font-bold text-sm hover:underline disabled:opacity-50">
                 {resending ? 'Sending...' : 'Resend code'}
               </button>
             ) : (

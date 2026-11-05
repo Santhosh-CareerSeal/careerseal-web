@@ -52,7 +52,7 @@ function Contact() {
     <div className="min-h-screen bg-transparent flex flex-col">
       <div className="bg-[#1A3C6E] px-6 py-4 flex items-center justify-between">
         <Link to={homeDest} className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
-          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+          <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold text-lg">GRID</span>
         </Link>
         <Link to={homeDest} className="text-white/80 text-sm font-bold" style={{ textDecoration: 'none' }}>Home</Link>
@@ -69,7 +69,7 @@ function Contact() {
             </div>
             <h2 className="text-xl font-bold text-[#1A3C6E] mb-2">Message sent!</h2>
             <p className="text-gray-600 text-sm mb-5">Thanks for reaching out. We'll get back to you at {form.email} soon.</p>
-            <Link to={homeDest} className="inline-block bg-[#1A3C6E] text-white font-bold text-sm px-6 py-3 rounded-xl" style={{ textDecoration: 'none' }}>Back to Home</Link>
+            <Link to={homeDest} className="inline-block bg-[#6b4edb] text-white font-bold text-sm px-6 py-3 rounded-xl" style={{ textDecoration: 'none' }}>Back to Home</Link>
           </div>
         ) : (
           <div className="flex flex-col gap-4">
@@ -98,7 +98,7 @@ function Contact() {
             </button>
 
             <p className="text-xs text-gray-400 text-center mt-2">
-              Or email us directly at <a href="mailto:support@thegridcard.com" className="text-[#0D7377] font-bold">support@thegridcard.com</a>
+              Or email us directly at <a href="mailto:support@thegridcard.com" className="text-[#6b4edb] font-bold">support@thegridcard.com</a>
             </p>
           </div>
         )}

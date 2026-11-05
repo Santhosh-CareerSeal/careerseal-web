@@ -44,9 +44,9 @@ function Sidebar({ active, setActive, company, navigate }) {
     { id: 'settings', label: 'Settings', icon: '⚙️' },
   ]
   return (
-    <div style={{ width: '200px', background: '#0f1e3d', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0, minHeight: '100vh' }}>
+    <div style={{ width: '200px', background: 'linear-gradient(180deg,#0c1f3d,#3c3489)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '4px', flexShrink: 0, minHeight: '100vh' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px solid rgba(255,255,255,0.1)', cursor: 'pointer' }} onClick={() => navigate(getHomeDest())}>
-        <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+        <svg width="16" height="16" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
         <span style={{ color: 'white', fontSize: '14px', fontWeight: '700' }}>GRID</span>
       </div>
       <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px', marginBottom: '10px', textAlign: 'center' }}>
@@ -675,7 +675,7 @@ export default function CompanyDashboard() {
           <div>
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 20px' }}>Analytics</p>
             {ownRating && (
-              <div style={{ background: 'linear-gradient(135deg, #1A3C6E, #0D7377)', borderRadius: '16px', padding: '20px', marginBottom: '20px', color: 'white' }}>
+              <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)', borderRadius: '16px', padding: '20px', marginBottom: '20px', color: 'white' }}>
                 <p style={{ fontSize: '13px', opacity: 0.8, margin: '0 0 6px' }}>Your GRID rating (from students you've interviewed)</p>
                 {ownRating.count === 0 ? (
                   <p style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>No ratings yet</p>
