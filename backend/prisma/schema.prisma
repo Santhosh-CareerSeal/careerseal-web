@@ -16,11 +16,28 @@ model User {
   otp          String?
   otpExpiry    DateTime?
   role         String?   @default("student")
+  adminRole    String?   // 'super' | 'staff' — only meaningful when role = 'admin'
+  isActive     Boolean   @default(true)
   createdAt    DateTime? @default(now()) @db.Timestamp(6)
   deletedAt    DateTime?
   company      Company?
   student      Student?
   college      College?
+}
+
+model AdminRequest {
+  id              Int       @id @default(autoincrement())
+  type            String    // 'deactivate_user' | 'activate_user' | 'verify_company' | 'vet_college' | 'resolve_fraud'
+  targetType      String    // 'user' | 'company' | 'college' | 'fraud_flag'
+  targetId        Int
+  targetLabel     String?   // cached display name of the target
+  reason          String?
+  status          String    @default("pending") // 'pending' | 'approved' | 'rejected'
+  requestedById   Int
+  requestedByName String?
+  resolvedById    Int?
+  resolvedAt      DateTime?
+  createdAt       DateTime  @default(now()) @db.Timestamp(6)
 }
 model Student {
   id                    Int           @id @default(autoincrement())
