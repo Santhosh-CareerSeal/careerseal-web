@@ -65,7 +65,7 @@ function PublicProfile() {
   const getInitials = (name) => name ? name.charAt(0).toUpperCase() : 'U'
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <div className="text-center">
         <div className="w-10 h-10 border-4 border-[#0D7377] border-t-transparent rounded-full animate-spin mx-auto mb-3"></div>
         <p className="text-[#1A3C6E] font-bold">Loading profile...</p>
@@ -73,7 +73,7 @@ function PublicProfile() {
     </div>
   )
   if (error) return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <div className="text-center bg-white rounded-2xl p-10 shadow-sm max-w-sm">
         <div className="text-5xl mb-4">🔍</div>
         <p className="text-[#1A3C6E] font-bold text-xl mb-2">Profile not found</p>
@@ -116,7 +116,7 @@ function PublicProfile() {
   )
 
   return (
-    <div className="min-h-screen bg-gray-100 py-0 sm:py-6">
+    <div className="min-h-screen bg-transparent py-0 sm:py-6">
       {/* Floating GRID bar */}
       <div className="bg-[#1A3C6E] px-5 py-3 flex items-center justify-between sm:max-w-4xl sm:mx-auto sm:rounded-t-2xl">
         <div className="flex items-center gap-2">

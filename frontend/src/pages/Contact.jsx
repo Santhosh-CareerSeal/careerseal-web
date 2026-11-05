@@ -49,7 +49,7 @@ function Contact() {
   const inputClass = 'w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm focus:border-[#0D7377] focus:outline-none transition-colors'
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-transparent flex flex-col">
       <div className="bg-[#1A3C6E] px-6 py-4 flex items-center justify-between">
         <Link to={homeDest} className="flex items-center gap-2" style={{ textDecoration: 'none' }}>
           <svg width="22" height="22" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#0D7377"/><path d="M6 11.5l3 3l7-7" stroke="#1A3C6E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>

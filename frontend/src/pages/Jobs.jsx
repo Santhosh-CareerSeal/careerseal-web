@@ -161,13 +161,13 @@ function Jobs() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <p className="text-[#1A3C6E] text-xl font-bold">Loading jobs...</p>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-transparent">
       <Navbar student={student} user={user} />
 
       {/* Hero search */}

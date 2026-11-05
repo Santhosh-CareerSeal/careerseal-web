@@ -62,10 +62,10 @@ function CompanyPipeline() {
     }
   }
 
-  if (loading) return <div className="min-h-screen bg-gray-100 flex items-center justify-center"><p className="text-[#1A3C6E] text-xl font-bold">Loading...</p></div>
+  if (loading) return <div className="min-h-screen bg-transparent flex items-center justify-center"><p className="text-[#1A3C6E] text-xl font-bold">Loading...</p></div>
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-transparent">
       <div className="bg-[#1A3C6E] px-6 py-4 flex justify-between items-center">
         <h1 className="text-white text-xl font-bold">GRID — Pipeline</h1>
         <button onClick={() => navigate('/company')} className="text-white/70 text-sm">Back</button>

@@ -104,13 +104,13 @@ function JobTracker() {
   const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : ''
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <p className="text-[#1A3C6E] font-bold">Loading applications...</p>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       <Navbar student={student} user={user} />
 
       <div className="max-w-4xl mx-auto px-4 py-6">

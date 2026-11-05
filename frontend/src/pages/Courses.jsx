@@ -68,13 +68,13 @@ function Courses() {
   const completedCount = courses.filter(c => c.status === 'completed').length
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <p className="text-[#1A3C6E] font-bold">Loading courses...</p>
     </div>
   )
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       <Navbar student={student} user={user} />
 
       {/* Hero */}

@@ -353,7 +353,7 @@ function ProfileDetails() {
   const sectionTitle = "text-base font-bold text-[#1A3C6E] mb-4 pl-3 border-l-4 border-[#6b4edb] leading-tight"
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <p className="text-[#1A3C6E] font-bold">Loading profile...</p>
     </div>
   )

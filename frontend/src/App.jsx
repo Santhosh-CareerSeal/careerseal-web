@@ -124,6 +124,34 @@ function ScrollManager() {
 function App() {
   return (
     <BrowserRouter>
+      <div className="grid-watermark" aria-hidden="true">
+        <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" viewBox="0 0 1200 800">
+          <defs>
+            <pattern id="gw-minor" width="54" height="54" patternUnits="userSpaceOnUse">
+              <path d="M54 0H0V54" fill="none" stroke="#1a3c6e" strokeWidth="1" strokeOpacity="0.05" />
+            </pattern>
+            <pattern id="gw-major" width="270" height="270" patternUnits="userSpaceOnUse">
+              <path d="M270 0H0V270" fill="none" stroke="#1a3c6e" strokeWidth="1.2" strokeOpacity="0.09" />
+            </pattern>
+            <radialGradient id="gw-glow" cx="82%" cy="16%" r="55%">
+              <stop offset="0%" stopColor="#6b4edb" stopOpacity="0.06" />
+              <stop offset="100%" stopColor="#6b4edb" stopOpacity="0" />
+            </radialGradient>
+          </defs>
+          <rect width="1200" height="800" fill="url(#gw-minor)" />
+          <rect width="1200" height="800" fill="url(#gw-major)" />
+          <rect width="1200" height="800" fill="url(#gw-glow)" />
+          <g stroke="#1a3c6e" strokeOpacity="0.07" fill="none" strokeWidth="1.1">
+            <circle cx="1120" cy="90" r="240" />
+            <ellipse cx="1120" cy="90" rx="80" ry="240" />
+            <ellipse cx="1120" cy="90" rx="160" ry="240" />
+            <ellipse cx="1120" cy="90" rx="240" ry="80" />
+            <ellipse cx="1120" cy="90" rx="240" ry="160" />
+            <line x1="880" y1="90" x2="1360" y2="90" />
+            <line x1="1120" y1="-150" x2="1120" y2="330" />
+          </g>
+        </svg>
+      </div>
       <Seo />
       <ScrollManager />
       <Routes>

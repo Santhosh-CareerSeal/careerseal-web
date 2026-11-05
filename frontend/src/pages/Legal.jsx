@@ -13,7 +13,7 @@ function Legal() {
   })
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       {/* Header */}
       <div className="bg-[#1A3C6E] px-6 py-4">
         <div className="max-w-3xl mx-auto flex items-center justify-between">

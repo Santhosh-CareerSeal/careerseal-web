@@ -143,7 +143,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
 
   if (result) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-transparent flex items-center justify-center px-4">
         <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-sm border border-gray-100">
           <div className="text-6xl mb-4">{result.passed ? '🎉' : '😔'}</div>
           <h2 className="text-2xl font-bold text-[#1A3C6E] mb-2">{result.passed ? 'Congratulations!' : 'Better luck next time!'}</h2>
@@ -191,7 +191,7 @@ function ExamPage({ skill, questions, timeLimit, attemptNumber, onFinish, onBack
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       {!isFullscreen && !submitted && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.95)", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "20px" }}>
           <div style={{ fontSize: "48px" }}>🔒</div>
@@ -404,7 +404,7 @@ function Exams() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-transparent flex items-center justify-center">
       <p className="text-[#1A3C6E] font-bold">Loading your skills...</p>
     </div>
   )
@@ -413,7 +413,7 @@ function Exams() {
   const totalCount = skillStatus.length
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-transparent">
       <Navbar student={student} user={user} />
 
       {/* Hero */}
