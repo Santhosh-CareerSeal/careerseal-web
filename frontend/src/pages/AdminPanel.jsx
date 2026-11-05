@@ -351,6 +351,63 @@ function AdminPanel() {
                 </div>
               ))}
             </div>
+
+            {(() => {
+              const pct = (n, d) => d ? Math.round((n / d) * 100) : 0
+              const emailRate = pct(stats.verifiedEmails, stats.totalUsers)
+              const publishRate = pct(stats.publishedGrids, stats.totalStudents)
+              const profileRate = pct(stats.profileComplete, stats.totalStudents)
+              const appsPerJob = stats.totalJobs ? (stats.totalApplications / stats.totalJobs).toFixed(1) : '—'
+              const ratios = [
+                { t: 'Email verification', v: emailRate + '%', sub: stats.verifiedEmails + '/' + stats.totalUsers, w: emailRate, cap: 'users with a verified email' },
+                { t: 'GRID publish rate', v: publishRate + '%', sub: stats.publishedGrids + '/' + stats.totalStudents, w: publishRate, cap: 'students who published their GRID' },
+                { t: 'Profile completion', v: profileRate + '%', sub: stats.profileComplete + '/' + stats.totalStudents, w: profileRate, cap: 'students with a complete profile' },
+                { t: 'Apps per job', v: appsPerJob, sub: stats.totalApplications + '/' + stats.totalJobs, w: Math.min(100, stats.totalJobs ? (stats.totalApplications / stats.totalJobs) * 25 : 0), cap: 'applications per posted job' },
+              ]
+              const unpublished = stats.unpublishedGrids != null ? stats.unpublishedGrids : (stats.totalStudents - stats.publishedGrids)
+              const attn = [
+                { n: stats.unverifiedEmails, dot: '#e2574c', p: 'emails unverified', s: 'users who never confirmed their email', go: () => { setVerifyFilter('unverified'); setUserFilter('all'); setActive('users') } },
+                { n: unpublished, dot: '#e4b24a', p: "students haven't published a GRID", s: 'signed up but no public card yet', go: () => { setUserFilter('student'); setVerifyFilter('all'); setActive('users') } },
+                { n: stats.pendingCompanies, dot: '#6b4edb', p: 'companies awaiting verification', s: "recruiters students can't yet trust", go: () => { setCompanyFilter('pending'); setActive('companies') } },
+                { n: stats.pendingColleges, dot: '#6b4edb', p: 'colleges pending vetting', s: 'not visible to students until vetted', go: () => { setCollegeFilter('pending'); setActive('colleges') } },
+              ].filter(a => a.n > 0)
+              return (
+                <>
+                  <h2 className="text-sm font-extrabold text-[#1A3C6E] mt-7 mb-1">Platform health</h2>
+                  <p className="text-xs text-gray-400 mb-3">Signals, not just counts — computed from numbers already loaded.</p>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+                    {ratios.map((r, i) => (
+                      <div key={i} className="bg-white rounded-2xl p-4 border border-gray-100">
+                        <p className="text-[11px] font-bold text-[#17304f] mb-2">{r.t}</p>
+                        <p className="text-2xl font-extrabold text-[#1A3C6E] leading-none">{r.v} <span className="text-xs font-bold text-gray-400">· {r.sub}</span></p>
+                        <div className="h-[7px] rounded-full bg-gray-100 overflow-hidden mt-3">
+                          <div className="h-full rounded-full" style={{ width: r.w + '%', background: 'linear-gradient(90deg,#6b4edb,#5dcaa5)' }} />
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-2">{r.cap}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <h2 className="text-sm font-extrabold text-[#1A3C6E] mb-1">Needs attention</h2>
+                  <p className="text-xs text-gray-400 mb-3">Each row jumps to the filtered list. Rows disappear when the count hits zero.</p>
+                  <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                    {attn.length === 0 ? (
+                      <p className="text-sm text-gray-400 text-center py-7">✓ All clear — nothing needs your attention right now.</p>
+                    ) : attn.map((a, i) => (
+                      <div key={i} onClick={a.go}
+                        className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0 cursor-pointer hover:bg-gray-50">
+                        <span className="w-2.5 h-2.5 rounded-full flex-shrink-0" style={{ background: a.dot }} />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-[#17304f]">{a.n} {a.p}</p>
+                          <p className="text-[11px] text-gray-400">{a.s}</p>
+                        </div>
+                        <span className="text-lg font-extrabold text-[#1A3C6E]">{a.n}</span>
+                        <span className="text-[11px] font-bold text-[#6b4edb] whitespace-nowrap">View →</span>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )
+            })()}
           </div>
         )}
 
