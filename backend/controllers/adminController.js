@@ -173,7 +173,7 @@ const getAdminUsers = async (req, res) => {
     const users = await prisma.user.findMany({
       where,
       select: {
-        id: true, name: true, email: true, role: true, emailVerified: true, createdAt: true,
+        id: true, name: true, email: true, role: true, emailVerified: true, isActive: true, createdAt: true,
         student: { select: { gridNumber: true, gridPublished: true, profileComplete: true, collegeName: true } },
         company: { select: { companyName: true, mcaStatus: true } }
       },

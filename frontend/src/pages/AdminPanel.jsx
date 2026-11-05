@@ -12,6 +12,7 @@ const TABS = [
   { id: 'documents', label: 'Documents', icon: '📄' },
   { id: 'fraud', label: 'Fraud Flags', icon: '🚩' },
   { id: 'ask', label: 'Ask GRID', icon: '💬' },
+  { id: 'team', label: 'Team & Requests', icon: '🛡️', superOnly: true },
   { id: 'settings', label: 'Settings', icon: '⚙️' }
 ]
 
@@ -46,6 +47,16 @@ function AdminPanel() {
     tpoName: '', tpoEmail: '', tpoPhone: '', password: ''
   })
 
+  const currentUser = (() => { try { return JSON.parse(localStorage.getItem('user') || '{}') } catch (e) { return {} } })()
+  const isStaff = currentUser.adminRole === 'staff'
+  const visibleTabs = TABS.filter(t => !t.superOnly || !isStaff)
+  const [userBusy, setUserBusy] = useState(null)
+  const [staff, setStaff] = useState([])
+  const [requests, setRequests] = useState([])
+  const [pendingReqCount, setPendingReqCount] = useState(0)
+  const [staffForm, setStaffForm] = useState({ name: '', email: '', password: '' })
+  const [teamMsg, setTeamMsg] = useState('')
+
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
 
@@ -71,6 +82,7 @@ function AdminPanel() {
     const u = JSON.parse(localStorage.getItem('user') || '{}')
     if (u.role !== 'admin') { navigate('/admin-login'); return }
     loadAll()
+    if (u.adminRole !== 'staff') loadTeam()
   }, [])
 
   const loadUsers = async () => {
@@ -81,6 +93,69 @@ function AdminPanel() {
       setUsers(res.data.users || [])
     } catch (e) { setUsers([]) }
   }
+
+  // --- customer-support actions (Users tab) ---
+  const userAction = async (u, kind) => {
+    setUserBusy(u.id + kind)
+    try {
+      const ep = kind === 'resend' ? 'resend-verification' : kind === 'verify' ? 'verify-email' : 'reset-password'
+      const res = await axios.post(`${API_URL}/api/admin/users/${u.id}/${ep}`, {}, { headers })
+      setMsg(res.data.message)
+      if (kind === 'verify') loadUsers()
+    } catch (e) { setMsg(e.response?.data?.message || 'Action failed') }
+    finally { setUserBusy(null) }
+  }
+  const setActiveState = async (u, active) => {
+    if (!window.confirm(`${active ? 'Activate' : 'Deactivate'} ${u.name}'s account?`)) return
+    setUserBusy(u.id + 'active')
+    try {
+      const res = await axios.patch(`${API_URL}/api/admin/users/${u.id}/active`, { active }, { headers })
+      setMsg(res.data.message)
+      loadUsers()
+    } catch (e) { setMsg(e.response?.data?.message || 'Action failed') }
+    finally { setUserBusy(null) }
+  }
+  // staff raises a request to the super admin
+  const raiseRequest = async (type, targetType, targetId, targetLabel) => {
+    const reason = window.prompt('Add a note for the super admin (optional):')
+    if (reason === null) return
+    try {
+      const res = await axios.post(`${API_URL}/api/admin/requests`, { type, targetType, targetId, targetLabel, reason }, { headers })
+      setMsg(res.data.message)
+    } catch (e) { setMsg(e.response?.data?.message || 'Could not send request') }
+  }
+  // --- Team & Requests (super) ---
+  const loadTeam = async () => {
+    try {
+      const [s, r] = await Promise.all([
+        axios.get(`${API_URL}/api/admin/staff`, { headers }),
+        axios.get(`${API_URL}/api/admin/requests`, { headers, params: { status: 'all' } })
+      ])
+      setStaff(s.data.staff || [])
+      setRequests(r.data.requests || [])
+      setPendingReqCount(r.data.pendingCount || 0)
+    } catch (e) {}
+  }
+  const addStaff = async () => {
+    setTeamMsg('')
+    if (!staffForm.name || !staffForm.email || !staffForm.password) { setTeamMsg('Name, email and password are required'); return }
+    try {
+      const res = await axios.post(`${API_URL}/api/admin/staff`, staffForm, { headers })
+      setTeamMsg(res.data.message)
+      setStaffForm({ name: '', email: '', password: '' })
+      loadTeam()
+    } catch (e) { setTeamMsg(e.response?.data?.message || 'Could not create staff') }
+  }
+  const deleteStaff = async (id) => {
+    if (!window.confirm('Remove this staff member? They lose access immediately.')) return
+    try { await axios.delete(`${API_URL}/api/admin/staff/${id}`, { headers }); loadTeam() }
+    catch (e) { setMsg('Could not remove staff member') }
+  }
+  const resolveRequest = async (id, action) => {
+    try { const res = await axios.patch(`${API_URL}/api/admin/requests/${id}`, { action }, { headers }); setMsg(res.data.message); loadTeam() }
+    catch (e) { setMsg(e.response?.data?.message || 'Could not update request') }
+  }
+
   const [docs, setDocs] = useState([])
   const [docFilter, setDocFilter] = useState('all')
   const [docBusy, setDocBusy] = useState(null)
@@ -167,6 +242,9 @@ function AdminPanel() {
   useEffect(() => {
     if (active === 'applications') loadApplications()
   }, [active, appFilter])
+  useEffect(() => {
+    if (active === 'team' && !isStaff) loadTeam()
+  }, [active])
 
   const handleAddCollege = async () => {
     setMsg('')
@@ -273,16 +351,20 @@ function AdminPanel() {
         <div className="flex items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold">GRID Admin</span>
+          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isStaff ? 'bg-[#5dcaa5]/25 text-[#9fe1cb] border border-[#5dcaa5]/40' : 'bg-[#e4b24a]/20 text-[#f4d79a] border border-[#e4b24a]/40'}`}>{isStaff ? 'STAFF' : 'SUPER'}</span>
         </div>
         <button onClick={handleLogout} className="text-white/50 text-sm hover:text-white">Logout</button>
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-6 flex gap-6 items-start">
         <div className="adminSidebar bg-white rounded-2xl p-2 border border-gray-100 flex-shrink-0 flex md:flex-col gap-1 overflow-x-auto md:overflow-visible md:w-52 w-full md:sticky md:top-6">
-          {TABS.map(t => (
+          {visibleTabs.map(t => (
             <button key={t.id} onClick={() => setActive(t.id)}
               className={`px-4 py-2.5 rounded-xl text-sm font-bold transition-all text-left whitespace-nowrap flex items-center gap-2 md:w-full ${active === t.id ? 'bg-[#6b4edb] text-white' : 'text-gray-500 hover:text-[#1A3C6E] hover:bg-gray-50'}`}>
               <span>{t.icon}</span> <span>{t.label}</span>
+              {t.id === 'team' && pendingReqCount > 0 && (
+                <span className={`ml-auto text-[10px] font-bold px-1.5 py-0.5 rounded-full ${active === t.id ? 'bg-white/25 text-white' : 'bg-red-100 text-red-700'}`}>{pendingReqCount}</span>
+              )}
             </button>
           ))}
         </div>
@@ -415,13 +497,15 @@ function AdminPanel() {
           <div>
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-xl font-bold text-[#1A3C6E]">Colleges ({colleges.length})</h1>
-              <button onClick={() => setShowAddCollege(!showAddCollege)}
-                className="bg-[#6b4edb] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#5538c9]">
-                {showAddCollege ? 'Cancel' : '+ Add College'}
-              </button>
+              {!isStaff && (
+                <button onClick={() => setShowAddCollege(!showAddCollege)}
+                  className="bg-[#6b4edb] text-white px-4 py-2 rounded-xl text-sm font-bold hover:bg-[#5538c9]">
+                  {showAddCollege ? 'Cancel' : '+ Add College'}
+                </button>
+              )}
             </div>
 
-            {showAddCollege && (
+            {!isStaff && showAddCollege && (
               <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4">
                 <p className="font-bold text-[#1A3C6E] mb-4">Add a new college</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -472,10 +556,17 @@ function AdminPanel() {
                     </p>
                     <p className="text-xs text-gray-400">TPO: {c.tpoName || '—'} · {c.tpoEmail}</p>
                   </div>
-                  <button onClick={() => toggleVetted(c.id)}
-                    className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
-                    {c.vetted ? 'Un-vet' : 'Mark vetted'}
-                  </button>
+                  {isStaff ? (
+                    !c.vetted && (
+                      <button onClick={() => raiseRequest('vet_college', 'college', c.id, c.collegeName)}
+                        className="text-xs font-bold text-[#9a6b12] hover:underline whitespace-nowrap">Request vetting →</button>
+                    )
+                  ) : (
+                    <button onClick={() => toggleVetted(c.id)}
+                      className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
+                      {c.vetted ? 'Un-vet' : 'Mark vetted'}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -521,10 +612,17 @@ function AdminPanel() {
                     <p className="text-xs text-gray-400">Recruiter: {c.recruiterName || '—'} · {c.recruiterEmail}</p>
                     {c.website && <p className="text-[10px] text-[#6b4edb]">{c.website}</p>}
                   </div>
-                  <button onClick={() => toggleCompanyVerify(c.id)}
-                    className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
-                    {c.mcaStatus === 'verified' ? 'Un-verify' : 'Verify'}
-                  </button>
+                  {isStaff ? (
+                    c.mcaStatus !== 'verified' && (
+                      <button onClick={() => raiseRequest('verify_company', 'company', c.id, c.companyName)}
+                        className="text-xs font-bold text-[#9a6b12] hover:underline whitespace-nowrap">Request verify →</button>
+                    )
+                  ) : (
+                    <button onClick={() => toggleCompanyVerify(c.id)}
+                      className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
+                      {c.mcaStatus === 'verified' ? 'Un-verify' : 'Verify'}
+                    </button>
+                  )}
                 </div>
               ))}
             </div>
@@ -649,6 +747,10 @@ function AdminPanel() {
                     {f.studentEmail && <p className="text-[10px] text-gray-400 mt-0.5">{f.studentEmail}</p>}
                   </div>
                   {f.status === 'open' ? (
+                    isStaff ? (
+                      <button onClick={() => raiseRequest('resolve_fraud', 'fraud_flag', f.id, f.studentName)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#fdf1dc] text-[#9a6b12] hover:bg-amber-100 whitespace-nowrap flex-shrink-0">Request resolve →</button>
+                    ) : (
                     <div className="flex gap-2 flex-shrink-0">
                       {f.flagType === 'exam_violations' && (
                         <button onClick={() => grantRetake(f)} disabled={flagBusy === f.id}
@@ -659,6 +761,7 @@ function AdminPanel() {
                       <button onClick={() => resolveFlag(f.id, 'resolve')} disabled={flagBusy === f.id}
                         className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63] whitespace-nowrap">Resolve</button>
                     </div>
+                    )
                   ) : (
                     <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500 capitalize flex-shrink-0">{f.status}</span>
                   )}
@@ -711,7 +814,7 @@ function AdminPanel() {
                         {q.status === 'done' && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E1F5EE] text-[#085041]">Added to KB</span>}
                       </div>
                     </div>
-                    {!q.answered && !q.offTopic && q.status !== 'done' && (
+                    {!isStaff && !q.answered && !q.offTopic && q.status !== 'done' && (
                       <button onClick={() => markAskDone(q.id)}
                         className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63] whitespace-nowrap flex-shrink-0">Mark added</button>
                     )}
@@ -721,6 +824,67 @@ function AdminPanel() {
             </div>
           </div>
         )}
+        {active === 'team' && !isStaff && (
+          <div>
+            <h1 className="text-xl font-bold text-[#1A3C6E] mb-1">Team &amp; Requests</h1>
+            <p className="text-xs text-gray-400 mb-4">Create scoped staff logins and action their requests. Only the super admin sees this tab.</p>
+
+            <div className="bg-white rounded-2xl p-5 border border-gray-100 mb-4">
+              <p className="font-bold text-[#1A3C6E] mb-1">Add a staff member</p>
+              <p className="text-xs text-gray-400 mb-3">They log in at the same screen but only see the scoped tabs, and must request anything restricted.</p>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <input placeholder="Name" value={staffForm.name} onChange={e => setStaffForm({ ...staffForm, name: e.target.value })} className={inputCls} />
+                <input placeholder="Login email" value={staffForm.email} onChange={e => setStaffForm({ ...staffForm, email: e.target.value })} className={inputCls} />
+                <input type="text" placeholder="Temp password (min 8)" value={staffForm.password} onChange={e => setStaffForm({ ...staffForm, password: e.target.value })} className={inputCls} />
+                <button onClick={addStaff} className="bg-[#6b4edb] text-white px-4 py-2.5 rounded-xl text-sm font-bold hover:bg-[#5538c9]">+ Create staff login</button>
+              </div>
+              {teamMsg && <p className={`text-xs mt-2 ${teamMsg.toLowerCase().includes('created') ? 'text-[#6b4edb]' : 'text-red-500'}`}>{teamMsg}</p>}
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden mb-4">
+              <p className="font-bold text-[#1A3C6E] px-4 pt-4 pb-2">Staff members ({staff.length})</p>
+              {staff.length === 0 ? (
+                <p className="text-sm text-gray-400 px-4 pb-4">No staff yet. Add one above.</p>
+              ) : staff.map(s => (
+                <div key={s.id} className="flex items-center justify-between gap-3 px-4 py-3 border-t border-gray-50">
+                  <div>
+                    <p className="text-sm font-bold text-[#1A3C6E]">{s.name}</p>
+                    <p className="text-xs text-gray-400">{s.email} · added {new Date(s.createdAt).toLocaleDateString()}</p>
+                  </div>
+                  <button onClick={() => deleteStaff(s.id)} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 whitespace-nowrap">Remove</button>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              <p className="font-bold text-[#1A3C6E] px-4 pt-4 pb-1">Requests ({pendingReqCount} pending)</p>
+              <p className="text-xs text-gray-400 px-4 pb-2">Staff flagged these for your decision. Approving performs the action.</p>
+              {requests.length === 0 ? (
+                <p className="text-sm text-gray-400 px-4 pb-4">No requests yet.</p>
+              ) : requests.map(r => {
+                const typeLabel = { deactivate_user: 'Deactivate account', activate_user: 'Activate account', verify_company: 'Verify company', vet_college: 'Vet college', resolve_fraud: 'Resolve fraud flag' }[r.type] || r.type
+                return (
+                  <div key={r.id} className="flex items-start justify-between gap-3 px-4 py-3 border-t border-gray-50">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-bold text-[#1A3C6E]">{typeLabel}{r.targetLabel ? ' — ' + r.targetLabel : ''}</p>
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full capitalize ${r.status === 'pending' ? 'bg-amber-100 text-amber-700' : r.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>{r.status}</span>
+                      </div>
+                      <p className="text-xs text-gray-400 mt-0.5">by {r.requestedByName || 'staff'}{r.reason ? ' · "' + r.reason + '"' : ''} · {new Date(r.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    {r.status === 'pending' && (
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button onClick={() => resolveRequest(r.id, 'reject')} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 whitespace-nowrap">Reject</button>
+                        <button onClick={() => resolveRequest(r.id, 'approve')} className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#6b4edb] text-white hover:bg-[#5538c9] whitespace-nowrap">Approve</button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
+
         {active === 'users' && (
           <div>
             <h1 className="text-xl font-bold text-[#1A3C6E] mb-4">Users</h1>
@@ -742,20 +906,47 @@ function AdminPanel() {
               {users.length === 0 ? (
                 <p className="text-gray-400 text-sm text-center py-8">No users found</p>
               ) : users.map(u => (
-                <div key={u.id} className="px-4 py-3 border-b border-gray-50 last:border-0 flex items-center justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
+                <div key={u.id} className="px-4 py-3 border-b border-gray-50 last:border-0 flex items-start justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <p className="font-bold text-sm text-[#1A3C6E]">{u.name}</p>
                       <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#f0f4ff] text-[#1A3C6E] capitalize">{u.role}</span>
                       {u.emailVerified
                         ? <span className="text-[10px] text-green-700">✓ verified</span>
                         : <span className="text-[10px] text-amber-700">pending</span>}
+                      {u.isActive === false && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600">deactivated</span>}
                     </div>
                     <p className="text-xs text-gray-400">{u.email}</p>
                     {u.student?.gridNumber && <p className="text-[10px] text-gray-400">{u.student.gridNumber} {u.student.gridPublished ? '· published' : ''}</p>}
                     {u.company?.companyName && <p className="text-[10px] text-gray-400">{u.company.companyName}</p>}
+                    {u.role !== 'admin' && (
+                      <div className="flex gap-1.5 flex-wrap mt-2">
+                        {!u.emailVerified && (
+                          <>
+                            <button onClick={() => userAction(u, 'resend')} disabled={userBusy === u.id + 'resend'}
+                              className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-[#efedff] text-[#6b4edb] hover:bg-[#e3e0f7] disabled:opacity-50">
+                              {userBusy === u.id + 'resend' ? '...' : 'Resend email'}</button>
+                            <button onClick={() => userAction(u, 'verify')} disabled={userBusy === u.id + 'verify'}
+                              className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50">
+                              {userBusy === u.id + 'verify' ? '...' : 'Mark verified'}</button>
+                          </>
+                        )}
+                        <button onClick={() => userAction(u, 'reset')} disabled={userBusy === u.id + 'reset'}
+                          className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-50">
+                          {userBusy === u.id + 'reset' ? '...' : 'Send password reset'}</button>
+                        {isStaff ? (
+                          <button onClick={() => raiseRequest(u.isActive === false ? 'activate_user' : 'deactivate_user', 'user', u.id, u.name)}
+                            className="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-[#fdf1dc] text-[#9a6b12] hover:bg-amber-100">
+                            {u.isActive === false ? 'Request activate →' : 'Request deactivation →'}</button>
+                        ) : (
+                          <button onClick={() => setActiveState(u, u.isActive === false)} disabled={userBusy === u.id + 'active'}
+                            className={`text-[11px] font-bold px-2.5 py-1 rounded-lg disabled:opacity-50 ${u.isActive === false ? 'bg-[#e3f6ee] text-[#0b7a56] hover:bg-green-100' : 'bg-red-50 text-red-600 hover:bg-red-100'}`}>
+                            {userBusy === u.id + 'active' ? '...' : u.isActive === false ? 'Activate' : 'Deactivate'}</button>
+                        )}
+                      </div>
+                    )}
                   </div>
-                  <p className="text-[10px] text-gray-300">{new Date(u.createdAt).toLocaleDateString()}</p>
+                  <p className="text-[10px] text-gray-300 whitespace-nowrap">{new Date(u.createdAt).toLocaleDateString()}</p>
                 </div>
               ))}
             </div>
