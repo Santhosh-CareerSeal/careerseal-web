@@ -11,13 +11,14 @@ const adminLogin = async (req, res) => {
     if (!user || user.role !== 'admin') {
       return res.status(400).json({ message: 'Invalid email or password' })
     }
+    if (user.isActive === false) return res.status(403).json({ message: 'This account has been deactivated. Contact the super admin.' })
     const isMatch = await bcrypt.compare(password, user.passwordHash)
     if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' })
-    const token = jwt.sign({ userId: user.id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' })
+    const token = jwt.sign({ userId: user.id, role: user.role, adminRole: user.adminRole || 'super' }, process.env.JWT_SECRET, { expiresIn: '7d' })
     res.json({
       message: 'Admin login successful',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role }
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, adminRole: user.adminRole || 'super' }
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })

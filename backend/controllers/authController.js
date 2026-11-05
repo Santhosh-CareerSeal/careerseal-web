@@ -114,6 +114,7 @@ const login = async (req, res) => {
     })
     if (!user) return res.status(400).json({ message: 'Invalid email or password' })
     if (user.deletedAt) return res.status(403).json({ message: 'This account has been deleted' })
+    if (user.isActive === false) return res.status(403).json({ message: 'This account has been deactivated. Please contact support@thegridcard.com' })
     const isMatch = await bcrypt.compare(password, user.passwordHash)
     if (!isMatch) return res.status(400).json({ message: 'Invalid email or password' })
 
