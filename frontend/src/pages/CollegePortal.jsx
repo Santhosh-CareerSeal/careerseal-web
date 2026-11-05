@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import getHomeDest from '../utils/homeDest'
+import PasswordField from '../components/PasswordField'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Footer from '../components/Footer'
@@ -581,9 +582,9 @@ export default function CollegePortal() {
             <div style={{ background: 'white', borderRadius: '14px', padding: '20px', border: '1px solid #eee' }}>
               <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 12px' }}>Change Password</p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                <input type="password" placeholder="Current password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
-                <input type="password" placeholder="New password" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
-                <input type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                <PasswordField placeholder="Current password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                <PasswordField placeholder="New password" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                <PasswordField placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
                 {pwMsg && <p style={{ fontSize: '12px', color: pwMsg.includes('success') || pwMsg.includes('updated') ? '#0D7377' : '#dc2626', margin: '2px 0' }}>{pwMsg}</p>}
                 <button onClick={handleChangePassword} disabled={pwLoading} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer', opacity: pwLoading ? 0.6 : 1 }}>{pwLoading ? 'Updating...' : 'Update Password'}</button>
               </div>

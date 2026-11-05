@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import getHomeDest from '../utils/homeDest'
+import PasswordField from '../components/PasswordField'
 import Footer from '../components/Footer'
 
 const STAGES = ['applied', 'shortlisted', 'interview', 'hired', 'rejected']
@@ -824,7 +825,7 @@ export default function CompanyDashboard() {
                   </div>
                   <div>
                     <label style={{ fontSize: '10px', fontWeight: '700', color: '#6b7280', display: 'block', marginBottom: '6px' }}>NEW PASSWORD</label>
-                    <input type="password" placeholder="Enter new password" style={{ width: '100%', border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
+                    <PasswordField placeholder="Enter new password" style={{ width: '100%', border: '2px solid #f0f0f0', borderRadius: '10px', padding: '10px 14px', fontSize: '13px', outline: 'none', fontFamily: 'system-ui' }} />
                   </div>
                   <button style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>Update Password</button>
                   <div style={{ borderTop: '1px solid #fee2e2', paddingTop: '16px' }}>

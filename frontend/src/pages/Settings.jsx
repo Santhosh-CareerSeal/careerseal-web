@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 function Settings() {
   const navigate = useNavigate()
@@ -128,12 +129,12 @@ function Settings() {
               <div className="flex flex-col gap-3">
                 <div>
                   <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">New Password</label>
-                  <input type="password" placeholder="Minimum 6 characters" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+                  <PasswordField placeholder="Minimum 6 characters" value={newPassword} onChange={e => setNewPassword(e.target.value)}
                     className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377]" />
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">Confirm Password</label>
-                  <input type="password" placeholder="Re-enter new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
+                  <PasswordField placeholder="Re-enter new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                     className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377]" />
                 </div>
                 <button onClick={handlePasswordChange} disabled={accountLoading}

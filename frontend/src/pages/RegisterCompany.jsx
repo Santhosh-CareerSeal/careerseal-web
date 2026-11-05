@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 function RegisterCompany() {
   const navigate = useNavigate()
@@ -50,7 +51,7 @@ function RegisterCompany() {
   const fieldCls = 'w-full border-2 border-gray-100 rounded-xl px-4 py-2.5 text-sm outline-none bg-white transition-colors focus:border-[#6b4edb] focus:ring-4 focus:ring-[#6b4edb]/12'
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-white">
+    <div className="min-h-screen flex flex-col md:flex-row">
 
       {/* Left — value panel (desktop) */}
       <div className="hidden md:flex md:w-[38%] relative overflow-hidden flex-col text-white px-10 py-12"
@@ -148,7 +149,7 @@ function RegisterCompany() {
                 </div>
                 <div>
                   <label className="text-xs font-bold text-gray-500 mb-1 block">Password *</label>
-                  <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} className={fieldCls} />
+                  <PasswordField placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} className={fieldCls} />
                 </div>
               </div>
             </div>

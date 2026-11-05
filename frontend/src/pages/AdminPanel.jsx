@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 const TABS = [
   { id: 'dashboard', label: 'Dashboard', icon: '📊' },
@@ -351,7 +352,14 @@ function AdminPanel() {
         <div className="flex items-center gap-2">
           <svg width="20" height="20" viewBox="0 0 22 22"><circle cx="11" cy="11" r="11" fill="#6b4edb"/><path d="M6 11.5l3 3l7-7" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
           <span className="text-white font-bold">GRID Admin</span>
-          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${isStaff ? 'bg-[#5dcaa5]/25 text-[#9fe1cb] border border-[#5dcaa5]/40' : 'bg-[#e4b24a]/20 text-[#f4d79a] border border-[#e4b24a]/40'}`}>{isStaff ? 'STAFF' : 'SUPER'}</span>
+          {isStaff ? (
+            <span className="flex items-center gap-1.5 text-[13px] font-bold text-white">
+              {currentUser.name || 'Staff'}
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#5dcaa5]/25 text-[#9fe1cb] border border-[#5dcaa5]/40">staff</span>
+            </span>
+          ) : (
+            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#e4b24a]/20 text-[#f4d79a] border border-[#e4b24a]/40">SUPER</span>
+          )}
         </div>
         <button onClick={handleLogout} className="text-white/50 text-sm hover:text-white">Logout</button>
       </div>
@@ -524,7 +532,7 @@ function AdminPanel() {
                   <input placeholder="TPO name" value={form.tpoName} onChange={e => setForm({ ...form, tpoName: e.target.value })} className={inputCls} />
                   <input placeholder="TPO login email *" value={form.tpoEmail} onChange={e => setForm({ ...form, tpoEmail: e.target.value })} className={inputCls} />
                   <input placeholder="TPO phone" value={form.tpoPhone} onChange={e => setForm({ ...form, tpoPhone: e.target.value })} className={inputCls} />
-                  <input type="password" placeholder="TPO login password *" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={inputCls} />
+                  <PasswordField placeholder="TPO login password *" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} className={inputCls} />
                 </div>
                 <label className="flex items-center gap-2 mt-3 text-sm text-gray-600">
                   <input type="checkbox" checked={form.vetted} onChange={e => setForm({ ...form, vetted: e.target.checked })} className="accent-[#0D7377]" />
@@ -637,9 +645,9 @@ function AdminPanel() {
               <p className="font-bold text-[#1A3C6E] mb-1">Change password</p>
               <p className="text-xs text-gray-400 mb-4">This password protects every user's data on GRID. Use something long and unique.</p>
               <div className="flex flex-col gap-3">
-                <input type="password" placeholder="Current password" value={pwCurrent} onChange={e => setPwCurrent(e.target.value)} className={inputCls} />
-                <input type="password" placeholder="New password (min 8 characters)" value={pwNew} onChange={e => setPwNew(e.target.value)} className={inputCls} />
-                <input type="password" placeholder="Confirm new password" value={pwConfirm} onChange={e => setPwConfirm(e.target.value)}
+                <PasswordField placeholder="Current password" value={pwCurrent} onChange={e => setPwCurrent(e.target.value)} className={inputCls} />
+                <PasswordField placeholder="New password (min 8 characters)" value={pwNew} onChange={e => setPwNew(e.target.value)} className={inputCls} />
+                <PasswordField placeholder="Confirm new password" value={pwConfirm} onChange={e => setPwConfirm(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleChangePassword()} className={inputCls} />
                 {pwMsg && <p className={`text-xs ${pwMsg.includes('updated') || pwMsg.includes('success') ? 'text-[#6b4edb]' : 'text-red-500'}`}>{pwMsg}</p>}
                 <button onClick={handleChangePassword} disabled={pwSaving}

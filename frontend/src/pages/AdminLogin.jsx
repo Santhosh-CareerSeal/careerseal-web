@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 function AdminLogin() {
   const navigate = useNavigate()
@@ -40,7 +41,7 @@ function AdminLogin() {
           <input type="email" placeholder="Admin email" value={email} onChange={e => setEmail(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
-          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}
+          <PasswordField placeholder="Password" value={password} onChange={e => setPassword(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             className="border border-gray-200 rounded-xl px-4 py-3 outline-none focus:border-[#0D7377] text-sm" />
           {error && <p className="text-red-500 text-xs">{error}</p>}

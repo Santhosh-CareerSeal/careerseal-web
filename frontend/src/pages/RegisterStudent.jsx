@@ -3,6 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 function RegisterStudent() {
   const navigate = useNavigate()
@@ -93,7 +94,7 @@ function RegisterStudent() {
       </div>
 
       {/* Right — form */}
-      <div className="flex-1 flex flex-col justify-center px-6 py-10 md:px-14 bg-white">
+      <div className="flex-1 flex flex-col justify-center px-6 py-10 md:px-14">
         <div className="max-w-sm w-full mx-auto">
 
           <button onClick={() => navigate('/register')} className="flex items-center gap-2 text-gray-400 text-sm mb-6 hover:text-[#6b4edb] transition-colors">← Back to options</button>
@@ -126,7 +127,7 @@ function RegisterStudent() {
             </div>
             <div>
               <label className="text-xs font-bold text-[#17304f] mb-1.5 block">Password</label>
-              <input type="password" placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} />
+              <PasswordField placeholder="Minimum 6 characters" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} />
             </div>
 
             <div className="rounded-xl p-3" style={{ background: '#efedff' }}>
@@ -134,7 +135,7 @@ function RegisterStudent() {
             </div>
 
             <button onClick={handleSubmit} disabled={loading}
-              className="w-full text-white py-3 rounded-xl font-bold disabled:opacity-50 transition-opacity mt-1"
+              className="grid-shine w-full text-white py-3 rounded-xl font-bold disabled:opacity-50 transition-opacity mt-1"
               style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
               {loading ? 'Creating account…' : 'Create account →'}
             </button>

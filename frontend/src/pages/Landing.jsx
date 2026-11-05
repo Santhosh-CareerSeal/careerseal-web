@@ -14,7 +14,7 @@ function Landing() {
   try { loggedUser = JSON.parse(localStorage.getItem('user') || '{}') } catch (e) {}
   const loginDest = loggedUser.role === 'company' ? '/company' : loggedUser.role === 'college' ? '/college-portal' : loggedUser.role === 'admin' ? '/admin' : '/dashboard'
   return (
-    <div style={{ background: '#fff', minHeight: '100vh' }}>
+    <div style={{ background: 'transparent', minHeight: '100vh' }}>
       <div style={{ background: 'linear-gradient(135deg,#0c1f3d,#3c3489)', padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', position: 'sticky', top: 0, zIndex: 50 }}>
         <Link to={getHomeDest()} style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <span style={{ width: '24px', height: '24px', borderRadius: '50%', background: '#6b4edb', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -28,7 +28,7 @@ function Landing() {
           ) : (
             <>
               <Link to="/login" style={{ color: 'rgba(255,255,255,0.85)', fontSize: '13px', fontWeight: 600, textDecoration: 'none', padding: '8px 14px' }}>Log in</Link>
-              <Link to="/register" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: '#fff', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Get started</Link>
+              <Link to="/register" className="grid-shine" style={{ display: 'inline-block', background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: '#fff', fontSize: '13px', fontWeight: 700, textDecoration: 'none', padding: '8px 16px', borderRadius: '8px' }}>Get started</Link>
             </>
           )}
         </div>
@@ -43,7 +43,7 @@ function Landing() {
             GRID gives every student a verified career identity — skills tested, documents checked — so companies can trust what they see, and no one gets overlooked for lack of a fancy resume.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/register-student" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>Create your GRID Card</Link>
+            <Link to="/register-student" className="grid-shine" style={{ display: 'inline-block', background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>Create your GRID Card</Link>
             <a href="#how" style={{ background: 'rgba(255,255,255,0.12)', color: '#fff', fontSize: '15px', fontWeight: 600, textDecoration: 'none', padding: '13px 28px', borderRadius: '10px' }}>See how it works</a>
           </div>
           <p style={{ fontSize: '13px', color: 'rgba(255,255,255,0.7)', margin: '18px 0 0' }}>Hiring, or a college? <a href="#audiences" style={{ color: '#9FE1CB', fontWeight: 700, textDecoration: 'none' }}>Choose your path below ↓</a></p>
@@ -65,7 +65,7 @@ function Landing() {
         </div>
       </div>
 
-      <div id="how" style={{ background: '#f4f6f9', padding: '3.5rem 1.5rem' }}>
+      <div id="how" style={{ background: 'transparent', padding: '3.5rem 1.5rem' }}>
         <div style={{ maxWidth: '860px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '26px', fontWeight: 800, color: '#1A3C6E', textAlign: 'center', margin: '0 0 8px' }}>How GRID works</h2>
           <p style={{ fontSize: '14px', color: '#8a929c', textAlign: 'center', margin: '0 0 32px' }}>Three steps to a career identity companies trust.</p>
@@ -109,7 +109,7 @@ function Landing() {
       <div style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)', padding: '3rem 1.5rem', textAlign: 'center', color: '#fff' }}>
         <h2 style={{ fontSize: '26px', fontWeight: 800, margin: '0 0 10px' }}>Your verified career starts here</h2>
         <p style={{ fontSize: '15px', color: 'rgba(255,255,255,0.85)', margin: '0 0 22px' }}>Join GRID free and build a career identity companies trust.</p>
-        <Link to="/register-student" style={{ background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 30px', borderRadius: '10px' }}>Create your GRID Card</Link>
+        <Link to="/register-student" className="grid-shine" style={{ display: 'inline-block', background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 30px', borderRadius: '10px' }}>Create your GRID Card</Link>
       </div>
 
       <Footer />

@@ -57,7 +57,7 @@ function Register() {
                   </div>
                 ))}
               </div>
-              <div className="text-center py-2.5 rounded-xl font-bold text-sm text-white" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>{c.cta}</div>
+              <div className="grid-shine text-center py-2.5 rounded-xl font-bold text-sm text-white" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>{c.cta}</div>
             </div>
           ))}
         </div>

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 function ResetPassword() {
   const navigate = useNavigate()
@@ -48,13 +49,13 @@ function ResetPassword() {
           <div className="flex flex-col gap-4">
             <div>
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">New Password</label>
-              <input type="password" placeholder="Minimum 6 characters" value={newPassword}
+              <PasswordField placeholder="Minimum 6 characters" value={newPassword}
                 onChange={e => setNewPassword(e.target.value)}
                 className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>
             </div>
             <div>
               <label className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-1 block">Confirm Password</label>
-              <input type="password" placeholder="Repeat your password" value={confirmPassword}
+              <PasswordField placeholder="Repeat your password" value={confirmPassword}
                 onChange={e => setConfirmPassword(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleReset()}
                 className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377] transition-colors"/>

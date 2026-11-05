@@ -3,6 +3,7 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import PasswordField from '../components/PasswordField'
 
 function Login({ fixedRole }) {
   const navigate = useNavigate()
@@ -134,7 +135,7 @@ function Login({ fixedRole }) {
       </div>
 
       {/* Right — form */}
-      <div className="md:w-1/2 flex flex-col justify-center px-8 md:px-14 py-12 bg-white">
+      <div className="md:w-1/2 flex flex-col justify-center px-8 md:px-14 py-12">
         <div className="max-w-sm mx-auto w-full">
 
           {fromRegister && (
@@ -160,7 +161,7 @@ function Login({ fixedRole }) {
 
           <div className="flex flex-col gap-3">
             <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} autoComplete="off" />
-            <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} autoComplete="off" />
+            <PasswordField placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} autoComplete="off" />
             <button onClick={() => setShowForgot(true)} className="text-right text-xs text-[#6b4edb] font-bold -mt-1">Forgot password?</button>
             <button onClick={handleSubmit} disabled={loading}
               className="text-white py-3 rounded-xl font-bold mt-1 disabled:opacity-50 transition-opacity"
