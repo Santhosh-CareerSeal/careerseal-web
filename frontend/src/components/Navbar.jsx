@@ -1,15 +1,21 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import axios from 'axios'
 import API_URL from '../config'
 import { clearCache } from '../utils/apiCache'
 import { useNavigate, useLocation } from 'react-router-dom'
 import getHomeDest from '../utils/homeDest'
+import BottomNav from './BottomNav'
 
 function Navbar({ student, user }) {
   const navigate = useNavigate()
   const location = useLocation()
-  const [menuOpen, setMenuOpen] = useState(false)
   const [showDropdown, setShowDropdown] = useState(false)
+
+  // Reserve space at the bottom on mobile so content clears the app tab bar.
+  useEffect(() => {
+    document.body.classList.add('has-bottomnav')
+    return () => document.body.classList.remove('has-bottomnav')
+  }, [])
 
   const navItems = [
     { label: 'Dashboard', path: '/dashboard' },
@@ -89,7 +95,7 @@ function Navbar({ student, user }) {
           <div className="w-px h-4 bg-white/20 mx-1"></div>
         </div>
 
-        <div className="flex md:hidden items-center gap-3">
+        <div className="flex md:hidden items-center">
           <div className="relative">
             <button onClick={() => setShowDropdown(!showDropdown)} className="flex focus:outline-none">
               {student?.photoUrl ? (
@@ -101,7 +107,7 @@ function Navbar({ student, user }) {
               )}
             </button>
             {showDropdown && (
-              <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-44 z-50">
+              <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-44 z-[70]">
                 <button onClick={() => { setShowDropdown(false); navigate('/profile-details') }}
                   className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
                   <div className="w-6 h-6 rounded-full bg-[#f0f4ff] flex items-center justify-center text-[#1A3C6E] text-xs font-bold">
@@ -109,6 +115,10 @@ function Navbar({ student, user }) {
                   </div>
                   My Profile
                 </button>
+                <button onClick={() => { setShowDropdown(false); navigate('/courses') }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Courses</button>
+                <button onClick={() => { setShowDropdown(false); navigate('/settings') }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">Settings</button>
                 <div className="h-px bg-gray-100 mx-2"></div>
                 <button onClick={() => { setShowDropdown(false); handleLogout() }}
                   className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2">
@@ -118,29 +128,10 @@ function Navbar({ student, user }) {
               </div>
             )}
           </div>
-          <button onClick={() => setMenuOpen(!menuOpen)} className="text-white p-1">
-            {menuOpen ? (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            ) : (
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            )}
-          </button>
         </div>
       </div>
 
-      {menuOpen && (
-        <div className="md:hidden bg-[#0f1e3d] border-t border-white/10">
-          {navItems.map(item => (
-            <button key={item.path} onClick={() => { navigate(item.path); setMenuOpen(false) }}
-              className={`w-full text-left px-5 py-3 text-sm font-medium border-b border-white/5 transition-colors ${isActive(item.path) ? 'text-white bg-[#1A3C6E]' : 'text-white/70 hover:text-white hover:bg-white/5'}`}>
-              {item.label}
-            </button>
-          ))}
-          <button onClick={handleLogout} className="w-full text-left px-5 py-3 text-sm text-red-400 hover:text-red-300 hover:bg-white/5">
-            Logout
-          </button>
-        </div>
-      )}
+      <BottomNav />
     </div>
   )
 }

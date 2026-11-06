@@ -68,6 +68,9 @@ input::-ms-clear { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .roadmap-reveal { opacity: 1; animation: none; } }
 
+/* Reserve space for the mobile app tab bar so content isn't hidden behind it. */
+@media (max-width: 767px) { body.has-bottomnav { padding-bottom: 72px; } }
+
 /* Typewriter cursor. */
 .tw-cursor { display: inline-block; margin-left: 1px; opacity: 0.8; animation: twBlink 0.9s steps(1) infinite; }
 @keyframes twBlink { 0%, 50% { opacity: 0.8; } 50.01%, 100% { opacity: 0; } }
