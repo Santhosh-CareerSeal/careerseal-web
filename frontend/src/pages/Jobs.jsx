@@ -84,6 +84,7 @@ function Jobs() {
   const [sortBy, setSortBy] = useState('match')
   const [activeChip, setActiveChip] = useState('All jobs')
   const [filters, setFilters] = useState({ jobType: [], salary: [], experience: [] })
+  const [showFilters, setShowFilters] = useState(false)
 
   const chips = ['All jobs', 'Full-time', 'Internship', 'Remote', 'Fresher', '0–5 LPA', '5–10 LPA', '10+ LPA']
 
@@ -225,8 +226,15 @@ function Jobs() {
 
       <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto">
 
+        {/* Mobile filter toggle */}
+        <button onClick={() => setShowFilters(s => !s)}
+          className="md:hidden flex items-center justify-center gap-2 bg-white border border-gray-200 rounded-xl py-2.5 text-sm font-bold text-[#1A3C6E]">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>
+          {showFilters ? 'Hide filters' : 'Filters'}
+        </button>
+
         {/* Filter panel */}
-        <div className="hidden md:block w-52 flex-shrink-0">
+        <div className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-52 flex-shrink-0`}>
           <div className="bg-white rounded-2xl p-4 border border-gray-100 sticky top-4">
             <p className="text-sm font-bold text-[#1A3C6E] mb-4">Filters</p>
 

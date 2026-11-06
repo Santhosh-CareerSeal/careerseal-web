@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly, superOnly } = require('../middleware/adminMiddleware')
 
@@ -33,6 +33,7 @@ router.patch('/colleges/:collegeId/vetted', protect, superOnly, toggleCollegeVet
 router.patch('/companies/:companyId/verify', protect, superOnly, toggleCompanyVerified)
 router.patch('/fraud-flags/:flagId', protect, superOnly, resolveFraudFlag)
 router.patch('/ask-questions/:questionId', protect, superOnly, updateAskQuestion)
+router.delete('/ask-questions/:questionId', protect, superOnly, deleteAskQuestion)
 router.post('/grant-retake', protect, superOnly, grantExamRetake)
 router.patch('/users/:userId/active', protect, superOnly, setUserActive) // real activate/deactivate switch
 router.get('/staff', protect, superOnly, listStaff)

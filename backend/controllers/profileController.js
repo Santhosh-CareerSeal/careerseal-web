@@ -68,7 +68,13 @@ const completeProfile = async (req, res) => {
         education, schoolCollege, skills, profileComplete: true
       }
     })
-    res.json({ message: 'Profile saved successfully', student })
+    // Keep the account display name in sync with the profile's legal name
+    let updatedName
+    if (legalFullName && legalFullName.trim()) {
+      const u = await prisma.user.update({ where: { id: userId }, data: { name: legalFullName.trim() } })
+      updatedName = u.name
+    }
+    res.json({ message: 'Profile saved successfully', student, name: updatedName })
     try {
       const { checkStudentProfile } = require('../utils/fraudDetection')
       checkStudentProfile(student).catch(e => console.error('Fraud check failed:', e.message))

@@ -54,7 +54,7 @@ function AskGrid() {
   return (
     <>
       {open && (
-        <div style={{ position: 'fixed', bottom: '90px', right: '20px', width: '340px', maxWidth: 'calc(100vw - 40px)', height: '460px', maxHeight: 'calc(100vh - 140px)', background: 'white', borderRadius: '18px', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', zIndex: 9998, overflow: 'hidden', fontFamily: 'system-ui, sans-serif' }}>
+        <div style={{ position: 'fixed', bottom: isMobile ? '150px' : '90px', right: '20px', width: '340px', maxWidth: 'calc(100vw - 40px)', height: '460px', maxHeight: isMobile ? 'calc(100vh - 210px)' : 'calc(100vh - 140px)', background: 'white', borderRadius: '18px', boxShadow: '0 8px 32px rgba(0,0,0,0.18)', display: 'flex', flexDirection: 'column', zIndex: 9998, overflow: 'hidden', fontFamily: 'system-ui, sans-serif' }}>
           <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)', padding: '14px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
               <p style={{ color: 'white', fontWeight: 700, fontSize: '14px', margin: 0 }}>Ask GRID</p>
@@ -101,7 +101,7 @@ function AskGrid() {
         @keyframes agBounce { 0%,20%,50%,80%,100% { transform: translateY(0) } 40% { transform: translateY(-12px) } 60% { transform: translateY(-6px) } }
       `}</style>
       <button onClick={() => { setOpen(o => !o); setNudged(true) }} aria-label="Ask GRID"
-        style={{ position: 'fixed', bottom: '20px', right: '20px', height: isMobile ? '56px' : '52px', width: isMobile ? '56px' : 'auto', padding: isMobile ? '0' : (open ? '0 18px' : '0 20px 0 7px'), borderRadius: isMobile ? '50%' : '26px', background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(107,78,219,0.3)', cursor: 'pointer', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '0' : '10px', animation: (isMobile && !open && !nudged) ? 'agBounce 2s ease-in-out infinite' : 'none' }}>
+        style={{ position: 'fixed', bottom: isMobile ? '84px' : '20px', right: '20px', height: isMobile ? '56px' : '52px', width: isMobile ? '56px' : 'auto', padding: isMobile ? '0' : (open ? '0 18px' : '0 20px 0 7px'), borderRadius: isMobile ? '50%' : '26px', background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', boxShadow: '0 4px 16px rgba(107,78,219,0.3)', cursor: 'pointer', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: isMobile ? '0' : '10px', animation: (isMobile && !open && !nudged) ? 'agBounce 2s ease-in-out infinite' : 'none' }}>
         {open ? (
           <span style={{ fontSize: '15px', fontWeight: 700 }}>Close</span>
         ) : (

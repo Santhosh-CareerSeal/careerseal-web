@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import { supabase } from '../supabaseClient'
+import { invalidate } from '../utils/apiCache'
 
 const TABS = ['Personal', 'Education', 'Profession', 'Skills', 'Others', 'Documents']
 const STEP_META = [
@@ -320,12 +321,22 @@ function ProfileDetails() {
       setError(e.response?.data?.message || 'Could not save. Please try again.')
     } finally { setSavingStep(false) }
   }
+  // Keep the account display name (navbar/dashboard) in sync with the saved profile name,
+  // and clear cached profile/dashboard data so the new values show immediately.
+  const syncNameAndCache = (newName) => {
+    if (newName) {
+      try { const u = JSON.parse(localStorage.getItem('user') || '{}'); u.name = newName; localStorage.setItem('user', JSON.stringify(u)) } catch (e) {}
+    }
+    invalidate('/api/profile/details', '/api/dashboard')
+  }
+
   const handleSave = async () => {
     setSaving(true); setError(''); setSuccess('')
     try {
       const photoUrl = photoFile ? await uploadPhoto() : form.photoUrl
       const token = localStorage.getItem('token')
-      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
+      const resp = await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
+      syncNameAndCache(resp.data?.name)
       setSuccess('Profile saved successfully!')
       setForm(f => ({ ...f, photoUrl }))
       setTimeout(() => navigate('/dashboard'), 1500)
@@ -338,7 +349,8 @@ function ProfileDetails() {
     try {
       const photoUrl = photoFile ? await uploadPhoto() : form.photoUrl
       const token = localStorage.getItem('token')
-      await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
+      const cResp = await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
+      syncNameAndCache(cResp.data?.name)
       const res = await axios.post(`${API_URL}/api/profile/move-to-grid`, {}, { headers: { Authorization: `Bearer ${token}` } })
       setUpdatesRemaining(res.data.updatesRemaining)
       setGridMsg(`Published to GRID! ${res.data.updatesRemaining} update${res.data.updatesRemaining !== 1 ? 's' : ''} remaining this month.`)

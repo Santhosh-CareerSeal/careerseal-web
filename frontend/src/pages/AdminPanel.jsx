@@ -184,6 +184,11 @@ function AdminPanel() {
       await loadAskQs()
     } catch (e) { alert('Could not update') }
   }
+  const deleteQuestion = async (q) => {
+    if (!window.confirm('Delete this question permanently?')) return
+    try { await axios.delete(`${API_URL}/api/admin/ask-questions/${q.id}`, { headers }); setMsg('Question deleted'); await loadAskQs() }
+    catch (e) { setMsg(e.response?.data?.message || 'Could not delete') }
+  }
   const saveAnswer = async (q, override) => {
     const text = override !== undefined ? override : (answerDrafts[q.id] ?? q.adminAnswer ?? '')
     setSavingAns(q.id)
@@ -854,7 +859,15 @@ function AdminPanel() {
                 <p className="text-sm text-gray-400 p-6 text-center">No questions yet</p>
               ) : askQs.map(q => (
                 <div key={q.id} className="px-4 py-3 border-b border-gray-50 last:border-0">
-                  <p className="text-sm font-bold text-[#1A3C6E]">{q.question}</p>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-sm font-bold text-[#1A3C6E]">{q.question}</p>
+                    {!isStaff && (
+                      <button onClick={() => deleteQuestion(q)} title="Delete question" aria-label="Delete question"
+                        className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-gray-400 hover:text-red-500 hover:bg-red-50">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                      </button>
+                    )}
+                  </div>
                   <p className="text-xs text-gray-400 mt-1 line-clamp-2">{q.answer}</p>
                   <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.offTopic ? 'bg-gray-100 text-gray-600' : q.answered ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>

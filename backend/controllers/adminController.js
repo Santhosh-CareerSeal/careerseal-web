@@ -635,6 +635,15 @@ const listAdminRequests = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
 }
 
+const deleteAskQuestion = async (req, res) => {
+  try {
+    await prisma.askQuestion.delete({ where: { id: parseInt(req.params.questionId) } })
+    res.json({ message: 'Question deleted' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 const resolveAdminRequest = async (req, res) => {
   try {
     const requestId = parseInt(req.params.requestId)
@@ -662,4 +671,4 @@ const resolveAdminRequest = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
 }
 
-module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
+module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
