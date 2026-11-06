@@ -37,3 +37,8 @@ body { background-color: #f4f6f9; }
   100% { transform: translateX(260%) skewX(-18deg); }
 }
 @media (prefers-reduced-motion: reduce) { .grid-shine::after { animation: none; } }
+
+/* Hide the browser's built-in password reveal/clear icons (Edge/IE) so only
+   our custom PasswordField eye shows — otherwise users see two eyes. */
+input::-ms-reveal,
+input::-ms-clear { display: none; }
