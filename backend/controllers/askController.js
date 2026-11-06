@@ -35,6 +35,21 @@ const askGrid = async (req, res) => {
     const kb = loadKnowledge()
     if (!kb) throw new Error('Knowledge base missing')
 
+    // Curated answers the super admin added in the panel — appended as extra knowledge.
+    let adminKb = ''
+    try {
+      const answered = await prisma.askQuestion.findMany({
+        where: { adminAnswer: { not: null } },
+        select: { question: true, adminAnswer: true },
+        orderBy: { createdAt: 'desc' },
+        take: 200
+      })
+      if (answered.length) {
+        adminKb = '\n\n## Answers added by the GRID team\n' +
+          answered.map(a => `Q: ${a.question}\nA: ${a.adminAnswer}`).join('\n\n')
+      }
+    } catch (e) { /* non-fatal */ }
+
     const prompt = `You are "Ask GRID", the help assistant for a platform called GRID (The GRID Card).
 
 STRICT RULES — follow exactly:
@@ -46,7 +61,7 @@ STRICT RULES — follow exactly:
 6. Never give legal, financial or medical advice.
 
 === GRID KNOWLEDGE ===
-${kb}
+${kb}${adminKb}
 === END KNOWLEDGE ===
 
 User question: "${q}"

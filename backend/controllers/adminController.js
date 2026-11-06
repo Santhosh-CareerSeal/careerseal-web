@@ -355,10 +355,20 @@ const getAskQuestions = async (req, res) => {
 const updateAskQuestion = async (req, res) => {
   try {
     const { questionId } = req.params
-    const { status } = req.body
+    const { status, adminAnswer } = req.body
+    const data = {}
+    if (status !== undefined) data.status = status
+    if (adminAnswer !== undefined) {
+      const trimmed = (adminAnswer || '').trim()
+      data.adminAnswer = trimmed || null
+      // saving a real answer resolves the question; clearing it reopens
+      data.status = trimmed ? 'done' : 'new'
+      data.answered = trimmed ? true : false
+    }
+    if (status === undefined && adminAnswer === undefined) data.status = 'done'
     const updated = await prisma.askQuestion.update({
       where: { id: parseInt(questionId) },
-      data: { status: status || 'done' }
+      data
     })
     res.json({ message: 'Updated', question: updated })
   } catch (error) {

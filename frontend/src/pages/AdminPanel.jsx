@@ -22,6 +22,8 @@ function AdminPanel() {
   const [active, setActive] = useState('dashboard')
   const [stats, setStats] = useState(null)
   const [activity, setActivity] = useState([])
+  const [answerDrafts, setAnswerDrafts] = useState({})
+  const [savingAns, setSavingAns] = useState(null)
   const [colleges, setColleges] = useState([])
   const [users, setUsers] = useState([])
   const [companies, setCompanies] = useState([])
@@ -181,6 +183,17 @@ function AdminPanel() {
       await axios.patch(`${API_URL}/api/admin/ask-questions/${id}`, { status: 'done' }, { headers })
       await loadAskQs()
     } catch (e) { alert('Could not update') }
+  }
+  const saveAnswer = async (q, override) => {
+    const text = override !== undefined ? override : (answerDrafts[q.id] ?? q.adminAnswer ?? '')
+    setSavingAns(q.id)
+    try {
+      await axios.patch(`${API_URL}/api/admin/ask-questions/${q.id}`, { adminAnswer: text }, { headers })
+      setMsg(text.trim() ? 'Answer saved — Ask GRID will use it.' : 'Answer cleared.')
+      setAnswerDrafts(d => { const n = { ...d }; delete n[q.id]; return n })
+      await loadAskQs()
+    } catch (e) { setMsg(e.response?.data?.message || 'Could not save answer') }
+    finally { setSavingAns(null) }
   }
   const loadFlags = async () => {
     try {
@@ -841,24 +854,36 @@ function AdminPanel() {
                 <p className="text-sm text-gray-400 p-6 text-center">No questions yet</p>
               ) : askQs.map(q => (
                 <div key={q.id} className="px-4 py-3 border-b border-gray-50 last:border-0">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-bold text-[#1A3C6E]">{q.question}</p>
-                      <p className="text-xs text-gray-400 mt-1 line-clamp-2">{q.answer}</p>
+                  <p className="text-sm font-bold text-[#1A3C6E]">{q.question}</p>
+                  <p className="text-xs text-gray-400 mt-1 line-clamp-2">{q.answer}</p>
+                  <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.offTopic ? 'bg-gray-100 text-gray-600' : q.answered ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {q.offTopic ? 'Off-topic' : q.answered ? 'Answered' : 'Needs answer'}
+                    </span>
+                    <span className="text-[10px] text-gray-400">{q.userRole || 'guest'}</span>
+                    <span className="text-[10px] text-gray-400">{new Date(q.createdAt).toLocaleDateString()}</span>
+                    {q.adminAnswer && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#efedff] text-[#6b4edb]">Team answer saved</span>}
+                  </div>
+                  {!isStaff && !q.offTopic && (
+                    <div className="mt-2.5">
+                      <textarea
+                        value={answerDrafts[q.id] ?? q.adminAnswer ?? ''}
+                        onChange={e => setAnswerDrafts(d => ({ ...d, [q.id]: e.target.value }))}
+                        placeholder="Write the official answer — it's saved to GRID's knowledge and the assistant will use it on the next question…"
+                        rows={2}
+                        className="w-full border-[1.5px] border-[#e3e0f7] focus:border-[#6b4edb] rounded-xl p-2.5 text-xs text-[#17304f] outline-none resize-y" />
                       <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${q.offTopic ? 'bg-gray-100 text-gray-600' : q.answered ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-                          {q.offTopic ? 'Off-topic' : q.answered ? 'Answered' : 'Needs answer'}
-                        </span>
-                        <span className="text-[10px] text-gray-400">{q.userRole || 'guest'}</span>
-                        <span className="text-[10px] text-gray-400">{new Date(q.createdAt).toLocaleDateString()}</span>
-                        {q.status === 'done' && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#E1F5EE] text-[#085041]">Added to KB</span>}
+                        <button onClick={() => saveAnswer(q)} disabled={savingAns === q.id}
+                          className="text-xs font-bold px-3.5 py-1.5 rounded-lg text-white disabled:opacity-50" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
+                          {savingAns === q.id ? 'Saving…' : q.adminAnswer ? 'Update answer' : 'Save answer'}</button>
+                        {q.adminAnswer && (
+                          <button onClick={() => { setAnswerDrafts(d => ({ ...d, [q.id]: '' })); saveAnswer({ ...q, adminAnswer: '' }, '') }} disabled={savingAns === q.id}
+                            className="text-xs font-bold px-3 py-1.5 rounded-lg bg-gray-100 text-gray-500 hover:bg-gray-200 disabled:opacity-50">Clear</button>
+                        )}
+                        <span className="text-[10px] text-gray-400">Stored to knowledge · used on the next question</span>
                       </div>
                     </div>
-                    {!isStaff && !q.answered && !q.offTopic && q.status !== 'done' && (
-                      <button onClick={() => markAskDone(q.id)}
-                        className="text-xs font-bold px-3 py-1.5 rounded-lg bg-[#0D7377] text-white hover:bg-[#0a5f63] whitespace-nowrap flex-shrink-0">Mark added</button>
-                    )}
-                  </div>
+                  )}
                 </div>
               ))}
             </div>

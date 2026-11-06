@@ -298,18 +298,20 @@ model FraudFlag {
 }
 
 model AskQuestion {
-  id         Int      @id @default(autoincrement())
-  question   String
-  answer     String?
-  answered   Boolean  @default(true)
-  offTopic   Boolean  @default(false)
-  userId     Int?
-  userRole   String?
-  status     String   @default("new")
-  createdAt  DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  question    String
+  answer      String?
+  adminAnswer String?  // curated answer written by the super admin; fed to the AI as knowledge
+  answered    Boolean  @default(true)
+  offTopic    Boolean  @default(false)
+  userId      Int?
+  userRole    String?
+  status      String   @default("new")
+  createdAt   DateTime @default(now())
 
   @@index([answered])
   @@index([status])
+  @@index([adminAnswer])
 }
 
 model ExamPaper {
