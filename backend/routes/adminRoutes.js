@@ -1,6 +1,6 @@
 const express = require('express')
 const router = express.Router()
-const { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly, superOnly } = require('../middleware/adminMiddleware')
 
@@ -9,6 +9,7 @@ router.post('/login', adminLogin)
 
 // --- Reads: both super and staff ---
 router.get('/stats', protect, adminOnly, getAdminStats)
+router.get('/activity', protect, adminOnly, getRecentActivity)
 router.get('/colleges', protect, adminOnly, getAdminColleges)
 router.get('/users', protect, adminOnly, getAdminUsers)
 router.get('/companies', protect, adminOnly, getAdminCompanies)

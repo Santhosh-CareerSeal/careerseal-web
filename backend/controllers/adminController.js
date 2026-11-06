@@ -29,13 +29,15 @@ const adminLogin = async (req, res) => {
 // Platform stats
 const getAdminStats = async (req, res) => {
   try {
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
     const [
       totalUsers, totalStudents, totalCompanies, totalColleges, totalAdmins,
       publishedGrids, totalJobs, totalApplications,
       verifiedEmails, unverifiedEmails,
       verifiedCompanies, pendingCompanies,
       vettedColleges, pendingColleges,
-      profileComplete
+      profileComplete,
+      newUsers, newStudents, newCompanies, newColleges, newJobs, newApplications
     ] = await Promise.all([
       prisma.user.count(),
       prisma.user.count({ where: { role: 'student' } }),
@@ -51,7 +53,14 @@ const getAdminStats = async (req, res) => {
       prisma.company.count({ where: { OR: [{ mcaStatus: { not: 'verified' } }, { mcaStatus: null }] } }),
       prisma.college.count({ where: { vetted: true } }),
       prisma.college.count({ where: { vetted: false } }),
-      prisma.student.count({ where: { profileComplete: true } })
+      prisma.student.count({ where: { profileComplete: true } }),
+      // last-7-days deltas (where a createdAt timestamp exists)
+      prisma.user.count({ where: { createdAt: { gte: weekAgo } } }),
+      prisma.user.count({ where: { role: 'student', createdAt: { gte: weekAgo } } }),
+      prisma.user.count({ where: { role: 'company', createdAt: { gte: weekAgo } } }),
+      prisma.college.count({ where: { createdAt: { gte: weekAgo } } }),
+      prisma.job.count({ where: { createdAt: { gte: weekAgo } } }),
+      prisma.application.count({ where: { createdAt: { gte: weekAgo } } })
     ])
     res.json({
       totalUsers, totalStudents, totalCompanies, totalColleges, totalAdmins,
@@ -60,8 +69,37 @@ const getAdminStats = async (req, res) => {
       verifiedCompanies, pendingCompanies,
       vettedColleges, pendingColleges,
       profileComplete,
-      unpublishedGrids: totalStudents - publishedGrids
+      unpublishedGrids: totalStudents - publishedGrids,
+      deltas: {
+        users: newUsers, students: newStudents, companies: newCompanies,
+        colleges: newColleges, jobs: newJobs, applications: newApplications
+      }
     })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Recent activity feed — most recent signups, applications, and job posts, merged.
+const getRecentActivity = async (req, res) => {
+  try {
+    const [users, apps, jobs] = await Promise.all([
+      prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: 8, select: { name: true, role: true, createdAt: true } }),
+      prisma.application.findMany({
+        orderBy: { createdAt: 'desc' }, take: 8,
+        select: { createdAt: true, student: { select: { user: { select: { name: true } } } }, job: { select: { title: true } } }
+      }),
+      prisma.job.findMany({
+        orderBy: { createdAt: 'desc' }, take: 8,
+        select: { createdAt: true, title: true, company: { select: { companyName: true } } }
+      })
+    ])
+    const items = []
+    for (const u of users) items.push({ type: 'signup', label: `New ${u.role || 'user'} signed up`, sublabel: u.name || '—', at: u.createdAt })
+    for (const a of apps) items.push({ type: 'application', label: `${a.student?.user?.name || 'A student'} applied`, sublabel: a.job?.title || 'a job', at: a.createdAt })
+    for (const j of jobs) items.push({ type: 'job', label: `${j.company?.companyName || 'A company'} posted a job`, sublabel: j.title, at: j.createdAt })
+    items.sort((x, y) => new Date(y.at || 0) - new Date(x.at || 0))
+    res.json({ activity: items.slice(0, 12) })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -614,4 +652,4 @@ const resolveAdminRequest = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
 }
 
-module.exports = { adminLogin, getAdminStats, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
+module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }

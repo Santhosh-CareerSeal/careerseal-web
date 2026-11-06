@@ -21,6 +21,7 @@ function AdminPanel() {
   const navigate = useNavigate()
   const [active, setActive] = useState('dashboard')
   const [stats, setStats] = useState(null)
+  const [activity, setActivity] = useState([])
   const [colleges, setColleges] = useState([])
   const [users, setUsers] = useState([])
   const [companies, setCompanies] = useState([])
@@ -63,14 +64,16 @@ function AdminPanel() {
 
   const loadAll = async () => {
     try {
-      const [statsRes, collegesRes, companiesRes] = await Promise.all([
+      const [statsRes, collegesRes, companiesRes, activityRes] = await Promise.all([
         axios.get(`${API_URL}/api/admin/stats`, { headers }),
         axios.get(`${API_URL}/api/admin/colleges`, { headers }),
-        axios.get(`${API_URL}/api/admin/companies`, { headers })
+        axios.get(`${API_URL}/api/admin/companies`, { headers }),
+        axios.get(`${API_URL}/api/admin/activity`, { headers }).catch(() => ({ data: { activity: [] } }))
       ])
       setStats(statsRes.data)
       setColleges(collegesRes.data.colleges || [])
       setCompanies(companiesRes.data.companies || [])
+      setActivity(activityRes.data.activity || [])
     } catch (e) {
       if (e.response?.status === 403 || e.response?.status === 401) navigate('/admin-login')
     } finally {
@@ -385,22 +388,22 @@ function AdminPanel() {
             <h1 className="text-xl font-bold text-[#1A3C6E] mb-4">Platform overview</h1>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
               {[
-                { id: 'users', label: 'TOTAL USERS', value: stats.totalUsers, breakdown: [
+                { id: 'users', label: 'TOTAL USERS', value: stats.totalUsers, delta: stats.deltas?.users, breakdown: [
                   { label: 'Students', value: stats.totalStudents, go: () => { setUserFilter('student'); setActive('users') } },
                   { label: 'Companies', value: stats.totalCompanies, go: () => setActive('companies') },
                   { label: 'Colleges', value: stats.totalColleges, go: () => setActive('colleges') },
                   { label: 'Admins', value: stats.totalAdmins, go: () => { setUserFilter('admin'); setActive('users') } }
                 ]},
-                { id: 'students', label: 'STUDENTS', value: stats.totalStudents, breakdown: [
+                { id: 'students', label: 'STUDENTS', value: stats.totalStudents, delta: stats.deltas?.students, breakdown: [
                   { label: 'Profile complete', value: stats.profileComplete, go: () => { setUserFilter('student'); setVerifyFilter('all'); setActive('users') } },
                   { label: 'Profile incomplete', value: stats.totalStudents - stats.profileComplete, go: () => { setUserFilter('student'); setVerifyFilter('all'); setActive('users') } },
                   { label: 'View all students', value: stats.totalStudents, go: () => { setUserFilter('student'); setVerifyFilter('all'); setActive('users') } }
                 ]},
-                { id: 'companies', label: 'COMPANIES', value: stats.totalCompanies, breakdown: [
+                { id: 'companies', label: 'COMPANIES', value: stats.totalCompanies, delta: stats.deltas?.companies, breakdown: [
                   { label: 'Verified', value: stats.verifiedCompanies, go: () => { setCompanyFilter('verified'); setActive('companies') } },
                   { label: 'Pending', value: stats.pendingCompanies, go: () => { setCompanyFilter('pending'); setActive('companies') } }
                 ]},
-                { id: 'colleges', label: 'COLLEGES', value: stats.totalColleges, breakdown: [
+                { id: 'colleges', label: 'COLLEGES', value: stats.totalColleges, delta: stats.deltas?.colleges, breakdown: [
                   { label: 'Vetted', value: stats.vettedColleges, go: () => { setCollegeFilter('vetted'); setActive('colleges') } },
                   { label: 'Pending', value: stats.pendingColleges, go: () => { setCollegeFilter('pending'); setActive('colleges') } }
                 ]},
@@ -412,10 +415,10 @@ function AdminPanel() {
                   { label: 'Verified', value: stats.verifiedEmails, go: () => { setVerifyFilter('verified'); setUserFilter('all'); setActive('users') } },
                   { label: 'Unverified', value: stats.unverifiedEmails, go: () => { setVerifyFilter('unverified'); setUserFilter('all'); setActive('users') } }
                 ]},
-                { id: 'jobs', label: 'JOBS POSTED', value: stats.totalJobs, breakdown: [
+                { id: 'jobs', label: 'JOBS POSTED', value: stats.totalJobs, delta: stats.deltas?.jobs, breakdown: [
                   { label: 'View companies posting jobs', value: stats.totalJobs, go: () => { setCompanyFilter('all'); setActive('companies') } }
                 ]},
-                { id: 'apps', label: 'APPLICATIONS', value: stats.totalApplications, breakdown: [
+                { id: 'apps', label: 'APPLICATIONS', value: stats.totalApplications, delta: stats.deltas?.applications, breakdown: [
                   { label: 'View all applications', value: stats.totalApplications, go: () => { setAppFilter('all'); setActive('applications') } },
                   { label: 'Hired', value: '', go: () => { setAppFilter('hired'); setActive('applications') } },
                   { label: 'Shortlisted', value: '', go: () => { setAppFilter('shortlisted'); setActive('applications') } }
@@ -425,6 +428,7 @@ function AdminPanel() {
                   className={`bg-white rounded-2xl p-4 border cursor-pointer transition-all ${expanded === s.id ? 'border-[#0D7377] shadow-sm' : 'border-gray-100 hover:border-gray-200'}`}>
                   <p className="text-[10px] text-gray-400 font-bold tracking-wider mb-1">{s.label}</p>
                   <p className="text-2xl font-bold text-[#1A3C6E]">{s.value}</p>
+                  {s.delta > 0 && <span className="inline-block text-[10px] font-bold text-[#0b7a56] bg-[#e3f6ee] px-1.5 py-0.5 rounded-full mt-1">+{s.delta} this week</span>}
                   {expanded === s.id ? (
                     <div className="mt-3 pt-3 border-t border-gray-100 flex flex-col gap-1.5">
                       {s.breakdown.map((b, j) => (
@@ -498,6 +502,34 @@ function AdminPanel() {
                 </>
               )
             })()}
+
+            <h2 className="text-sm font-extrabold text-[#1A3C6E] mt-7 mb-1">Recent activity</h2>
+            <p className="text-xs text-gray-400 mb-3">Latest signups, applications and job posts across the platform.</p>
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+              {activity.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-7">No recent activity yet.</p>
+              ) : activity.map((a, i) => {
+                const dot = a.type === 'signup' ? '#6b4edb' : a.type === 'application' ? '#0d7377' : '#e4b24a'
+                const ago = (() => {
+                  if (!a.at) return ''
+                  const s = Math.floor((Date.now() - new Date(a.at).getTime()) / 1000)
+                  if (s < 60) return 'just now'
+                  if (s < 3600) return Math.floor(s / 60) + 'm ago'
+                  if (s < 86400) return Math.floor(s / 3600) + 'h ago'
+                  return Math.floor(s / 86400) + 'd ago'
+                })()
+                return (
+                  <div key={i} className="flex items-center gap-3 px-4 py-3 border-b border-gray-50 last:border-0">
+                    <span className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: dot }} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-[#17304f] truncate">{a.label}</p>
+                      <p className="text-[11px] text-gray-400 truncate">{a.sublabel}</p>
+                    </div>
+                    <span className="text-[11px] text-gray-400 whitespace-nowrap">{ago}</span>
+                  </div>
+                )
+              })}
+            </div>
           </div>
         )}
 
