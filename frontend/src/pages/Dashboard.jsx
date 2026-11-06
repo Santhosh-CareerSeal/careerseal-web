@@ -5,6 +5,7 @@ import axios from 'axios'
 import Footer from '../components/Footer'
 import API_URL from '../config'
 import { cget } from '../utils/apiCache'
+import Icon from '../components/Icon'
 import Skeleton, { SkeletonCard } from '../components/Skeleton'
 
 const TIPS = [
@@ -186,7 +187,7 @@ function Dashboard() {
 
       {/* Tip of the day — slim purple strip */}
       <div className="px-6 py-2 flex items-center gap-2.5" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 60%,#0d7377)' }}>
-        <i className="ti ti-bulb text-white text-sm flex-shrink-0" aria-hidden="true"></i>
+        <Icon name="bulb" className="text-white text-sm flex-shrink-0" />
         <p className="text-white text-xs md:text-sm">
           <span className="font-bold">Tip · {today.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })}: </span>
           {tip}
@@ -227,7 +228,7 @@ function Dashboard() {
 
           <div className="bg-white rounded-2xl p-4 border border-gray-100">
             <div className="flex items-center gap-2 mb-3">
-              <i className="ti ti-award text-[#6b4edb] text-base" aria-hidden="true"></i>
+              <Icon name="award" className="text-[#6b4edb] text-base" />
               <p className="text-[#1A3C6E] font-bold text-sm">Verification</p>
             </div>
             <div className="flex flex-col gap-2">
@@ -266,7 +267,7 @@ function Dashboard() {
                     )}
                   </div>
                 </div>
-                <i className="ti ti-arrow-right text-amber-600 text-lg flex-shrink-0 mt-1" aria-hidden="true"></i>
+                <Icon name="arrow-right" className="text-amber-600 text-lg flex-shrink-0 mt-1" />
               </div>
             </div>
           )}
@@ -299,7 +300,7 @@ function Dashboard() {
           <div className="bg-white rounded-xl p-4 border border-gray-100">
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-2">
-                <i className="ti ti-trending-up text-[#6b4edb] text-base" aria-hidden="true"></i>
+                <Icon name="trending-up" className="text-[#6b4edb] text-base" />
                 <p className="text-[#1A3C6E] font-bold text-sm">Your activity</p>
               </div>
               <button onClick={() => navigate('/tracker')} className="text-[#6b4edb] text-xs font-bold">View all →</button>
@@ -344,22 +345,22 @@ function Dashboard() {
           {/* Quick actions */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <div onClick={() => navigate('/jobs')} className="rounded-xl p-4 cursor-pointer transition-transform hover:-translate-y-0.5" style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)' }}>
-              <i className="ti ti-briefcase text-white text-xl mb-2 block" aria-hidden="true"></i>
+              <Icon name="briefcase" className="text-white text-xl mb-2 block" />
               <p className="text-white font-bold text-sm">Browse jobs</p>
               <p className="text-white/60 text-xs mt-1">Find your next opportunity</p>
             </div>
             <div onClick={() => navigate('/tracker')} className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-sm transition-shadow border border-gray-100">
-              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#6b4edb]" style={{ background: '#efedff' }}><i className="ti ti-chart-bar text-xl" aria-hidden="true"></i></span>
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#6b4edb]" style={{ background: '#efedff' }}><Icon name="chart-bar" className="text-xl" /></span>
               <p className="text-[#1A3C6E] font-bold text-sm">Track applications</p>
               <p className="text-gray-400 text-xs mt-1">View your pipeline</p>
             </div>
             <div onClick={() => navigate('/exams')} className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-sm transition-shadow border border-gray-100">
-              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#0d7377]" style={{ background: '#e1f1f1' }}><i className="ti ti-certificate text-xl" aria-hidden="true"></i></span>
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#0d7377]" style={{ background: '#e1f1f1' }}><Icon name="certificate" className="text-xl" /></span>
               <p className="text-[#1A3C6E] font-bold text-sm">Take a skill exam</p>
               <p className="text-gray-400 text-xs mt-1">Get your skills verified</p>
             </div>
             <div onClick={() => navigate('/roadmap')} className="bg-white rounded-xl p-4 cursor-pointer hover:shadow-sm transition-shadow border border-gray-100">
-              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#9a7322]" style={{ background: '#fdf3dc' }}><i className="ti ti-route text-xl" aria-hidden="true"></i></span>
+              <span className="w-9 h-9 rounded-lg flex items-center justify-center mb-2 text-[#9a7322]" style={{ background: '#fdf3dc' }}><Icon name="route" className="text-xl" /></span>
               <p className="text-[#1A3C6E] font-bold text-sm">AI Career Roadmap</p>
               <p className="text-gray-400 text-xs mt-1">Your personalised path</p>
             </div>
@@ -368,7 +369,7 @@ function Dashboard() {
           {stats.interviews > 0 && (
             <div className="bg-white rounded-xl p-4 border border-gray-100">
               <div className="flex items-center gap-2 mb-3">
-                <i className="ti ti-calendar-event text-[#6b4edb] text-base" aria-hidden="true"></i>
+                <Icon name="calendar-event" className="text-[#6b4edb] text-base" />
                 <p className="text-[#1A3C6E] font-bold text-sm">Upcoming interviews</p>
               </div>
               <div className="bg-green-50 border border-green-100 rounded-xl p-3">
