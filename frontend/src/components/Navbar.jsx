@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import axios from 'axios'
 import API_URL from '../config'
+import { clearCache } from '../utils/apiCache'
 import { useNavigate, useLocation } from 'react-router-dom'
 import getHomeDest from '../utils/homeDest'
 
@@ -35,6 +36,7 @@ function Navbar({ student, user }) {
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       localStorage.removeItem('college')
+      clearCache() // drop cached API data so the next user starts fresh
       navigate('/login')
     }
   }

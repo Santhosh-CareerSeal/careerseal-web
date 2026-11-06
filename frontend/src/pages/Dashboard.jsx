@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import Footer from '../components/Footer'
 import API_URL from '../config'
+import { cget } from '../utils/apiCache'
+import Skeleton, { SkeletonCard } from '../components/Skeleton'
 
 const TIPS = [
   "Tailor your skills section for each job — profiles with matching skills get 3x more shortlists.",
@@ -60,9 +62,9 @@ function Dashboard() {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
         const [dashRes, profileRes, appRes] = await Promise.all([
-          axios.get(`${API_URL}/api/dashboard/student`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } })
+          cget(`${API_URL}/api/dashboard/student`, { headers: { Authorization: `Bearer ${token}` } }),
+          cget(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
+          cget(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } })
         ])
         setUser(dashRes.data.user)
         setStats(dashRes.data.stats)
@@ -141,8 +143,18 @@ function Dashboard() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <p className="text-[#1A3C6E] text-xl font-bold">Loading...</p>
+    <div className="min-h-screen bg-transparent">
+      <Navbar student={student} user={user} />
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        <Skeleton className="h-16 w-full mb-5" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+          {[0,1,2,3].map(i => <SkeletonCard key={i} />)}
+        </div>
+        <div className="grid md:grid-cols-3 gap-4">
+          <Skeleton className="h-64 w-full" />
+          <Skeleton className="h-64 w-full md:col-span-2" />
+        </div>
+      </div>
     </div>
   )
 

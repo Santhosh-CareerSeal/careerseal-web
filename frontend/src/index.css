@@ -42,3 +42,15 @@ body { background-color: #f4f6f9; }
    our custom PasswordField eye shows — otherwise users see two eyes. */
 input::-ms-reveal,
 input::-ms-clear { display: none; }
+
+/* Shimmer skeleton for loading states. */
+.grid-skeleton {
+  background: linear-gradient(100deg, #eef1f5 30%, #f7f9fb 50%, #eef1f5 70%);
+  background-size: 200% 100%;
+  animation: gridSkeleton 1.3s ease-in-out infinite;
+}
+@keyframes gridSkeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) { .grid-skeleton { animation: none; } }

@@ -3,6 +3,8 @@ import Navbar from '../components/Navbar'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import { cget } from '../utils/apiCache'
+import Skeleton from '../components/Skeleton'
 
 const LEVEL_COLORS = {
   beginner: { bg: '#E1F5EE', color: '#085041', label: 'Beginner' },
@@ -343,8 +345,8 @@ function Exams() {
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
       setUser(storedUser)
       const [profileRes, examRes] = await Promise.all([
-        axios.get(`${API_URL}/api/profile/details`, { headers }),
-        axios.get(`${API_URL}/api/exams`, { headers })
+        cget(`${API_URL}/api/profile/details`, { headers }),
+        cget(`${API_URL}/api/exams`, { headers })
       ])
       setStudent(profileRes.data.student)
       setSkillStatus(examRes.data.skillStatus || [])
@@ -404,8 +406,14 @@ function Exams() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <p className="text-[#1A3C6E] font-bold">Loading your skills...</p>
+    <div className="min-h-screen bg-transparent">
+      <Navbar student={student} user={user} />
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        <Skeleton className="h-10 w-56 mb-5" />
+        <div className="grid sm:grid-cols-2 gap-3">
+          {[0,1,2,3].map(i => <Skeleton key={i} className="h-28 w-full" />)}
+        </div>
+      </div>
     </div>
   )
 

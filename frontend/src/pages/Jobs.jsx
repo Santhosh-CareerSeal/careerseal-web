@@ -4,6 +4,8 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import Footer from '../components/Footer'
+import { cget, invalidate } from '../utils/apiCache'
+import Skeleton from '../components/Skeleton'
 
 const JOB_ICONS = {
   'frontend': '💻', 'react': '⚛️', 'java': '☕', 'python': '🐍',
@@ -93,9 +95,9 @@ function Jobs() {
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
         setUser(storedUser)
         const [jobsRes, profileRes, appRes] = await Promise.all([
-          axios.get(`${API_URL}/api/jobs`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
-          axios.get(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } })
+          cget(`${API_URL}/api/jobs`, { headers: { Authorization: `Bearer ${token}` } }),
+          cget(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
+          cget(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } })
         ])
         setJobs(jobsRes.data.jobs || [])
         setStudent(profileRes.data.student)
@@ -145,6 +147,7 @@ function Jobs() {
       const token = localStorage.getItem('token')
       await axios.post(`${API_URL}/api/applications`, { jobId }, { headers: { Authorization: `Bearer ${token}` } })
       setApplied(prev => [...prev, jobId])
+      invalidate('/api/applications', '/api/dashboard') // reflect the new application on next load
     } catch (e) {
       alert(e.response?.data?.message || 'Could not apply')
     } finally {
@@ -161,8 +164,14 @@ function Jobs() {
   }
 
   if (loading) return (
-    <div className="min-h-screen bg-transparent flex items-center justify-center">
-      <p className="text-[#1A3C6E] text-xl font-bold">Loading jobs...</p>
+    <div className="min-h-screen bg-transparent">
+      <Navbar student={student} user={user} />
+      <div className="max-w-5xl mx-auto px-4 py-6">
+        <Skeleton className="h-10 w-48 mb-5" />
+        <div className="flex flex-col gap-3">
+          {[0,1,2,3].map(i => <Skeleton key={i} className="h-28 w-full" />)}
+        </div>
+      </div>
     </div>
   )
 
