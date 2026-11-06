@@ -196,8 +196,8 @@ function Dashboard() {
 
       <div className="flex flex-col md:flex-row gap-4 p-4 md:p-5 max-w-6xl mx-auto min-h-screen md:items-start">
 
-        {/* Left sidebar — identity only */}
-        <div className="hidden md:flex w-60 flex-shrink-0 flex-col gap-3">
+        {/* Left sidebar — identity (full-width on mobile, fixed sidebar on desktop) */}
+        <div className="flex w-full md:w-60 flex-shrink-0 flex-col gap-3">
 
           <div className="rounded-2xl p-5 flex flex-col items-center gap-3" style={{ background: 'linear-gradient(170deg,#0c1f3d,#3c3489)' }}>
             {student?.photoUrl ? (

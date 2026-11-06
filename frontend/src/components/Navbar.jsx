@@ -90,13 +90,34 @@ function Navbar({ student, user }) {
         </div>
 
         <div className="flex md:hidden items-center gap-3">
-          {student?.photoUrl ? (
-            <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
-          ) : (
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
-              {user?.name?.charAt(0)?.toUpperCase() || 'S'}
-            </div>
-          )}
+          <div className="relative">
+            <button onClick={() => setShowDropdown(!showDropdown)} className="flex focus:outline-none">
+              {student?.photoUrl ? (
+                <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
+              ) : (
+                <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
+                  {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                </div>
+              )}
+            </button>
+            {showDropdown && (
+              <div className="absolute right-0 top-11 bg-white rounded-xl shadow-lg border border-gray-100 py-1 w-44 z-50">
+                <button onClick={() => { setShowDropdown(false); navigate('/profile-details') }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2">
+                  <div className="w-6 h-6 rounded-full bg-[#f0f4ff] flex items-center justify-center text-[#1A3C6E] text-xs font-bold">
+                    {user?.name?.charAt(0)?.toUpperCase() || 'S'}
+                  </div>
+                  My Profile
+                </button>
+                <div className="h-px bg-gray-100 mx-2"></div>
+                <button onClick={() => { setShowDropdown(false); handleLogout() }}
+                  className="w-full text-left px-4 py-2.5 text-sm text-red-500 hover:bg-red-50 flex items-center gap-2">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                  Logout
+                </button>
+              </div>
+            )}
+          </div>
           <button onClick={() => setMenuOpen(!menuOpen)} className="text-white p-1">
             {menuOpen ? (
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>

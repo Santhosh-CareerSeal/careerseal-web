@@ -85,4 +85,6 @@ I forgot my password. Students and companies: use "Forgot password" on the login
 
 How do I get verified? Verify your email via the link or OTP sent when you sign up. Aadhaar and DigiLocker verification are coming soon.
 
+Does GRID have a mobile app (Android or iPhone/iOS)? GRID does not have a separate Android or iPhone app yet. GRID works as a fast, mobile-friendly website that you can open in any browser on your phone — all features (your GRID Card, jobs, exams, roadmap) work there. You can also "Add to Home Screen" from your browser to open GRID like an app with its own icon. A dedicated app may come later.
+
 Contact and support: A dedicated support email address is coming soon. For now, please use the contact options on thegridcard.com.
