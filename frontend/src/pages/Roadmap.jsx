@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import { cget, invalidate } from '../utils/apiCache'
+import Typewriter from '../components/Typewriter'
 
 const STUDENT_QUESTIONS = [
   { id: 'class', question: 'Which class are you currently in?', options: ['8th', '9th', '10th', '11th', '12th', 'College 1st Year', 'College 2nd Year', 'College 3rd Year', 'Final Year'] },
@@ -518,7 +519,9 @@ function Roadmap() {
                     <span className="text-2xl flex-shrink-0">🤖</span>
                     <div>
                       <p className="text-white/50 text-xs mb-1">CAREER INSIGHT</p>
-                      <p className="text-white text-sm leading-relaxed">{displayRoadmap.aiInsight}</p>
+                      <p className="text-white text-sm leading-relaxed">
+                        <Typewriter text={displayRoadmap.aiInsight} animate={!savedRoadmap && !!roadmap} />
+                      </p>
                     </div>
                   </div>
                 )}
