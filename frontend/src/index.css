@@ -54,3 +54,11 @@ input::-ms-clear { display: none; }
   100% { background-position: -200% 0; }
 }
 @media (prefers-reduced-motion: reduce) { .grid-skeleton { animation: none; } }
+
+/* Staggered reveal — cards fade/slide in one-by-one (used for roadmap milestones). */
+.roadmap-reveal { opacity: 0; animation: roadmapReveal 0.5s ease forwards; }
+@keyframes roadmapReveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) { .roadmap-reveal { opacity: 1; animation: none; } }

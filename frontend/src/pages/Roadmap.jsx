@@ -3,6 +3,7 @@ import Navbar from '../components/Navbar'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
+import { cget, invalidate } from '../utils/apiCache'
 
 const STUDENT_QUESTIONS = [
   { id: 'class', question: 'Which class are you currently in?', options: ['8th', '9th', '10th', '11th', '12th', 'College 1st Year', 'College 2nd Year', 'College 3rd Year', 'Final Year'] },
@@ -81,8 +82,8 @@ function Roadmap() {
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
         setUser(storedUser)
         const [profileRes, roadmapRes] = await Promise.all([
-          axios.get(`${API_URL}/api/profile/details`, { headers }),
-          axios.get(`${API_URL}/api/roadmap`, { headers })
+          cget(`${API_URL}/api/profile/details`, { headers }),
+          cget(`${API_URL}/api/roadmap`, { headers })
         ])
         const s = profileRes.data.student
         setStudent(s)
@@ -230,6 +231,7 @@ function Roadmap() {
       const saveRes = await axios.post(`${API_URL}/api/roadmap/save`, { roadmapContent: JSON.stringify(roadmap) }, { headers })
       setRegeneratesRemaining(saveRes.data.regeneratesRemaining)
       setSavedRoadmap(roadmap)
+      invalidate('/api/roadmap') // next visit loads the freshly saved roadmap
       setRoadmapSaved(true)
       setTimeout(() => setRoadmapSaved(false), 3000)
     } catch (e) {
@@ -388,10 +390,31 @@ function Roadmap() {
         {(step === 'roadmap' || step === 'saved') && (
           <div>
             {roadmapLoading ? (
-              <div className="bg-white rounded-2xl p-8 text-center shadow-sm">
-                <div className="w-12 h-12 border-4 border-[#0D7377] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                <p className="text-[#1A3C6E] font-bold text-lg">Generating your personalized roadmap...</p>
-                <p className="text-gray-400 text-sm mt-2">Building step-by-step plan for {selectedCareer?.career}</p>
+              <div>
+                <div style={{ background: 'linear-gradient(135deg, #1a3c6e, #6b4edb 55%, #0d7377)' }} className="rounded-2xl p-6 mb-4">
+                  <p className="text-white/60 text-xs mb-1">BUILDING YOUR ROADMAP</p>
+                  <p className="text-white font-bold text-xl">{selectedCareer?.career}</p>
+                  <div className="mt-4 flex flex-col gap-2.5">
+                    {['Analyzing your goal & background', 'Mapping the milestones', 'Estimating timeline & salary', 'Finalizing your plan'].map((s, i) => (
+                      <div key={i} className="roadmap-reveal flex items-center gap-2.5 text-white/85 text-sm" style={{ animationDelay: `${i * 0.7}s` }}>
+                        <span className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin flex-shrink-0" />
+                        {s}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-col gap-4">
+                  {[0, 1, 2, 3].map(i => (
+                    <div key={i} className="flex gap-4 roadmap-reveal" style={{ animationDelay: `${0.3 + i * 0.25}s` }}>
+                      <div className="w-10 h-10 rounded-full grid-skeleton flex-shrink-0" />
+                      <div className="flex-1 bg-white rounded-2xl border border-gray-100 p-4">
+                        <div className="grid-skeleton h-4 w-32 mb-3 rounded" />
+                        <div className="grid-skeleton h-3 w-full mb-2 rounded" />
+                        <div className="grid-skeleton h-3 w-2/3 rounded" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : displayRoadmap ? (
               <div>
@@ -437,7 +460,7 @@ function Roadmap() {
 
                 <div className="flex flex-col gap-4 mb-4">
                   {displayRoadmap.milestones?.map((milestone, i) => (
-                    <div key={i} className="flex gap-4">
+                    <div key={i} className="flex gap-4 roadmap-reveal" style={{ animationDelay: `${i * 0.12}s` }}>
                       <div className="flex flex-col items-center">
                         <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl flex-shrink-0 ${milestone.status === 'current' ? 'bg-[#1A3C6E]' : milestone.status === 'done' ? 'bg-[#0D7377]' : 'bg-gray-200'}`}>
                           {milestone.emoji}
