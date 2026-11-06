@@ -126,7 +126,7 @@ function JobTracker() {
         </div>
 
         {/* Stat cards */}
-        <div className="grid grid-cols-4 gap-3 mb-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           {[
             { label: 'APPLIED', count: getCount('applied'), color: '#1A3C6E' },
             { label: 'SHORTLISTED', count: getCount('shortlisted'), color: '#EF9F27' },

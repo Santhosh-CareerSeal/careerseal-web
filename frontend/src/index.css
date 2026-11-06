@@ -18,6 +18,11 @@
   --color-ink: #17304f;
 }
 
+/* Prevent any stray wide element from causing horizontal scroll / mobile zoom-out
+   (which was making the desktop navbar appear on phones). Nested overflow-x:auto
+   scroll containers (tables, the A4 card) keep their own scrolling. */
+html, body { overflow-x: hidden; max-width: 100%; }
+
 /* GRID lat/long watermark — faint graticule behind the whole site. */
 body { background-color: #f4f6f9; }
 .grid-watermark { position: fixed; inset: 0; z-index: -1; pointer-events: none; overflow: hidden; }
