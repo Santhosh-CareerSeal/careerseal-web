@@ -38,7 +38,7 @@ function Footer() {
         </div>
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.12)', marginTop: '20px', paddingTop: '14px' }}>
-          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', margin: 0 }}>© 2026 GRID Card Technologies Pvt Ltd. All rights reserved.</p>
+          <p style={{ color: 'rgba(255,255,255,0.35)', fontSize: '11px', margin: 0 }}>© {new Date().getFullYear()} GRID Card Technologies Pvt Ltd. All rights reserved.</p>
         </div>
       </div>
     </footer>

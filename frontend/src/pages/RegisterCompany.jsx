@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import PasswordField from '../components/PasswordField'
+import usePageMeta from '../hooks/usePageMeta'
 
 function RegisterCompany() {
+  usePageMeta({ title: 'Register your company · GRID', description: 'Join GRID to hire skill-verified, document-checked candidates faster.', canonical: 'https://www.thegridcard.com/register-company' })
   const navigate = useNavigate()
   const [companyName, setCompanyName] = useState('')
   const [recruiterName, setRecruiterName] = useState('')

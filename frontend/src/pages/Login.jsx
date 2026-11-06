@@ -4,8 +4,10 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import PasswordField from '../components/PasswordField'
+import usePageMeta from '../hooks/usePageMeta'
 
 function Login({ fixedRole }) {
+  usePageMeta({ title: 'Sign in · GRID', description: 'Log in to your GRID account to manage your verified career identity.' })
   const navigate = useNavigate()
   const location = useLocation()
   const [role, setRole] = useState(fixedRole || 'student')

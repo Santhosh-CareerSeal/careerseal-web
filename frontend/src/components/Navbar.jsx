@@ -61,7 +61,7 @@ function Navbar({ student, user }) {
           <div className="relative">
             <button onClick={() => setShowDropdown(!showDropdown)} className="flex items-center gap-1 focus:outline-none">
               {student?.photoUrl ? (
-                <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
+                <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
               ) : (
                 <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
                   {user?.name?.charAt(0)?.toUpperCase() || 'S'}
@@ -91,7 +91,7 @@ function Navbar({ student, user }) {
 
         <div className="flex md:hidden items-center gap-3">
           {student?.photoUrl ? (
-            <img src={student.photoUrl} className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
+            <img src={student.photoUrl} alt="Profile" className="w-8 h-8 rounded-full object-cover border-2 border-[#6b4edb]" />
           ) : (
             <div className="w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
               {user?.name?.charAt(0)?.toUpperCase() || 'S'}

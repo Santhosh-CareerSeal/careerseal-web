@@ -93,7 +93,7 @@ function Settings() {
         {/* Profile header */}
         <div className="flex items-center gap-4 mb-6">
           {student?.photoUrl ? (
-            <img src={student.photoUrl} className="w-14 h-14 rounded-full object-cover border-2 border-gray-100" />
+            <img src={student.photoUrl} alt="Profile" className="w-14 h-14 rounded-full object-cover border-2 border-gray-100" />
           ) : (
             <div className="w-14 h-14 rounded-full bg-[#0D7377] flex items-center justify-center text-white text-2xl font-bold">
               {user?.name?.charAt(0)?.toUpperCase()}

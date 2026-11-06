@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 import API_URL from '../config'
 import PasswordField from '../components/PasswordField'
+import usePageMeta from '../hooks/usePageMeta'
 
 function RegisterStudent() {
+  usePageMeta({ title: 'Create your GRID Card · GRID', description: 'Sign up as a student and build your verified, skill-tested career identity on GRID.', canonical: 'https://www.thegridcard.com/register-student' })
   const navigate = useNavigate()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
