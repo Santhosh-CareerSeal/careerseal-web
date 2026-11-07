@@ -46,6 +46,8 @@ model Student {
   gridPublished         Boolean       @default(false)
   gridUpdatesThisMonth  Int           @default(0)
   gridLastUpdatedMonth  Int?
+  publishedProfile      Json?         // snapshot shown on the GRID card / public profile; updated only on Move to GRID
+  hasUnpublishedChanges Boolean       @default(false)
   legalFullName         String?
   photoUrl              String?
   dateOfBirth           String?

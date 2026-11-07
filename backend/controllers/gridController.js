@@ -30,17 +30,29 @@ const getGridCard = async (req, res) => {
       })
     }
 
+    // The card shows the PUBLISHED snapshot, not the live draft. Back-fill the
+    // snapshot once for accounts that were published before this feature existed.
+    if (!student.publishedProfile && student.gridPublished) {
+      const { publishedProfile: _old, ...snap } = student
+      await prisma.student.update({ where: { userId }, data: { publishedProfile: snap } })
+      student.publishedProfile = snap
+    }
+    const pub = student.publishedProfile || null
+
     res.json({
       gridCard: {
         gridNumber: student.gridNumber,
         name: user.name,
         email: user.email,
-        education: student.education || 'Not verified yet',
-        skills: student.skills || 'Not added yet',
+        education: (pub?.education) || 'Not verified yet',
+        skills: (pub?.skills) || 'Not added yet',
         aadhaarVerified: false,
         digiLockerVerified: false,
         mcaVerified: false
-      }
+      },
+      published: pub,
+      gridPublished: student.gridPublished,
+      hasUnpublishedChanges: student.hasUnpublishedChanges
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })

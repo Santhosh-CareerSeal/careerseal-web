@@ -39,6 +39,7 @@ function GridCard() {
   const [student, setStudent] = useState(null)
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [notPublished, setNotPublished] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [verifiedSkills, setVerifiedSkills] = useState([])
 
@@ -53,7 +54,8 @@ function GridCard() {
           axios.get(`${API_URL}/api/exams`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { skillStatus: [] } }))
         ])
         setGridCard(gridRes.data.gridCard)
-        setStudent(profileRes.data.student)
+        setStudent(gridRes.data.published) // the PUBLISHED snapshot, not the live draft
+        setNotPublished(!gridRes.data.published)
         setVerifiedSkills(examRes.data.skillStatus || [])
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
         setUser(storedUser)
@@ -222,6 +224,20 @@ function GridCard() {
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0e20' }}>
       <p className="text-white text-xl font-bold">Loading GRID...</p>
+    </div>
+  )
+
+  if (notPublished) return (
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: '#0a0e20', fontFamily: 'system-ui, sans-serif' }}>
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-5" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 5a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v14a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2z"/><path d="M7 9h10M7 13h6"/></svg>
+      </div>
+      <h1 className="text-white text-xl font-extrabold mb-2">Your GRID Card isn't published yet</h1>
+      <p className="text-white/50 text-sm mb-6 max-w-sm">Fill in your profile, then tap <b className="text-white/80">Move to GRID</b> to publish it. Your card and public profile only show published data.</p>
+      <button onClick={() => navigate('/profile-details')}
+        className="grid-shine text-white font-bold px-6 py-3 rounded-xl" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)' }}>
+        Go to profile →
+      </button>
     </div>
   )
 

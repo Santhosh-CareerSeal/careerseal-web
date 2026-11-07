@@ -40,6 +40,7 @@ function ProfileDetails() {
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null)
   const [photoPreview, setPhotoPreview] = useState(null)
   const [updatesRemaining, setUpdatesRemaining] = useState(3)
+  const [hasUnpublished, setHasUnpublished] = useState(false)
 
   const [form, setForm] = useState({
     legalFullName: '',
@@ -173,6 +174,7 @@ function ProfileDetails() {
         setEmailVerified(res.data.emailVerified || false)
         const s = res.data.student
         if (s) {
+          setHasUnpublished(!!s.hasUnpublishedChanges)
           setForm(f => ({
             ...f,
             legalFullName: s.legalFullName || '',
@@ -337,9 +339,10 @@ function ProfileDetails() {
       const token = localStorage.getItem('token')
       const resp = await axios.post(`${API_URL}/api/profile/complete`, { ...form, photoUrl, projects: JSON.stringify(form.projects || []), employmentHistory: JSON.stringify(form.employmentHistory || []) }, { headers: { Authorization: `Bearer ${token}` } })
       syncNameAndCache(resp.data?.name)
-      setSuccess('Profile saved successfully!')
+      setHasUnpublished(true)
+      setSuccess('Profile saved as draft. Click "Move to GRID" to publish it to your card.')
       setForm(f => ({ ...f, photoUrl }))
-      setTimeout(() => navigate('/dashboard'), 1500)
+      setTimeout(() => navigate('/dashboard'), 1800)
     } catch (e) { setError(e.response?.data?.message || 'Something went wrong') }
     finally { setSaving(false) }
   }
@@ -353,6 +356,8 @@ function ProfileDetails() {
       syncNameAndCache(cResp.data?.name)
       const res = await axios.post(`${API_URL}/api/profile/move-to-grid`, {}, { headers: { Authorization: `Bearer ${token}` } })
       setUpdatesRemaining(res.data.updatesRemaining)
+      setHasUnpublished(false)
+      invalidate('/api/grid', '/api/profile/details')
       setGridMsg(`Published to GRID! ${res.data.updatesRemaining} update${res.data.updatesRemaining !== 1 ? 's' : ''} remaining this month.`)
       setTimeout(() => navigate('/dashboard'), 1500)
     } catch (e) {
@@ -463,6 +468,12 @@ function ProfileDetails() {
       <div className="flex-1 min-w-0 bg-white">
         <div className="max-w-2xl mx-auto px-6 sm:px-10 py-8 md:py-12">
 
+          {hasUnpublished && (
+            <div className="rounded-xl px-4 py-3 mb-4 flex items-start gap-2.5" style={{ background: '#fdf6e3', border: '1px solid #e9d8a6' }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9a6b12" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+              <p className="text-[#9a6b12] text-sm"><b>You have unpublished changes.</b> Your edits are saved as a draft — tap <b>Move to GRID</b> (last step) to publish them to your GRID Card.</p>
+            </div>
+          )}
           {error && <div className="bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-4 text-red-700 text-sm">{error}</div>}
           {success && <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-3 mb-4 text-green-700 text-sm">{success}</div>}
           {gridMsg && <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 mb-4 text-blue-700 text-sm">{gridMsg}</div>}

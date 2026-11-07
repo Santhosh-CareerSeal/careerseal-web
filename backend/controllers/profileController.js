@@ -53,7 +53,7 @@ const completeProfile = async (req, res) => {
         preferredJobType, preferredWorkLocation, noticePeriod, expectedSalary,
         technicalSkills, softSkills, languagesKnown, certifications, toolsAndSoftware,
         hobbies, pfAccountNumber, aadhaarNumber: encryptedAadhaar, passportNumber: encryptedPassport, digiLockerStatus, bio,
-        education, schoolCollege, skills, profileComplete: true
+        education, schoolCollege, skills, profileComplete: true, hasUnpublishedChanges: true
       },
       create: {
         userId, legalFullName, photoUrl, dateOfBirth, gender, contactNumber, address, city, state, pincode,
@@ -107,11 +107,16 @@ const moveToGrid = async (req, res) => {
       return res.status(400).json({ message: 'You can only update your GRID card 3 times per month.' })
     }
 
+    // Snapshot the current (draft) profile as the published version shown on the card / public profile.
+    const { publishedProfile: _old, ...snapshot } = student
+
     await prisma.student.update({
       where: { userId },
       data: {
         gridPublished: true,
         aiSummary: null,
+        hasUnpublishedChanges: false,
+        publishedProfile: snapshot,
         gridUpdatesThisMonth: updatesThisMonth + 1,
         gridLastUpdatedMonth: currentMonth
       }

@@ -14,8 +14,12 @@ router.get('/profile/:gridNumber', async (req, res) => {
     if (!student) return res.status(404).json({ message: 'Profile not found' })
     if (!student.gridPublished) return res.status(403).json({ message: 'Profile not yet published to GRID' })
 
+    // Serve the PUBLISHED snapshot, never the live draft. Legacy published
+    // accounts with no snapshot yet fall back to the live record once.
+    const p = student.publishedProfile || student
+
     const verifiedSkillRecords = await prisma.verifiedSkill.findMany({ where: { studentId: student.id } })
-    const allSkillsArr = (student.technicalSkills || '').split(',').map(s => s.trim()).filter(Boolean)
+    const allSkillsArr = (p.technicalSkills || '').split(',').map(s => s.trim()).filter(Boolean)
     const verifiedOnly = allSkillsArr.filter(skill => {
       const match = verifiedSkillRecords.find(v => v.skill.toLowerCase() === skill.toLowerCase())
       return match && new Date(match.expiresAt) > new Date()
@@ -25,46 +29,46 @@ router.get('/profile/:gridNumber', async (req, res) => {
       name: student.user?.name,
       email: student.user?.email,
       gridNumber: student.gridNumber,
-      photoUrl: student.photoUrl,
-      bio: student.bio,
-      contactNumber: student.contactNumber,
-      city: student.city,
-      state: student.state,
-      workStatus: student.workStatus,
-      jobTitle: student.jobTitle,
-      currentCompany: student.currentCompany,
-      preferredWorkLocation: student.preferredWorkLocation,
-      preferredJobType: student.preferredJobType,
-      expectedSalary: student.expectedSalary,
-      noticePeriod: student.noticePeriod,
-      education: student.education,
-      degree: student.degree,
-      branch: student.branch,
-      collegeName: student.collegeName,
-      collegePassingYear: student.collegePassingYear,
-      collegeCGPA: student.collegeCGPA,
-      pgDegree: student.pgDegree,
-      pgBranch: student.pgBranch,
-      pgCollegeName: student.pgCollegeName,
-      pgPassingYear: student.pgPassingYear,
-      pgCGPA: student.pgCGPA,
-      twelfthSchoolName: student.twelfthSchoolName,
-      twelfthBoard: student.twelfthBoard,
-      twelfthPassingYear: student.twelfthPassingYear,
-      twelfthPercentage: student.twelfthPercentage,
-      schoolName: student.schoolName,
-      schoolBoard: student.schoolBoard,
-      schoolPassingYear: student.schoolPassingYear,
-      schoolPercentage: student.schoolPercentage,
+      photoUrl: p.photoUrl,
+      bio: p.bio,
+      contactNumber: p.contactNumber,
+      city: p.city,
+      state: p.state,
+      workStatus: p.workStatus,
+      jobTitle: p.jobTitle,
+      currentCompany: p.currentCompany,
+      preferredWorkLocation: p.preferredWorkLocation,
+      preferredJobType: p.preferredJobType,
+      expectedSalary: p.expectedSalary,
+      noticePeriod: p.noticePeriod,
+      education: p.education,
+      degree: p.degree,
+      branch: p.branch,
+      collegeName: p.collegeName,
+      collegePassingYear: p.collegePassingYear,
+      collegeCGPA: p.collegeCGPA,
+      pgDegree: p.pgDegree,
+      pgBranch: p.pgBranch,
+      pgCollegeName: p.pgCollegeName,
+      pgPassingYear: p.pgPassingYear,
+      pgCGPA: p.pgCGPA,
+      twelfthSchoolName: p.twelfthSchoolName,
+      twelfthBoard: p.twelfthBoard,
+      twelfthPassingYear: p.twelfthPassingYear,
+      twelfthPercentage: p.twelfthPercentage,
+      schoolName: p.schoolName,
+      schoolBoard: p.schoolBoard,
+      schoolPassingYear: p.schoolPassingYear,
+      schoolPercentage: p.schoolPercentage,
       technicalSkills: verifiedOnly.join(', '),
-      softSkills: student.softSkills,
-      toolsAndSoftware: student.toolsAndSoftware,
-      languagesKnown: student.languagesKnown,
-      certifications: student.certifications,
-      hobbies: student.hobbies,
-      workExperience: student.workExperience,
-      projects: student.projects,
-      employmentHistory: student.employmentHistory,
+      softSkills: p.softSkills,
+      toolsAndSoftware: p.toolsAndSoftware,
+      languagesKnown: p.languagesKnown,
+      certifications: p.certifications,
+      hobbies: p.hobbies,
+      workExperience: p.workExperience,
+      projects: p.projects,
+      employmentHistory: p.employmentHistory,
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -94,7 +98,8 @@ router.get('/profile/:gridNumber/ai-summary', async (req, res) => {
     const { generateSummary } = require('../utils/summaryGenerator')
     let summary
     try {
-      summary = await generateSummary(student)
+      // summarise the PUBLISHED snapshot, not the live draft
+      summary = await generateSummary(student.publishedProfile || student)
     } catch (e) {
       console.error('AI summary generation failed:', e.message)
       return res.status(503).json({ message: 'Could not generate summary right now. Please try again shortly.' })
