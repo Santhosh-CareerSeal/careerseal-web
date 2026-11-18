@@ -1,11 +1,17 @@
 const express = require('express')
+const rateLimit = require('express-rate-limit')
+const adminLoginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 8,
+  message: { message: 'Too many login attempts. Try again in 15 minutes.' }
+})
 const router = express.Router()
 const { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly, superOnly } = require('../middleware/adminMiddleware')
 
 // Public - admin login
-router.post('/login', adminLogin)
+router.post('/login', adminLoginLimiter, adminLogin)
 
 // --- Reads: both super and staff ---
 router.get('/stats', protect, adminOnly, getAdminStats)

@@ -93,7 +93,15 @@ const updateJob = async (req, res) => {
     const company = await prisma.company.findUnique({ where: { userId } })
     const job = await prisma.job.findFirst({ where: { id: parseInt(jobId), companyId: company.id } })
     if (!job) return res.status(404).json({ message: 'Job not found' })
-    const updated = await prisma.job.update({ where: { id: parseInt(jobId) }, data: req.body })
+    // Whitelist editable fields — never trust req.body to set id/companyId/createdAt.
+    const ALLOWED = ['title', 'description', 'salaryRange', 'requiredSkills', 'jobType', 'location',
+      'experienceLevel', 'openings', 'deadline', 'status', 'targetCollegeId', 'isDrive', 'driveDate',
+      'driveMode', 'driveLocation', 'eligBranches', 'eligMinCGPA', 'eligBatchYear', 'allowBacklogs', 'driveCompany']
+    const data = {}
+    for (const key of ALLOWED) {
+      if (Object.prototype.hasOwnProperty.call(req.body, key)) data[key] = req.body[key]
+    }
+    const updated = await prisma.job.update({ where: { id: parseInt(jobId) }, data })
     res.json({ message: 'Job updated', job: updated })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })

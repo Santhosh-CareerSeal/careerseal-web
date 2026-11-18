@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 const { OAuth2Client } = require('google-auth-library')
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 const { PrismaClient } = require('@prisma/client')
@@ -142,10 +143,10 @@ const forgotPassword = async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user) return res.status(200).json({ message: 'If this email exists, a reset code has been sent.' })
 
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
+    const otp = crypto.randomInt(100000, 1000000).toString()
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000)
 
-    await prisma.user.update({ where: { email }, data: { otp, otpExpiry } })
+    await prisma.user.update({ where: { email }, data: { otp, otpExpiry, otpAttempts: 0 } })
     await sendPasswordResetEmail(email, user.name, otp)
 
     res.json({ message: 'If this email exists, a reset code has been sent.' })
@@ -159,10 +160,17 @@ const verifyResetOtp = async (req, res) => {
   try {
     const { email, otp } = req.body
     const user = await prisma.user.findUnique({ where: { email } })
-    if (!user) return res.status(404).json({ message: 'User not found' })
-    if (!user.otp || !user.otpExpiry) return res.status(400).json({ message: 'No reset code found. Please request a new one.' })
+    // Generic responses below avoid revealing whether an email is registered.
+    if (!user || !user.otp || !user.otpExpiry) return res.status(400).json({ message: 'Invalid or expired code. Please request a new one.' })
     if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
-    if (user.otp !== otp.toString()) return res.status(400).json({ message: 'Invalid code. Please try again.' })
+    if ((user.otpAttempts || 0) >= 5) {
+      await prisma.user.update({ where: { email }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
+      return res.status(429).json({ message: 'Too many incorrect attempts. Please request a new code.' })
+    }
+    if (user.otp !== otp.toString()) {
+      await prisma.user.update({ where: { email }, data: { otpAttempts: { increment: 1 } } })
+      return res.status(400).json({ message: 'Invalid code. Please try again.' })
+    }
     res.json({ message: 'Code verified', valid: true })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -173,14 +181,20 @@ const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body
     const user = await prisma.user.findUnique({ where: { email } })
-    if (!user) return res.status(404).json({ message: 'User not found' })
-    if (!user.otp || !user.otpExpiry) return res.status(400).json({ message: 'No reset code found. Please request a new one.' })
+    if (!user || !user.otp || !user.otpExpiry) return res.status(400).json({ message: 'Invalid or expired code. Please request a new one.' })
     if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
-    if (user.otp !== otp.toString()) return res.status(400).json({ message: 'Invalid code. Please try again.' })
+    if ((user.otpAttempts || 0) >= 5) {
+      await prisma.user.update({ where: { email }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
+      return res.status(429).json({ message: 'Too many incorrect attempts. Please request a new code.' })
+    }
+    if (user.otp !== otp.toString()) {
+      await prisma.user.update({ where: { email }, data: { otpAttempts: { increment: 1 } } })
+      return res.status(400).json({ message: 'Invalid code. Please try again.' })
+    }
     if (!newPassword || newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters.' })
 
     const passwordHash = await bcrypt.hash(newPassword, 10)
-    await prisma.user.update({ where: { email }, data: { passwordHash, otp: null, otpExpiry: null } })
+    await prisma.user.update({ where: { email }, data: { passwordHash, otp: null, otpExpiry: null, otpAttempts: 0 } })
 
     res.json({ message: 'Password reset successfully! Please sign in.' })
   } catch (error) {
