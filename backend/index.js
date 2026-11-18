@@ -25,6 +25,10 @@ const ratingRoutes = require('./routes/ratingRoutes')
 dotenv.config()
 
 const app = express()
+// Render runs the app behind one reverse proxy. Trust exactly one hop so
+// express-rate-limit sees the real client IP (not the proxy's) and cannot be
+// spoofed via a forged X-Forwarded-For chain.
+app.set('trust proxy', 1)
 const prisma = new PrismaClient()
 const PORT = process.env.PORT || 5000
 const profileRoutes = require('./routes/profileRoutes')
@@ -53,11 +57,7 @@ app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.path} ${req.ip}`)
   next()
 })
-app.use((req, res, next) => {
-  console.log(`${new Date().toISOString()} ${req.method} ${req.path} ${req.ip}`)
-  next()
-})
-app.use(express.json())
+app.use(express.json({ limit: '1mb' }))
 
 app.get('/', async (req, res) => {
   try {

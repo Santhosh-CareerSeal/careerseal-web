@@ -25,7 +25,10 @@ const uploadStudentDocument = async (req, res) => {
       return res.status(400).json({ message: 'File must be under 5 MB' })
     }
 
-    const ext = req.file.originalname.split('.').pop().toLowerCase()
+    // Derive extension from the validated mimetype, not the client filename,
+    // so a crafted originalname can't inject path characters into the storage key.
+    const EXT_BY_MIME = { 'application/pdf': 'pdf', 'image/jpeg': 'jpg', 'image/jpg': 'jpg', 'image/png': 'png' }
+    const ext = EXT_BY_MIME[req.file.mimetype] || 'bin'
     const path = `student_${student.id}/${docType}_${Date.now()}.${ext}`
     await uploadDocument(path, req.file.buffer, req.file.mimetype)
 
