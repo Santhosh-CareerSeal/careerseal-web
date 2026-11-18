@@ -16,6 +16,10 @@ model User {
   otp          String?
   otpExpiry    DateTime?
   otpAttempts  Int       @default(0)
+  recoveryEmail         String?
+  recoveryEmailVerified Boolean   @default(false)
+  recoveryOtp           String?
+  recoveryOtpExpiry     DateTime?
   role         String?   @default("student")
   adminRole    String?   // 'super' | 'staff' — only meaningful when role = 'admin'
   isActive     Boolean   @default(true)

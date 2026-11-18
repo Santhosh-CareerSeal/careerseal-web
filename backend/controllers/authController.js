@@ -14,11 +14,17 @@ const MAX_OTP_ATTEMPTS = 3
 async function rejectBadOtp(res, user) {
   const attempts = (user.otpAttempts || 0) + 1
   if (attempts >= MAX_OTP_ATTEMPTS) {
-    await prisma.user.update({ where: { email: user.email }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
+    await prisma.user.update({ where: { id: user.id }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
     return res.status(429).json({ message: 'Too many incorrect attempts. This code has expired — please request a new one.' })
   }
-  await prisma.user.update({ where: { email: user.email }, data: { otpAttempts: attempts } })
+  await prisma.user.update({ where: { id: user.id }, data: { otpAttempts: attempts } })
   return res.status(400).json({ message: `Invalid code. ${MAX_OTP_ATTEMPTS - attempts} attempt(s) left before it expires.` })
+}
+
+// Resolve a password-reset request to an account by primary email OR a verified
+// recovery email, so a user who lost their main inbox can still recover.
+function resetAccountLookup(email) {
+  return { OR: [{ email }, { recoveryEmail: email, recoveryEmailVerified: true }] }
 }
 
 // SIGNUP — direct account creation (email verification parked until domain verified)
@@ -153,13 +159,14 @@ const forgotPassword = async (req, res) => {
     const emailCheck = validateEmail(email)
     if (!emailCheck.valid) return res.status(400).json({ message: emailCheck.message })
 
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findFirst({ where: resetAccountLookup(email) })
     if (!user) return res.status(200).json({ message: 'If this email exists, a reset code has been sent.' })
 
     const otp = crypto.randomInt(100000, 1000000).toString()
     const otpExpiry = new Date(Date.now() + 5 * 60 * 1000)
 
-    await prisma.user.update({ where: { email }, data: { otp, otpExpiry, otpAttempts: 0 } })
+    await prisma.user.update({ where: { id: user.id }, data: { otp, otpExpiry, otpAttempts: 0 } })
+    // Deliver the code to whichever address was entered (primary or verified recovery).
     await sendPasswordResetEmail(email, user.name, otp)
 
     res.json({ message: 'If this email exists, a reset code has been sent.' })
@@ -172,7 +179,7 @@ const forgotPassword = async (req, res) => {
 const verifyResetOtp = async (req, res) => {
   try {
     const { email, otp } = req.body
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findFirst({ where: resetAccountLookup(email) })
     // Generic responses below avoid revealing whether an email is registered.
     if (!user || !user.otp || !user.otpExpiry) return res.status(400).json({ message: 'Invalid or expired code. Please request a new one.' })
     if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
@@ -186,14 +193,14 @@ const verifyResetOtp = async (req, res) => {
 const resetPassword = async (req, res) => {
   try {
     const { email, otp, newPassword } = req.body
-    const user = await prisma.user.findUnique({ where: { email } })
+    const user = await prisma.user.findFirst({ where: resetAccountLookup(email) })
     if (!user || !user.otp || !user.otpExpiry) return res.status(400).json({ message: 'Invalid or expired code. Please request a new one.' })
     if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
     if (user.otp !== otp.toString()) return rejectBadOtp(res, user)
     if (!newPassword || newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters.' })
 
     const passwordHash = await bcrypt.hash(newPassword, 10)
-    await prisma.user.update({ where: { email }, data: { passwordHash, otp: null, otpExpiry: null, otpAttempts: 0 } })
+    await prisma.user.update({ where: { id: user.id }, data: { passwordHash, otp: null, otpExpiry: null, otpAttempts: 0 } })
 
     res.json({ message: 'Password reset successfully! Please sign in.' })
   } catch (error) {
@@ -332,4 +339,68 @@ const googleAuth = async (req, res) => {
   }
 }
 
-module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, verifyResetOtp, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification , googleAuth }
+// ---------- Recovery email (backup inbox for account recovery) ----------
+
+const getRecoveryEmail = async (req, res) => {
+  try {
+    const user = await prisma.user.findUnique({ where: { id: req.user.userId }, select: { recoveryEmail: true, recoveryEmailVerified: true } })
+    res.json({ recoveryEmail: user?.recoveryEmail || null, recoveryEmailVerified: user?.recoveryEmailVerified || false })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const setRecoveryEmail = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const { recoveryEmail } = req.body
+    const emailCheck = validateEmail(recoveryEmail)
+    if (!emailCheck.valid) return res.status(400).json({ message: emailCheck.message })
+
+    const me = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } })
+    if (me && recoveryEmail.toLowerCase() === me.email.toLowerCase()) {
+      return res.status(400).json({ message: 'Your recovery email must be different from your account email.' })
+    }
+
+    const code = crypto.randomInt(100000, 1000000).toString()
+    const recoveryOtpExpiry = new Date(Date.now() + 5 * 60 * 1000)
+    await prisma.user.update({
+      where: { id: userId },
+      data: { recoveryEmail, recoveryEmailVerified: false, recoveryOtp: code, recoveryOtpExpiry }
+    })
+    await sendOTPEmail(recoveryEmail, 'there', code)
+    res.json({ message: 'Verification code sent to your recovery email.' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const verifyRecoveryEmail = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const { code } = req.body
+    const user = await prisma.user.findUnique({ where: { id: userId } })
+    if (!user || !user.recoveryOtp || !user.recoveryOtpExpiry) return res.status(400).json({ message: 'No pending verification. Please add your recovery email again.' })
+    if (new Date() > new Date(user.recoveryOtpExpiry)) return res.status(400).json({ message: 'Code expired. Please resend it.' })
+    if (user.recoveryOtp !== (code || '').toString()) return res.status(400).json({ message: 'Invalid code. Please try again.' })
+
+    await prisma.user.update({ where: { id: userId }, data: { recoveryEmailVerified: true, recoveryOtp: null, recoveryOtpExpiry: null } })
+    res.json({ message: 'Recovery email verified.' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const removeRecoveryEmail = async (req, res) => {
+  try {
+    await prisma.user.update({
+      where: { id: req.user.userId },
+      data: { recoveryEmail: null, recoveryEmailVerified: false, recoveryOtp: null, recoveryOtpExpiry: null }
+    })
+    res.json({ message: 'Recovery email removed.' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { initiateSignup, verifyAndCreateAccount, login, forgotPassword, verifyResetOtp, resetPassword, changePassword, deleteAccount, logout, verifyEmailLink, resendVerification , googleAuth, getRecoveryEmail, setRecoveryEmail, verifyRecoveryEmail, removeRecoveryEmail }

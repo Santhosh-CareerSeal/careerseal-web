@@ -23,6 +23,12 @@ function Settings() {
     profilePublic: true, showContact: true, showEmail: false, showSalary: false, allowRecruiterSearch: true
   })
   const [privacyMsg, setPrivacyMsg] = useState('')
+  const [recovery, setRecovery] = useState({ recoveryEmail: null, recoveryEmailVerified: false })
+  const [recoveryInput, setRecoveryInput] = useState('')
+  const [recoveryCode, setRecoveryCode] = useState('')
+  const [recoveryStage, setRecoveryStage] = useState('idle') // 'idle' | 'verify'
+  const [recoveryMsg, setRecoveryMsg] = useState({ type: '', text: '' })
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
 
   const token = localStorage.getItem('token')
   const headers = { Authorization: `Bearer ${token}` }
@@ -35,6 +41,11 @@ function Settings() {
         setUser(storedUser)
         const profileRes = await axios.get(`${API_URL}/api/profile/details`, { headers })
         setStudent(profileRes.data.student)
+        try {
+          const rec = await axios.get(`${API_URL}/api/auth/recovery-email`, { headers })
+          setRecovery(rec.data)
+          if (rec.data.recoveryEmail && !rec.data.recoveryEmailVerified) setRecoveryStage('verify')
+        } catch (e) { /* non-fatal */ }
       } catch (e) {
         navigate('/login')
       } finally {
@@ -59,6 +70,47 @@ function Settings() {
     } finally {
       setAccountLoading(false)
     }
+  }
+
+  const handleSetRecovery = async () => {
+    setRecoveryMsg({ type: '', text: '' })
+    if (!recoveryInput) { setRecoveryMsg({ type: 'error', text: 'Enter a backup email address' }); return }
+    setRecoveryLoading(true)
+    try {
+      await axios.post(`${API_URL}/api/auth/recovery-email`, { recoveryEmail: recoveryInput }, { headers })
+      setRecovery({ recoveryEmail: recoveryInput, recoveryEmailVerified: false })
+      setRecoveryStage('verify')
+      setRecoveryMsg({ type: 'success', text: 'We sent a 6-digit code to that inbox. Enter it below (valid 5 minutes).' })
+    } catch (e) {
+      setRecoveryMsg({ type: 'error', text: e.response?.data?.message || 'Could not send code' })
+    } finally { setRecoveryLoading(false) }
+  }
+
+  const handleVerifyRecovery = async () => {
+    setRecoveryMsg({ type: '', text: '' })
+    if (!recoveryCode) { setRecoveryMsg({ type: 'error', text: 'Enter the 6-digit code' }); return }
+    setRecoveryLoading(true)
+    try {
+      await axios.post(`${API_URL}/api/auth/recovery-email/verify`, { code: recoveryCode }, { headers })
+      setRecovery(r => ({ ...r, recoveryEmailVerified: true }))
+      setRecoveryStage('idle'); setRecoveryCode('')
+      setRecoveryMsg({ type: 'success', text: 'Recovery email verified ✓' })
+    } catch (e) {
+      setRecoveryMsg({ type: 'error', text: e.response?.data?.message || 'Could not verify code' })
+    } finally { setRecoveryLoading(false) }
+  }
+
+  const handleRemoveRecovery = async () => {
+    if (!window.confirm('Remove your recovery email?')) return
+    setRecoveryLoading(true)
+    try {
+      await axios.delete(`${API_URL}/api/auth/recovery-email`, { headers })
+      setRecovery({ recoveryEmail: null, recoveryEmailVerified: false })
+      setRecoveryStage('idle'); setRecoveryInput(''); setRecoveryCode('')
+      setRecoveryMsg({ type: '', text: '' })
+    } catch (e) {
+      setRecoveryMsg({ type: 'error', text: 'Could not remove recovery email' })
+    } finally { setRecoveryLoading(false) }
   }
 
   const handleDeleteAccount = async () => {
@@ -141,6 +193,77 @@ function Settings() {
                   className="bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm disabled:opacity-50">
                   {accountLoading ? 'Updating...' : 'Update Password'}
                 </button>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-2xl p-5 border border-gray-100">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-sm font-bold text-[#1A3C6E]">Recovery Email</p>
+                {recovery.recoveryEmail && (
+                  <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full ${recovery.recoveryEmailVerified ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
+                    {recovery.recoveryEmailVerified ? 'Verified ✓' : 'Unverified'}
+                  </span>
+                )}
+              </div>
+              <p className="text-xs text-gray-400 mb-4">A backup inbox to recover your account if you lose access to your main email. Reset codes can be sent here too.</p>
+
+              {recoveryMsg.text && (
+                <div className={`text-sm px-4 py-3 rounded-xl mb-4 ${recoveryMsg.type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-600 border border-red-200'}`}>
+                  {recoveryMsg.text}
+                </div>
+              )}
+
+              {/* Verified state */}
+              {recovery.recoveryEmail && recovery.recoveryEmailVerified && recoveryStage === 'idle' && (
+                <div className="flex items-center justify-between gap-3 bg-gray-50 rounded-xl px-4 py-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-xl">✅</span>
+                    <p className="text-sm font-bold text-gray-700 truncate">{recovery.recoveryEmail}</p>
+                  </div>
+                  <button onClick={handleRemoveRecovery} disabled={recoveryLoading} className="text-xs font-bold text-red-500 hover:text-red-600 whitespace-nowrap disabled:opacity-50">Remove</button>
+                </div>
+              )}
+
+              {/* Add state */}
+              {(!recovery.recoveryEmail || recoveryStage === 'idle') && !(recovery.recoveryEmail && recovery.recoveryEmailVerified) && (
+                <div className="flex flex-col gap-3">
+                  <input type="email" placeholder="you@backup-email.com" value={recoveryInput} onChange={e => setRecoveryInput(e.target.value)}
+                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:border-[#0D7377]" />
+                  <button onClick={handleSetRecovery} disabled={recoveryLoading}
+                    className="bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm disabled:opacity-50">
+                    {recoveryLoading ? 'Sending...' : 'Send verification code'}
+                  </button>
+                </div>
+              )}
+
+              {/* Verify state */}
+              {recoveryStage === 'verify' && (
+                <div className="flex flex-col gap-3">
+                  <p className="text-xs text-gray-500">Code sent to <b>{recovery.recoveryEmail}</b></p>
+                  <input inputMode="numeric" maxLength={6} placeholder="6-digit code" value={recoveryCode} onChange={e => setRecoveryCode(e.target.value.replace(/\D/g, ''))}
+                    className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm tracking-[6px] text-center font-bold outline-none focus:border-[#0D7377]" />
+                  <div className="flex gap-2">
+                    <button onClick={handleVerifyRecovery} disabled={recoveryLoading}
+                      className="flex-1 bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors text-sm disabled:opacity-50">
+                      {recoveryLoading ? 'Verifying...' : 'Verify'}
+                    </button>
+                    <button onClick={handleSetRecovery} disabled={recoveryLoading}
+                      className="px-4 bg-gray-100 text-gray-600 py-3 rounded-xl font-bold hover:bg-gray-200 transition-colors text-sm disabled:opacity-50">Resend</button>
+                  </div>
+                  <button onClick={handleRemoveRecovery} disabled={recoveryLoading} className="text-xs font-bold text-gray-400 hover:text-red-500 self-start disabled:opacity-50">Cancel</button>
+                </div>
+              )}
+
+              {/* Phone (phase 2) */}
+              <div className="flex items-center justify-between py-3 mt-3 border-t border-gray-50">
+                <div className="flex items-center gap-3">
+                  <span className="text-xl opacity-60">📱</span>
+                  <div>
+                    <p className="text-sm font-bold text-gray-500">Recovery phone (SMS)</p>
+                    <p className="text-xs text-gray-400">Verify via mobile OTP</p>
+                  </div>
+                </div>
+                <span className="text-xs text-gray-400 font-bold bg-gray-100 px-3 py-1 rounded-full">Coming soon</span>
               </div>
             </div>
 

@@ -17,6 +17,7 @@ function Login({ fixedRole }) {
   const [loading, setLoading] = useState(false)
   const [connecting, setConnecting] = useState(null)
   const [showForgot, setShowForgot] = useState(false)
+  const [failCount, setFailCount] = useState(0)
   const [resetLoading, setResetLoading] = useState(false)
   const [resetError, setResetError] = useState('')
   const [resetEmail, setResetEmail] = useState('')
@@ -42,6 +43,7 @@ function Login({ fixedRole }) {
         navigate('/verify-email', { state: { email: err.response.data.email } })
       } else {
         setError(err.response?.data?.message || 'Something went wrong')
+        if (err.response?.status === 400) setFailCount(c => c + 1)
       }
     } finally {
       setLoading(false)
@@ -161,6 +163,17 @@ function Login({ fixedRole }) {
 
           {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
+          {failCount >= 3 && (
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-3.5 mb-4">
+              <p className="text-sm font-bold text-amber-800">Trouble signing in?</p>
+              <p className="text-xs text-amber-700 mt-0.5 mb-2.5">Recover your account with a code sent to your email — including your backup recovery email if you’ve added one.</p>
+              <button onClick={() => setShowForgot(true)}
+                className="w-full bg-[#6b4edb] text-white py-2.5 rounded-lg font-bold text-sm hover:bg-[#5538c9] transition-colors">
+                Recover via email →
+              </button>
+            </div>
+          )}
+
           <div className="flex flex-col gap-3">
             <input type="email" placeholder="Email Address" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} autoComplete="off" />
             <PasswordField placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} className={inputCls} autoComplete="off" />
@@ -205,7 +218,7 @@ function Login({ fixedRole }) {
             {!resetSent ? (
               <>
                 <h3 className="text-xl font-bold text-[#17304f] mb-2">Reset your password</h3>
-                <p className="text-gray-500 text-sm mb-5">Enter your email and we'll send you a reset code.</p>
+                <p className="text-gray-500 text-sm mb-5">Enter your account email — or your verified recovery email — and we'll send a reset code there.</p>
                 <input type="email" placeholder="Email Address" value={resetEmail} onChange={e => setResetEmail(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleForgotPassword()} className={inputCls + ' mb-4'} />
                 {resetError && <p className="text-red-500 text-xs mb-3">{resetError}</p>}
