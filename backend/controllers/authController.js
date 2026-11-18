@@ -8,6 +8,19 @@ const { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail } = require(
 const { validateEmail, validateIndianMobile } = require('../utils/emailValidator')
 const prisma = new PrismaClient()
 
+const MAX_OTP_ATTEMPTS = 3
+// Handle a wrong OTP guess: on the 3rd wrong try the code is destroyed and the
+// user must request a new one. Returns the Express response either way.
+async function rejectBadOtp(res, user) {
+  const attempts = (user.otpAttempts || 0) + 1
+  if (attempts >= MAX_OTP_ATTEMPTS) {
+    await prisma.user.update({ where: { email: user.email }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
+    return res.status(429).json({ message: 'Too many incorrect attempts. This code has expired — please request a new one.' })
+  }
+  await prisma.user.update({ where: { email: user.email }, data: { otpAttempts: attempts } })
+  return res.status(400).json({ message: `Invalid code. ${MAX_OTP_ATTEMPTS - attempts} attempt(s) left before it expires.` })
+}
+
 // SIGNUP — direct account creation (email verification parked until domain verified)
 const initiateSignup = async (req, res) => {
   try {
@@ -144,7 +157,7 @@ const forgotPassword = async (req, res) => {
     if (!user) return res.status(200).json({ message: 'If this email exists, a reset code has been sent.' })
 
     const otp = crypto.randomInt(100000, 1000000).toString()
-    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000)
+    const otpExpiry = new Date(Date.now() + 5 * 60 * 1000)
 
     await prisma.user.update({ where: { email }, data: { otp, otpExpiry, otpAttempts: 0 } })
     await sendPasswordResetEmail(email, user.name, otp)
@@ -163,14 +176,7 @@ const verifyResetOtp = async (req, res) => {
     // Generic responses below avoid revealing whether an email is registered.
     if (!user || !user.otp || !user.otpExpiry) return res.status(400).json({ message: 'Invalid or expired code. Please request a new one.' })
     if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
-    if ((user.otpAttempts || 0) >= 5) {
-      await prisma.user.update({ where: { email }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
-      return res.status(429).json({ message: 'Too many incorrect attempts. Please request a new code.' })
-    }
-    if (user.otp !== otp.toString()) {
-      await prisma.user.update({ where: { email }, data: { otpAttempts: { increment: 1 } } })
-      return res.status(400).json({ message: 'Invalid code. Please try again.' })
-    }
+    if (user.otp !== otp.toString()) return rejectBadOtp(res, user)
     res.json({ message: 'Code verified', valid: true })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
@@ -183,14 +189,7 @@ const resetPassword = async (req, res) => {
     const user = await prisma.user.findUnique({ where: { email } })
     if (!user || !user.otp || !user.otpExpiry) return res.status(400).json({ message: 'Invalid or expired code. Please request a new one.' })
     if (new Date() > new Date(user.otpExpiry)) return res.status(400).json({ message: 'Code expired. Please request a new one.' })
-    if ((user.otpAttempts || 0) >= 5) {
-      await prisma.user.update({ where: { email }, data: { otp: null, otpExpiry: null, otpAttempts: 0 } })
-      return res.status(429).json({ message: 'Too many incorrect attempts. Please request a new code.' })
-    }
-    if (user.otp !== otp.toString()) {
-      await prisma.user.update({ where: { email }, data: { otpAttempts: { increment: 1 } } })
-      return res.status(400).json({ message: 'Invalid code. Please try again.' })
-    }
+    if (user.otp !== otp.toString()) return rejectBadOtp(res, user)
     if (!newPassword || newPassword.length < 6) return res.status(400).json({ message: 'Password must be at least 6 characters.' })
 
     const passwordHash = await bcrypt.hash(newPassword, 10)
