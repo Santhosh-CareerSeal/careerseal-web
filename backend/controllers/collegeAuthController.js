@@ -20,7 +20,7 @@ const collegeLogin = async (req, res) => {
     res.json({
       message: 'Login successful',
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, mustChangePassword: user.mustChangePassword },
       college: user.college
     })
   } catch (error) {
@@ -40,7 +40,7 @@ const changeCollegePassword = async (req, res) => {
     const isMatch = await bcrypt.compare(currentPassword, user.passwordHash)
     if (!isMatch) return res.status(400).json({ message: 'Current password is incorrect' })
     const passwordHash = await bcrypt.hash(newPassword, 10)
-    await prisma.user.update({ where: { id: userId }, data: { passwordHash } })
+    await prisma.user.update({ where: { id: userId }, data: { passwordHash, mustChangePassword: false } })
     res.json({ message: 'Password updated successfully!' })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })

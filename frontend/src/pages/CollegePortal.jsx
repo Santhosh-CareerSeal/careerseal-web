@@ -61,6 +61,9 @@ export default function CollegePortal() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [pwMsg, setPwMsg] = useState('')
   const [pwLoading, setPwLoading] = useState(false)
+  const [mustChange, setMustChange] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('user') || '{}').mustChangePassword === true } catch { return false }
+  })
   const [targetedJobs, setTargetedJobs] = useState([])
   const [drives, setDrives] = useState([])
   const [driveForm, setDriveForm] = useState(null)
@@ -165,6 +168,11 @@ export default function CollegePortal() {
       const res = await axios.post(`${API_URL}/api/college/change-password`, { currentPassword, newPassword }, { headers })
       setPwMsg(res.data.message || 'Password updated!')
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword('')
+      // Clear the forced-change gate once the password has been set.
+      if (mustChange) {
+        try { const u = JSON.parse(localStorage.getItem('user') || '{}'); u.mustChangePassword = false; localStorage.setItem('user', JSON.stringify(u)) } catch { /* no-op */ }
+        setMustChange(false)
+      }
     } catch (err) {
       setPwMsg(err.response?.data?.message || 'Failed to update password')
     } finally {
@@ -213,6 +221,24 @@ export default function CollegePortal() {
   if (loading) return (
     <div style={{ minHeight: '100vh', background: '#f4f5f7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <p style={{ color: '#1A3C6E', fontWeight: '700' }}>Loading college portal...</p>
+    </div>
+  )
+
+  // Forced password change on first login (admin-created or approved accounts).
+  if (mustChange) return (
+    <div style={{ minHeight: '100vh', background: '#0e1b2e', display: 'grid', placeItems: 'center', padding: '20px' }}>
+      <div style={{ background: '#fff', borderRadius: '18px', padding: '32px', width: '420px', maxWidth: '100%' }}>
+        <div style={{ width: '48px', height: '48px', borderRadius: '12px', background: '#f3eefe', color: '#6b4edb', display: 'grid', placeItems: 'center', fontSize: '22px', marginBottom: '14px' }}>🔐</div>
+        <h1 style={{ fontSize: '20px', fontWeight: 800, color: '#1A3C6E', margin: '0 0 4px' }}>Set a new password</h1>
+        <p style={{ fontSize: '13px', color: '#6b7280', margin: '0 0 20px' }}>For your security, please replace the temporary password before using your portal.</p>
+        {pwMsg && <div style={{ background: pwMsg.toLowerCase().includes('updat') ? '#e7f7ef' : '#fdecec', color: pwMsg.toLowerCase().includes('updat') ? '#0f7a4f' : '#b42318', fontSize: '13px', borderRadius: '10px', padding: '10px 14px', marginBottom: '14px' }}>{pwMsg}</div>}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          <PasswordField placeholder="Temporary password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} style={{ width: '100%', border: '2px solid #eef0f3', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', outline: 'none' }} />
+          <PasswordField placeholder="New password (min 6 chars)" value={newPassword} onChange={e => setNewPassword(e.target.value)} style={{ width: '100%', border: '2px solid #eef0f3', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', outline: 'none' }} />
+          <PasswordField placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} style={{ width: '100%', border: '2px solid #eef0f3', borderRadius: '10px', padding: '11px 14px', fontSize: '14px', outline: 'none' }} />
+          <button onClick={handleChangePassword} disabled={pwLoading} className="grid-shine" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: '#fff', border: 'none', borderRadius: '11px', padding: '13px', fontSize: '15px', fontWeight: 800, cursor: pwLoading ? 'wait' : 'pointer', opacity: pwLoading ? 0.7 : 1 }}>{pwLoading ? 'Saving…' : 'Set password & continue →'}</button>
+        </div>
+      </div>
     </div>
   )
 

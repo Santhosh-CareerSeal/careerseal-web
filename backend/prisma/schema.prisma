@@ -20,6 +20,7 @@ model User {
   recoveryEmailVerified Boolean   @default(false)
   recoveryOtp           String?
   recoveryOtpExpiry     DateTime?
+  mustChangePassword    Boolean   @default(false)
   role         String?   @default("student")
   adminRole    String?   // 'super' | 'staff' — only meaningful when role = 'admin'
   isActive     Boolean   @default(true)

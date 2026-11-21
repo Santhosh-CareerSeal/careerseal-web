@@ -85,4 +85,20 @@ const sendContactEmail = async (fromName, fromEmail, subject, message) => {
   }
 }
 
-module.exports = { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail, sendContactEmail }
+const sendCollegeWelcomeEmail = async (email, collegeName, tempPassword) => {
+  try {
+    const loginUrl = `${process.env.FRONTEND_URL || 'https://thegridcard.com'}/college-login`
+    await resend.emails.send({
+      from: 'GRID <noreply@thegridcard.com>',
+      to: email,
+      subject: `Your GRID college portal is ready — ${collegeName}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:480px;margin:0 auto;padding:32px;background:#f8f9fa;border-radius:16px;"><div style="background:white;border-radius:12px;padding:32px;"><h2 style="color:#1A3C6E;margin:0 0 8px;">Welcome to GRID, ${collegeName}!</h2><p style="color:#6b7280;margin:0 0 20px;">Your partner college portal has been approved. Sign in with the credentials below — you'll be asked to set your own password on first login.</p><div style="background:#f0f4ff;border-radius:10px;padding:16px;margin-bottom:20px;"><p style="color:#6b7280;margin:0 0 6px;font-size:13px;"><strong>Login email:</strong> ${email}</p><p style="color:#6b7280;margin:0;font-size:13px;"><strong>Temporary password:</strong> <span style="font-family:monospace;color:#1A3C6E;font-weight:700;">${tempPassword}</span></p></div><a href="${loginUrl}" style="display:inline-block;background:#0D7377;color:white;text-decoration:none;padding:13px 28px;border-radius:10px;font-weight:700;font-size:14px;">Sign in to your portal →</a><p style="color:#9ca3af;font-size:12px;margin:20px 0 0;">For security, please change this temporary password immediately after signing in.</p></div></div>`
+    })
+    return true
+  } catch (error) {
+    console.error('College welcome email error:', error)
+    return false
+  }
+}
+
+module.exports = { sendOTPEmail, sendPasswordResetEmail, sendVerificationEmail, sendContactEmail, sendCollegeWelcomeEmail }

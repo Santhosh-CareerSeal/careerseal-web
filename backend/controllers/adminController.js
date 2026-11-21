@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs')
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const { PrismaClient } = require('@prisma/client')
-const { sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService')
+const { sendPasswordResetEmail, sendVerificationEmail, sendCollegeWelcomeEmail } = require('../services/emailService')
 const prisma = new PrismaClient()
 
 // Admin login
@@ -158,6 +158,7 @@ const addCollege = async (req, res) => {
         passwordHash,
         role: 'college',
         emailVerified: true,
+        mustChangePassword: true,
         college: {
           create: {
             collegeName, slug,
@@ -219,6 +220,7 @@ const approveCollegeApplication = async (req, res) => {
         passwordHash,
         role: 'college',
         emailVerified: true,
+        mustChangePassword: true,
         college: {
           create: {
             collegeName: app.collegeName, slug,
@@ -234,9 +236,10 @@ const approveCollegeApplication = async (req, res) => {
       where: { id: app.id },
       data: { status: 'approved', reviewedBy: req.user?.email || 'admin', reviewedAt: new Date() }
     })
-    // tempPassword is returned ONCE so the admin can pass it to the TPO, who
-    // changes it after first login.
-    res.json({ message: 'College account created', tpoEmail: app.tpoEmail, tempPassword })
+    // Email the TPO their credentials; they must change the password on first login.
+    const emailed = await sendCollegeWelcomeEmail(app.tpoEmail, app.collegeName, tempPassword)
+    // tempPassword is also returned ONCE as a fallback if the email doesn't arrive.
+    res.json({ message: 'College account created', tpoEmail: app.tpoEmail, tempPassword, emailed })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
