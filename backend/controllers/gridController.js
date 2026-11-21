@@ -1,10 +1,23 @@
 const { PrismaClient } = require('@prisma/client')
+const crypto = require('crypto')
 const prisma = new PrismaClient()
 
-const generateGridNumber = () => {
+const randomGridNumber = () => {
   const year = new Date().getFullYear()
-  const random = Math.floor(10000000 + Math.random() * 90000000)
+  const random = 10000000 + crypto.randomInt(0, 90000000) // 8 digits, CSPRNG
   return `GRID-IN-${year}-${random}`
+}
+
+// Produce a GRID number that isn't already taken. The @unique column is the hard
+// guarantee; this pre-check just keeps a collision from ever surfacing as a 500.
+const generateUniqueGridNumber = async () => {
+  for (let i = 0; i < 6; i++) {
+    const candidate = randomGridNumber()
+    const existing = await prisma.student.findUnique({ where: { gridNumber: candidate } })
+    if (!existing) return candidate
+  }
+  // Astronomically unlikely fallback: widen entropy with a time-based suffix.
+  return `GRID-IN-${new Date().getFullYear()}-${Date.now().toString().slice(-8)}`
 }
 
 const getGridCard = async (req, res) => {
@@ -24,10 +37,19 @@ const getGridCard = async (req, res) => {
     }
 
     if (!student.gridNumber) {
-      student = await prisma.student.update({
-        where: { userId },
-        data: { gridNumber: generateGridNumber() }
-      })
+      // Race-safe: retry if two concurrent requests pick the same number.
+      for (let attempt = 0; attempt < 5; attempt++) {
+        try {
+          student = await prisma.student.update({
+            where: { userId },
+            data: { gridNumber: await generateUniqueGridNumber() }
+          })
+          break
+        } catch (e) {
+          if (e.code === 'P2002' && attempt < 4) continue // unique violation → try again
+          throw e
+        }
+      }
     }
 
     // The card shows the PUBLISHED snapshot, not the live draft. Back-fill the
