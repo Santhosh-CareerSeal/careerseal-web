@@ -4,6 +4,7 @@ import axios from 'axios'
 import API_URL from '../config'
 import getHomeDest from '../utils/homeDest'
 import PasswordField from '../components/PasswordField'
+import { supabase } from '../supabaseClient'
 import Footer from '../components/Footer'
 
 const STAGES = ['applied', 'shortlisted', 'interview', 'hired', 'rejected']
@@ -89,6 +90,7 @@ export default function CompanyDashboard() {
   const [colleges, setColleges] = useState([])
   const [gridLookup, setGridLookup] = useState('')
   const [gridLookupError, setGridLookupError] = useState('')
+  const [uploadingLogo, setUploadingLogo] = useState(false)
 
   // Post job form
   const [jobForm, setJobForm] = useState({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '', targetCollegeId: '' })
@@ -156,7 +158,8 @@ export default function CompanyDashboard() {
           location: profileRes.data.company.location || '',
           foundedYear: profileRes.data.company.foundedYear || '',
           linkedIn: profileRes.data.company.linkedIn || '',
-          twitter: profileRes.data.company.twitter || ''
+          twitter: profileRes.data.company.twitter || '',
+          logoUrl: profileRes.data.company.logoUrl || ''
         })
       } catch (e) {
         navigate('/login')
@@ -249,6 +252,30 @@ export default function CompanyDashboard() {
       const res = await axios.get(`${API_URL}/api/company/talent`, { params: talentSearch, headers })
       setTalent(res.data.students || [])
     } catch (e) { console.error(e) }
+  }
+
+  const handleLogoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const allowed = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml']
+    if (!allowed.includes(file.type)) { setProfileSuccess(''); alert('Only JPG, PNG, WEBP or SVG allowed'); return }
+    if (file.size > 5 * 1024 * 1024) { alert('Logo must be smaller than 5MB'); return }
+    setUploadingLogo(true)
+    try {
+      const ext = file.name.split('.').pop().toLowerCase()
+      const uid = JSON.parse(localStorage.getItem('user') || '{}').id || 'anon'
+      const fileName = `company_${uid}_${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage.from('profile-photos').upload(fileName, file, { cacheControl: '3600', upsert: false, contentType: file.type })
+      if (upErr) throw upErr
+      const { data } = supabase.storage.from('profile-photos').getPublicUrl(fileName)
+      // Save immediately so the logo persists without needing a full form save.
+      const updated = { ...profileForm, logoUrl: data.publicUrl }
+      setProfileForm(updated)
+      await axios.put(`${API_URL}/api/company/profile`, updated, { headers })
+      setProfileSuccess('Logo updated!')
+      setTimeout(() => setProfileSuccess(''), 3000)
+    } catch (err) { console.error(err); alert('Logo upload failed, please try again') }
+    finally { setUploadingLogo(false) }
   }
 
   const handleUpdateProfile = async () => {
@@ -802,6 +829,24 @@ export default function CompanyDashboard() {
             )}
 
             <div style={{ background: 'white', borderRadius: '16px', padding: '24px', border: '1px solid #eee', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {/* Logo editor */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '16px', paddingBottom: '16px', borderBottom: '1px solid #f0f0f0' }}>
+                {profileForm.logoUrl ? (
+                  <img src={profileForm.logoUrl} alt="Company logo" style={{ width: '72px', height: '72px', borderRadius: '14px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: '72px', height: '72px', borderRadius: '14px', background: 'linear-gradient(135deg,#0d7377,#1a3c6e)', display: 'grid', placeItems: 'center', color: 'white', fontWeight: 800, fontSize: '28px', flexShrink: 0 }}>
+                    {(profileForm.companyName || 'C').charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div>
+                  <p style={{ fontSize: '13px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 2px' }}>Company logo</p>
+                  <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 8px' }}>JPG, PNG, WEBP or SVG · up to 5MB</p>
+                  <label style={{ display: 'inline-block', background: '#f1f3f6', color: '#1A3C6E', fontSize: '12px', fontWeight: 700, padding: '7px 14px', borderRadius: '9px', cursor: uploadingLogo ? 'wait' : 'pointer' }}>
+                    {uploadingLogo ? 'Uploading…' : (profileForm.logoUrl ? 'Change logo' : 'Upload logo')}
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={handleLogoUpload} disabled={uploadingLogo} style={{ display: 'none' }} />
+                  </label>
+                </div>
+              </div>
               {[
                 { label: 'COMPANY NAME', key: 'companyName', placeholder: 'Your company name' },
                 { label: 'DESCRIPTION', key: 'description', placeholder: 'Tell students about your company, culture and mission...', textarea: true },

@@ -18,10 +18,10 @@ const getCompanyProfile = async (req, res) => {
 const updateCompanyProfile = async (req, res) => {
   try {
     const userId = req.user.userId
-    const { companyName, description, industry, companySize, website, location, foundedYear, linkedIn, twitter } = req.body
+    const { companyName, description, industry, companySize, website, location, foundedYear, linkedIn, twitter, logoUrl } = req.body
     const company = await prisma.company.update({
       where: { userId },
-      data: { companyName, description, industry, companySize, website, location, foundedYear, linkedIn, twitter }
+      data: { companyName, description, industry, companySize, website, location, foundedYear, linkedIn, twitter, logoUrl }
     })
     res.json({ message: 'Profile updated', company })
   } catch (error) {
