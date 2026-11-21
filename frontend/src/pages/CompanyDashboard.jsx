@@ -87,6 +87,8 @@ export default function CompanyDashboard() {
   const [loading, setLoading] = useState(true)
   const [user, setUser] = useState(null)
   const [colleges, setColleges] = useState([])
+  const [gridLookup, setGridLookup] = useState('')
+  const [gridLookupError, setGridLookupError] = useState('')
 
   // Post job form
   const [jobForm, setJobForm] = useState({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '', targetCollegeId: '' })
@@ -192,6 +194,13 @@ export default function CompanyDashboard() {
     { key: 'better_candidate', label: 'Another candidate was a closer fit' },
     { key: 'other', label: 'Other' }
   ]
+  const openGridLookup = () => {
+    let v = (gridLookup || '').trim().toUpperCase().replace(/\s+/g, '')
+    if (/^\d{8}$/.test(v)) v = `GRID-IN-${new Date().getFullYear()}-${v}`
+    if (!v || !v.includes('GRID')) { setGridLookupError('Enter a valid GRID ID (e.g. GRID-IN-2026-12345678)'); return }
+    navigate(`/id/${v}`)
+  }
+
   const [rejectModal, setRejectModal] = useState(null)
   const [rejectReason, setRejectReason] = useState('')
   const [rejectNote, setRejectNote] = useState('')
@@ -304,6 +313,28 @@ export default function CompanyDashboard() {
                 <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>{stats?.totalApplications > 0 ? `You have ${candidates.filter(a => a.status === 'applied').length} new applications to review` : 'Post your first job to start receiving applications'}</p>
               </div>
               <button onClick={() => setActive('post-job')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 20px', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}>+ Post New Job</button>
+            </div>
+
+            {/* Hire by GRID ID */}
+            <div style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)', borderRadius: '16px', padding: '20px 22px', marginBottom: '20px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                <span style={{ color: '#9FE1CB' }}>✔</span>
+                <p style={{ color: 'white', fontWeight: '800', fontSize: '15px', margin: 0 }}>Hire by GRID ID</p>
+              </div>
+              <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px', margin: '0 0 12px' }}>Enter a candidate's GRID ID to open their verified résumé — with contact details, since you're signed in.</p>
+              <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                <input
+                  value={gridLookup}
+                  onChange={(e) => { setGridLookup(e.target.value); setGridLookupError('') }}
+                  onKeyDown={(e) => e.key === 'Enter' && openGridLookup()}
+                  placeholder="GRID-IN-2026-12345678"
+                  style={{ flex: 1, minWidth: '220px', background: 'white', color: '#1A3C6E', border: 'none', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', fontWeight: '700', outline: 'none' }}
+                />
+                <button onClick={openGridLookup} style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', color: 'white', borderRadius: '10px', padding: '12px 22px', fontSize: '14px', fontWeight: '700', cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                  View résumé →
+                </button>
+              </div>
+              {gridLookupError && <p style={{ color: '#ffd4d4', fontSize: '12px', margin: '8px 0 0' }}>{gridLookupError}</p>}
             </div>
 
             {/* Stat cards */}
