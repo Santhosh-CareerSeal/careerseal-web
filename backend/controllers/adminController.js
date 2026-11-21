@@ -202,8 +202,8 @@ const approveCollegeApplication = async (req, res) => {
     if (!app) return res.status(404).json({ message: 'Application not found' })
     if (app.status === 'approved') return res.status(400).json({ message: 'Already approved' })
 
-    const existing = await prisma.user.findUnique({ where: { email: app.tpoEmail } })
-    if (existing) return res.status(400).json({ message: 'A user with this email already exists' })
+    const existing = await prisma.user.findUnique({ where: { email: app.tpoEmail }, select: { role: true } })
+    if (existing) return res.status(400).json({ message: `This email is already registered as ${existing.role ? `a ${existing.role}` : 'another'} account. Each email can belong to only one account — approve with a different email, or remove that account first.` })
 
     const slug = app.collegeName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
     if (await prisma.college.findUnique({ where: { slug } })) {
