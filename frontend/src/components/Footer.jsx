@@ -22,6 +22,12 @@ function Footer() {
           </div>
 
           <div>
+            <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.05em', margin: '0 0 10px' }}>FOR RECRUITERS</p>
+            <p style={{ margin: '0 0 7px' }}><Link to="/verify" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', textDecoration: 'none' }}>Verify a GRID ID</Link></p>
+            <p style={{ margin: '0 0 7px' }}><Link to="/company-login" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', textDecoration: 'none' }}>Recruiter sign in</Link></p>
+          </div>
+
+          <div>
             <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', letterSpacing: '0.05em', margin: '0 0 10px' }}>REACH US</p>
             <p style={{ margin: '0 0 10px' }}><a href="mailto:support@thegridcard.com" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '13px', textDecoration: 'none' }}>support@thegridcard.com</a></p>
             <div style={{ display: 'flex', gap: '10px' }}>

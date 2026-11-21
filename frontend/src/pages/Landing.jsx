@@ -112,6 +112,17 @@ function Landing() {
         <Link to="/register-student" className="grid-shine" style={{ display: 'inline-block', background: '#5DCAA5', color: '#1A3C6E', fontSize: '15px', fontWeight: 700, textDecoration: 'none', padding: '13px 30px', borderRadius: '10px' }}>Create your GRID Card</Link>
       </div>
 
+      {/* Recruiter strip */}
+      <div style={{ background: '#0e1b2e', padding: '2.25rem 1.5rem', textAlign: 'center', color: '#fff' }}>
+        <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', background: 'rgba(255,255,255,0.08)', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '999px', padding: '4px 12px', marginBottom: '12px' }}>
+          <span style={{ color: '#5dcaa5' }}>✔</span>
+          <span style={{ fontSize: '11px', fontWeight: 700, letterSpacing: '0.05em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.8)' }}>For recruiters</span>
+        </div>
+        <h2 style={{ fontSize: '22px', fontWeight: 800, margin: '0 0 8px' }}>Hiring? Verify a candidate with one ID</h2>
+        <p style={{ fontSize: '14px', color: 'rgba(255,255,255,0.6)', margin: '0 0 20px' }}>No PDFs. Enter a GRID ID to open a verified résumé.</p>
+        <Link to="/verify" className="grid-shine" style={{ display: 'inline-block', color: '#fff', fontSize: '14px', fontWeight: 700, textDecoration: 'none', padding: '12px 28px', borderRadius: '10px' }}>Verify a GRID ID →</Link>
+      </div>
+
       <Footer />
     </div>
   )

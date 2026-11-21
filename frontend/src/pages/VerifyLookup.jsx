@@ -1,9 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import usePageMeta from '../hooks/usePageMeta'
 
 // Public, Google-indexable entry point: anyone types a GRID ID to view a
 // verified résumé. Verification-first framing — this is GRID's differentiation.
 function VerifyLookup() {
+  usePageMeta({
+    title: 'Verify a GRID ID — View a candidate’s verified résumé | GRID',
+    description: 'Enter a GRID ID to open a verified résumé — education, skills and documents checked. No PDFs, no back-and-forth. For recruiters hiring verified Indian talent.',
+    canonical: 'https://www.thegridcard.com/verify',
+  })
   const navigate = useNavigate()
   const [value, setValue] = useState('')
   const [error, setError] = useState('')
