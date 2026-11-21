@@ -110,7 +110,7 @@ const getRecentActivity = async (req, res) => {
 const getAdminColleges = async (req, res) => {
   try {
     const colleges = await prisma.college.findMany({
-      include: { students: { select: { id: true } }, user: { select: { email: true } } },
+      include: { students: { select: { id: true } }, user: { select: { email: true, mustChangePassword: true } } },
       orderBy: { createdAt: 'desc' }
     })
     const formatted = colleges.map(c => ({
@@ -125,6 +125,7 @@ const getAdminColleges = async (req, res) => {
       tpoEmail: c.tpoEmail,
       tpoPhone: c.tpoPhone,
       studentCount: c.students.length,
+      awaitingFirstLogin: c.user?.mustChangePassword === true,
       createdAt: c.createdAt
     }))
     res.json({ colleges: formatted })
@@ -269,6 +270,41 @@ const toggleCollegeVetted = async (req, res) => {
       data: { vetted: !college.vetted }
     })
     res.json({ message: 'College updated', college: updated })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Delete a college and its login account (students are unlinked, not deleted).
+const deleteCollege = async (req, res) => {
+  try {
+    const { collegeId } = req.params
+    const college = await prisma.college.findUnique({ where: { id: parseInt(collegeId) } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    // Unlink any students and jobs that reference this college so FKs don't block.
+    await prisma.student.updateMany({ where: { collegeId: college.id }, data: { collegeId: null } })
+    await prisma.job.updateMany({ where: { targetCollegeId: college.id }, data: { targetCollegeId: null } })
+    const userId = college.userId
+    await prisma.college.delete({ where: { id: college.id } })
+    if (userId) await prisma.user.delete({ where: { id: userId } }).catch(() => {})
+    res.json({ message: 'College deleted' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Reset a college's password to a new temp password (shown once) and require a
+// change on next login. We can't reveal the old password — it's hashed.
+const resetCollegePassword = async (req, res) => {
+  try {
+    const { collegeId } = req.params
+    const college = await prisma.college.findUnique({ where: { id: parseInt(collegeId) } })
+    if (!college || !college.userId) return res.status(404).json({ message: 'College account not found' })
+    const tempPassword = crypto.randomBytes(6).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)
+    const passwordHash = await bcrypt.hash(tempPassword, 10)
+    await prisma.user.update({ where: { id: college.userId }, data: { passwordHash, mustChangePassword: true } })
+    if (college.tpoEmail) sendCollegeWelcomeEmail(college.tpoEmail, college.collegeName, tempPassword).catch(() => {})
+    res.json({ message: 'Password reset', tpoEmail: college.tpoEmail, tempPassword })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -749,4 +785,4 @@ const resolveAdminRequest = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
 }
 
-module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getCollegeApplications, approveCollegeApplication, rejectCollegeApplication, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
+module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, deleteCollege, resetCollegePassword, getCollegeApplications, approveCollegeApplication, rejectCollegeApplication, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }

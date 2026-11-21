@@ -314,6 +314,29 @@ function AdminPanel() {
     }
   }
 
+  const deleteCollege = async (c) => {
+    if (!window.confirm(`Delete ${c.collegeName}? This removes their login account. Linked students are kept but unlinked. This cannot be undone.`)) return
+    try {
+      await axios.delete(`${API_URL}/api/admin/colleges/${c.id}`, { headers })
+      setColleges(cs => cs.filter(x => x.id !== c.id))
+      setAppMsg(`${c.collegeName} was deleted.`)
+      refreshStats()
+    } catch (e) {
+      setAppMsg(e.response?.data?.message || 'Could not delete college')
+    }
+  }
+
+  const resetCollegePwd = async (c) => {
+    if (!window.confirm(`Reset password for ${c.collegeName}? A new temporary password will be generated and emailed to the TPO.`)) return
+    try {
+      const res = await axios.post(`${API_URL}/api/admin/colleges/${c.id}/reset-password`, {}, { headers })
+      setColleges(cs => cs.map(x => x.id === c.id ? { ...x, awaitingFirstLogin: true } : x))
+      setAppMsg(`New temp password for ${c.collegeName}: ${res.data.tempPassword} (login: ${res.data.tpoEmail}). Emailed to the TPO; they must change it on next login.`)
+    } catch (e) {
+      setAppMsg(e.response?.data?.message || 'Could not reset password')
+    }
+  }
+
   const toggleVetted = async (collegeId) => {
     const prev = colleges
     // Optimistic: flip it on screen immediately
@@ -672,6 +695,11 @@ function AdminPanel() {
                       <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.vetted ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'}`}>
                         {c.vetted ? '✓ Vetted' : 'Pending'}
                       </span>
+                      {c.awaitingFirstLogin && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 text-purple-700" title="Temporary password not yet changed by the TPO">
+                          🔑 Temp password
+                        </span>
+                      )}
                     </div>
                     <p className="text-xs text-gray-400 mt-0.5">
                       {[c.city, c.state].filter(Boolean).join(', ')} · {c.collegeType} · {c.studentCount} students
@@ -684,10 +712,16 @@ function AdminPanel() {
                         className="text-xs font-bold text-[#9a6b12] hover:underline whitespace-nowrap">Request vetting →</button>
                     )
                   ) : (
-                    <button onClick={() => toggleVetted(c.id)}
-                      className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
-                      {c.vetted ? 'Un-vet' : 'Mark vetted'}
-                    </button>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <button onClick={() => toggleVetted(c.id)}
+                        className="text-xs font-bold text-[#6b4edb] hover:underline whitespace-nowrap">
+                        {c.vetted ? 'Un-vet' : 'Mark vetted'}
+                      </button>
+                      <button onClick={() => resetCollegePwd(c)}
+                        className="text-xs font-bold text-[#0d7377] hover:underline whitespace-nowrap">Reset password</button>
+                      <button onClick={() => deleteCollege(c)}
+                        className="text-xs font-bold text-red-500 hover:underline whitespace-nowrap">Delete</button>
+                    </div>
                   )}
                 </div>
               ))}
