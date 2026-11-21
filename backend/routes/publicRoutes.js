@@ -2,7 +2,21 @@ const jwt = require('jsonwebtoken')
 const express = require('express')
 const router = express.Router()
 const { PrismaClient } = require('@prisma/client')
+const { decrypt } = require('../utils/encryption')
 const prisma = new PrismaClient()
+
+// The public profile is open to anyone, but contact details (email + phone) are
+// shown only to a signed-in company account. Returns true if the bearer token
+// belongs to a company user.
+async function viewerIsRecruiter(req) {
+  try {
+    const auth = req.headers.authorization
+    if (!auth || !auth.startsWith('Bearer ')) return false
+    const decoded = jwt.verify(auth.split(' ')[1], process.env.JWT_SECRET)
+    const u = await prisma.user.findUnique({ where: { id: decoded.userId }, select: { role: true } })
+    return u?.role === 'company'
+  } catch { return false }
+}
 
 router.get('/profile/:gridNumber', async (req, res) => {
   try {
@@ -17,6 +31,7 @@ router.get('/profile/:gridNumber', async (req, res) => {
     // Serve the PUBLISHED snapshot, never the live draft. Legacy published
     // accounts with no snapshot yet fall back to the live record once.
     const p = student.publishedProfile || student
+    const recruiter = await viewerIsRecruiter(req)
 
     const verifiedSkillRecords = await prisma.verifiedSkill.findMany({ where: { studentId: student.id } })
     const allSkillsArr = (p.technicalSkills || '').split(',').map(s => s.trim()).filter(Boolean)
@@ -27,11 +42,13 @@ router.get('/profile/:gridNumber', async (req, res) => {
 
     res.json({
       name: student.user?.name,
-      email: student.user?.email,
+      // Contact is recruiter-only. Phone is stored encrypted; decrypt just for them.
+      email: recruiter ? student.user?.email : null,
+      contactNumber: recruiter ? decrypt(p.contactNumber) : null,
+      contactLocked: !recruiter,
       gridNumber: student.gridNumber,
       photoUrl: p.photoUrl,
       bio: p.bio,
-      contactNumber: p.contactNumber,
       city: p.city,
       state: p.state,
       workStatus: p.workStatus,

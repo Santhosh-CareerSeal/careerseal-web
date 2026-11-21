@@ -36,7 +36,9 @@ function PublicProfile() {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const res = await axios.get(`${API_URL}/api/public/profile/${gridNumber}`)
+        // Send the token if present so a signed-in recruiter sees contact details.
+        const token = localStorage.getItem('token')
+        const res = await axios.get(`${API_URL}/api/public/profile/${gridNumber}`, token ? { headers: { Authorization: `Bearer ${token}` } } : {})
         setProfile(res.data)
       } catch (e) {
         setError(e.response?.data?.message || 'Profile not found')
@@ -152,9 +154,14 @@ function PublicProfile() {
               </div>
             </div>
             {/* Contact strip */}
-            <div className="bg-[#12305c] text-white/80 text-xs px-6 py-2.5 flex flex-wrap gap-x-5 gap-y-1 justify-center sm:justify-start">
+            <div className="bg-[#12305c] text-white/80 text-xs px-6 py-2.5 flex flex-wrap gap-x-5 gap-y-1 justify-center sm:justify-start items-center">
               {profile.contactNumber && <span>📞 {profile.contactNumber}</span>}
               {profile.email && <span>✉️ {profile.email}</span>}
+              {profile.contactLocked && (
+                <a href="/login" className="inline-flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/15 rounded-full px-3 py-1 text-white/70 font-semibold transition-colors">
+                  🔒 Contact visible to recruiters — sign in
+                </a>
+              )}
               {(profile.city || profile.state) && <span>📍 {[profile.city, profile.state].filter(Boolean).join(', ')}</span>}
               <span className="text-[#9FE1CB] font-bold">{profile.gridNumber}</span>
             </div>
@@ -309,6 +316,11 @@ function PublicProfile() {
                 <div className="text-xs text-white/80 flex flex-col gap-1.5">
                   {profile.contactNumber && <p>📞 {profile.contactNumber}</p>}
                   {profile.email && <p className="break-all">✉️ {profile.email}</p>}
+                  {profile.contactLocked && (
+                    <a href="/login" className="block bg-white/10 hover:bg-white/15 border border-white/15 rounded-lg px-3 py-2 text-white/70 font-semibold transition-colors">
+                      🔒 Sign in as a recruiter to see phone &amp; email
+                    </a>
+                  )}
                   {(profile.city || profile.state) && <p>📍 {[profile.city, profile.state].filter(Boolean).join(', ')}</p>}
                 </div>
               </div>

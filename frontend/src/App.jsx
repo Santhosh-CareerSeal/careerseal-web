@@ -13,6 +13,7 @@ import Jobs from './pages/Jobs'
 import CompanyPipeline from './pages/CompanyPipeline'
 import ProfileDetails from './pages/ProfileDetails'
 import PublicProfile from './pages/PublicProfile'
+import VerifyLookup from './pages/VerifyLookup'
 import Roadmap from './pages/Roadmap'
 import Settings from './pages/Settings'
 import Exams from './pages/Exams'
@@ -172,6 +173,8 @@ function App() {
         <Route path="/pipeline" element={<CompanyPipeline />} />
         <Route path="/profile-details" element={<ProfileDetails />} />
         <Route path="/profile/:gridNumber" element={<PublicProfile />} />
+        <Route path="/id/:gridNumber" element={<PublicProfile />} />
+        <Route path="/verify" element={<VerifyLookup />} />
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/exams" element={<Exams />} />

@@ -42,6 +42,8 @@ function GridCard() {
   const [notPublished, setNotPublished] = useState(false)
   const [downloading, setDownloading] = useState(false)
   const [verifiedSkills, setVerifiedSkills] = useState([])
+  const [qrImg, setQrImg] = useState('')
+  const [linkCopied, setLinkCopied] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,7 +83,18 @@ function GridCard() {
     const match = verifiedSkills.find(v => v.skill.toLowerCase() === skill.toLowerCase())
     return match && match.status === 'verified'
   })
-  const profileUrl = `https://thegridcard.com/profile/${gridCard?.gridNumber || 'GRID'}`
+  const profileUrl = `https://thegridcard.com/id/${gridCard?.gridNumber || 'GRID'}`
+
+  // Generate an on-screen QR of the public résumé link once the number exists.
+  useEffect(() => {
+    if (!gridCard?.gridNumber || notPublished) { setQrImg(''); return }
+    QRCode.toDataURL(`https://thegridcard.com/id/${gridCard.gridNumber}`, { width: 320, margin: 1, color: { dark: '#1A3C6E', light: '#ffffff' } })
+      .then(setQrImg).catch(() => setQrImg(''))
+  }, [gridCard?.gridNumber, notPublished])
+
+  const copyLink = async () => {
+    try { await navigator.clipboard.writeText(profileUrl); setLinkCopied(true); setTimeout(() => setLinkCopied(false), 1600) } catch { /* no-op */ }
+  }
   const shareUrl = `https://thegridcard.com/api/profile-preview?gridNumber=${gridCard?.gridNumber || 'GRID'}`
 
   const handleDownload = async () => {
@@ -199,7 +212,7 @@ function GridCard() {
       ctx.strokeStyle = 'rgba(13,115,119,0.5)'; ctx.lineWidth = 1
       drawRR(60, BY + 356, 580, 56, 10); ctx.stroke()
       ctx.fillStyle = '#5DCAA5'; ctx.font = 'bold 18px system-ui'
-      ctx.fillText(`thegridcard.com/profile/${gridCard?.gridNumber || ''}`, 80, BY + 390)
+      ctx.fillText(`thegridcard.com/id/${gridCard?.gridNumber || ''}`, 80, BY + 390)
 
       const qrDataUrl = await QRCode.toDataURL(profileUrl, {
         width: 300, margin: 2,
@@ -344,6 +357,21 @@ function GridCard() {
             <button onClick={handleDownload} disabled={downloading} className="grid-shine" style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 28px', fontSize: '13px', fontWeight: '700', cursor: downloading ? 'not-allowed' : 'pointer', opacity: downloading ? 0.7 : 1 }}>
               {downloading ? 'Generating...' : 'Download Card'}
             </button>
+
+            {/* Share: QR + public link to the verified résumé */}
+            {qrImg && (
+              <div style={{ marginTop: '26px', background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.12)', borderRadius: '16px', padding: '20px', maxWidth: '340px', marginLeft: 'auto', marginRight: 'auto' }}>
+                <img src={qrImg} alt="GRID résumé QR" style={{ width: '132px', height: '132px', borderRadius: '10px', display: 'block', margin: '0 auto 12px' }} />
+                <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '12.5px', fontWeight: 700, margin: '0 0 2px' }}>Scan to open your verified résumé</p>
+                <p style={{ color: 'rgba(255,255,255,0.4)', fontSize: '11px', margin: '0 0 12px' }}>Recruiters see your résumé; contact stays private until they sign in.</p>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'rgba(255,255,255,0.08)', borderRadius: '9px', padding: '8px 10px' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.75)', fontSize: '11px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, textAlign: 'left' }}>thegridcard.com/id/{gridCard?.gridNumber}</span>
+                  <button onClick={copyLink} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '7px', padding: '6px 12px', fontSize: '11px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>
+                    {linkCopied ? 'Copied ✓' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
