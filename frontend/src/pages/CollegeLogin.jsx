@@ -63,6 +63,7 @@ function CollegeLogin() {
               className="w-full bg-[#6b4edb] text-white py-3 rounded-xl font-bold hover:bg-[#5538c9] transition-colors disabled:opacity-50">
               {loading ? 'Signing in...' : 'Sign In →'}
             </button>
+            <button onClick={() => navigate('/forgot-password')} className="w-full text-center text-xs text-[#6b4edb] font-bold mt-3">Forgot password?</button>
           </div>
 
           <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100">

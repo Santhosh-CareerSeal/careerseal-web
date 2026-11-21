@@ -52,9 +52,13 @@ function Sidebar({ active, setActive, company, navigate }) {
         <span style={{ color: 'white', fontSize: '14px', fontWeight: '700' }}>GRID</span>
       </div>
       <div style={{ background: 'rgba(255,255,255,0.06)', borderRadius: '8px', padding: '10px', marginBottom: '10px', textAlign: 'center' }}>
-        <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#0D7377', margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '16px' }}>
-          {company?.companyName?.charAt(0) || 'C'}
-        </div>
+        {company?.logoUrl ? (
+          <img src={company.logoUrl} alt="logo" style={{ width: '40px', height: '40px', borderRadius: '8px', objectFit: 'cover', margin: '0 auto 6px', display: 'block', background: 'white' }} />
+        ) : (
+          <div style={{ width: '40px', height: '40px', borderRadius: '8px', background: '#0D7377', margin: '0 auto 6px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: '700', fontSize: '16px' }}>
+            {company?.companyName?.charAt(0) || 'C'}
+          </div>
+        )}
         <p style={{ color: 'white', fontSize: '11px', fontWeight: '600', margin: '0 0 2px' }}>{company?.companyName || 'Company'}</p>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
           <div style={{ width: '6px', height: '6px', borderRadius: '50%', background: company?.mcaStatus === 'verified' ? '#5DCAA5' : '#EF9F27' }}></div>
@@ -272,6 +276,7 @@ export default function CompanyDashboard() {
       // Save immediately so the logo persists without needing a full form save.
       const updated = { ...profileForm, logoUrl: data.publicUrl }
       setProfileForm(updated)
+      setCompany(c => ({ ...c, logoUrl: data.publicUrl }))
       await axios.put(`${API_URL}/api/company/profile`, updated, { headers })
       setProfileSuccess('Logo updated!')
       setTimeout(() => setProfileSuccess(''), 3000)

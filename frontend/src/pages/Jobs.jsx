@@ -309,9 +309,13 @@ function Jobs() {
 
                     <div className="flex justify-between items-start mb-3">
                       <div className="flex gap-3 items-start flex-1">
-                        <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${matchLabel?.label === 'Best match' ? 'bg-[#0D7377]/10' : 'bg-gray-100'}`}>
-                          {icon}
-                        </div>
+                        {job.company?.logoUrl ? (
+                          <img src={job.company.logoUrl} alt={job.company?.companyName || 'Company'} className="w-11 h-11 rounded-xl object-cover flex-shrink-0 bg-white border border-gray-100" />
+                        ) : (
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl flex-shrink-0 ${matchLabel?.label === 'Best match' ? 'bg-[#0D7377]/10' : 'bg-gray-100'}`}>
+                            {icon}
+                          </div>
+                        )}
                         <div className="flex-1">
                           <div className="flex items-center gap-2 flex-wrap mb-1">
                             <p className="text-base font-bold text-gray-800">{job.title}</p>
