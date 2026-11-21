@@ -91,6 +91,7 @@ export default function CompanyDashboard() {
   const [gridLookup, setGridLookup] = useState('')
   const [gridLookupError, setGridLookupError] = useState('')
   const [uploadingLogo, setUploadingLogo] = useState(false)
+  const [showBgv, setShowBgv] = useState(false)
 
   // Post job form
   const [jobForm, setJobForm] = useState({ title: '', description: '', requiredSkills: '', jobType: '', experienceLevel: '', location: '', salaryRange: '', openings: '1', deadline: '', targetCollegeId: '' })
@@ -302,6 +303,40 @@ export default function CompanyDashboard() {
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'system-ui, sans-serif', background: '#f4f5f7' }}>
       <Sidebar active={active} setActive={setActive} company={company} navigate={navigate} />
 
+      {showBgv && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(14,27,46,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '18px' }} onClick={() => setShowBgv(false)}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: '18px', width: '560px', maxWidth: '100%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div style={{ padding: '22px 22px 0' }}>
+              <span onClick={() => setShowBgv(false)} style={{ float: 'right', color: '#c3c9d2', fontSize: '18px', cursor: 'pointer' }}>✕</span>
+              <div style={{ width: '40px', height: '40px', borderRadius: '11px', background: '#f3eefe', color: '#6b4edb', display: 'grid', placeItems: 'center', fontSize: '19px', marginBottom: '10px' }}>🛡️</div>
+              <h2 style={{ fontSize: '19px', fontWeight: 800, color: '#1A3C6E', margin: 0 }}>Unlock Full Background Verification</h2>
+              <p style={{ fontSize: '13px', color: '#6b7280', margin: '4px 0 0' }}>GRID already verifies education, skills, documents &amp; email. Full BGV adds identity (DigiLocker) &amp; employment history.</p>
+            </div>
+            <div style={{ padding: '18px 22px 22px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '14px' }}>
+                {[
+                  { name: 'Growth', price: '₹2,999', per: '/mo', feats: ['10 full BGVs / month', 'Priority verification', 'Unlimited GRID-ID lookups'], best: false },
+                  { name: 'Pro', price: '₹7,999', per: '/mo', feats: ['30 full BGVs / month', 'Bulk & API access', 'Team seats + support'], best: true },
+                ].map(p => (
+                  <div key={p.name} style={{ border: p.best ? '1.5px solid #6b4edb' : '1.5px solid #e8eaee', borderRadius: '14px', padding: '16px', position: 'relative', boxShadow: p.best ? '0 0 0 3px rgba(107,78,219,.12)' : 'none' }}>
+                    {p.best && <span style={{ position: 'absolute', top: '-10px', right: '14px', background: '#6b4edb', color: 'white', fontSize: '10px', fontWeight: 800, padding: '3px 9px', borderRadius: '999px', textTransform: 'uppercase' }}>Popular</span>}
+                    <h3 style={{ margin: 0, fontSize: '14px', fontWeight: 800, color: '#1A3C6E' }}>{p.name}</h3>
+                    <div style={{ margin: '6px 0 10px', fontSize: '22px', fontWeight: 800 }}>{p.price}<span style={{ fontSize: '12px', fontWeight: 600, color: '#9ca3af' }}>{p.per}</span></div>
+                    {p.feats.map(f => <p key={f} style={{ fontSize: '12px', color: '#4b5563', margin: '0 0 6px', display: 'flex', gap: '7px' }}><span style={{ color: '#0f7a4f', fontWeight: 800 }}>✓</span> {f}</p>)}
+                    <button onClick={() => alert('Plans & payments are launching soon. Contact support@thegridcard.com for early access.')} style={{ marginTop: '10px', width: '100%', border: 'none', borderRadius: '10px', padding: '10px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', background: p.best ? 'linear-gradient(135deg,#6b4edb,#0d7377)' : '#f1f3f6', color: p.best ? 'white' : '#1A3C6E' }}>Choose {p.name}</button>
+                  </div>
+                ))}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', border: '1.5px dashed #c7ccd6', borderRadius: '12px', padding: '12px 14px' }}>
+                <div><b style={{ fontSize: '13px', color: '#1A3C6E' }}>One-time full BGV</b><small style={{ display: 'block', fontSize: '11px', color: '#9ca3af' }}>Pay only for this candidate</small></div>
+                <button onClick={() => alert('Plans & payments are launching soon. Contact support@thegridcard.com for early access.')} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '9px', padding: '9px 16px', fontSize: '12.5px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Pay ₹499 →</button>
+              </div>
+              <p style={{ fontSize: '11px', color: '#9ca3af', textAlign: 'center', margin: '12px 0 0' }}>🔒 Secure payments via Razorpay · launching soon (example pricing)</p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {rejectModal && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
           <div style={{ background: 'white', borderRadius: '16px', padding: '24px', width: '440px', maxWidth: '90vw' }}>
@@ -362,6 +397,16 @@ export default function CompanyDashboard() {
                 </button>
               </div>
               {gridLookupError && <p style={{ color: '#ffd4d4', fontSize: '12px', margin: '8px 0 0' }}>{gridLookupError}</p>}
+            </div>
+
+            {/* Background Verification */}
+            <div style={{ background: 'white', border: '1px solid #eee', borderRadius: '16px', padding: '18px 20px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '12px', background: '#f3eefe', color: '#6b4edb', display: 'grid', placeItems: 'center', fontSize: '20px', flexShrink: 0 }}>🛡️</div>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <p style={{ fontSize: '14px', fontWeight: 800, color: '#1A3C6E', margin: '0 0 2px' }}>Background Verification (BGV)</p>
+                <p style={{ fontSize: '12px', color: '#6b7280', margin: 0 }}>GRID pre-verifies education, skills, documents &amp; email. Complete the rest — identity &amp; employment — in one click.</p>
+              </div>
+              <button onClick={() => setShowBgv(true)} style={{ background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '10px 18px', fontSize: '13px', fontWeight: 700, cursor: 'pointer', whiteSpace: 'nowrap' }}>Run full BGV</button>
             </div>
 
             {/* Stat cards */}

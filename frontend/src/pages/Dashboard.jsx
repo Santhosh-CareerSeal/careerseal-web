@@ -50,6 +50,8 @@ function Dashboard() {
   const [loading, setLoading] = useState(true)
   const [emailVerified, setEmailVerified] = useState(true)
   const [resendMsg, setResendMsg] = useState('')
+  const [verifiedSkillCount, setVerifiedSkillCount] = useState(0)
+  const [docVerified, setDocVerified] = useState(false)
 
   const today = new Date()
   const tipIndex = (today.getDate() - 1) % TIPS.length
@@ -62,16 +64,22 @@ function Dashboard() {
       try {
         const token = localStorage.getItem('token')
         if (!token) { navigate('/login'); return }
-        const [dashRes, profileRes, appRes] = await Promise.all([
+        const [dashRes, profileRes, appRes, examRes, docRes] = await Promise.all([
           cget(`${API_URL}/api/dashboard/student`, { headers: { Authorization: `Bearer ${token}` } }),
           cget(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
-          cget(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } })
+          cget(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } }),
+          cget(`${API_URL}/api/exams`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { skillStatus: [] } })),
+          cget(`${API_URL}/api/documents/my`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { documents: [] } }))
         ])
         setUser(dashRes.data.user)
         setStats(dashRes.data.stats)
         setStudent(profileRes.data.student)
         setEmailVerified(profileRes.data.emailVerified !== false)
         setApplications(appRes.data.applications || [])
+        const passed = (examRes.data.skillStatus || []).filter(s => s.verified || s.passed || (s.passedLevels && s.passedLevels.length)).length
+        setVerifiedSkillCount(passed)
+        const docs = docRes.data.documents || []
+        setDocVerified(docs.some(d => d.trustStatus === 'verified'))
       } catch (error) {
         navigate('/login')
       } finally {
@@ -226,27 +234,44 @@ function Dashboard() {
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-4 border border-gray-100">
-            <div className="flex items-center gap-2 mb-3">
-              <Icon name="award" className="text-[#6b4edb] text-base" />
-              <p className="text-[#1A3C6E] font-bold text-sm">Verification</p>
-            </div>
-            <div className="flex flex-col gap-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Email</span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800">✓ Done</span>
+          {(() => {
+            const checks = [
+              { label: 'Email', done: emailVerified, go: null, hint: emailVerified ? 'Verified' : 'Verify your email' },
+              { label: 'Skills tested', done: verifiedSkillCount > 0, go: '/exams', hint: verifiedSkillCount > 0 ? `${verifiedSkillCount} passed` : 'Take a skill exam' },
+              { label: 'Documents', done: docVerified, go: '/profile-details', hint: docVerified ? 'Verified' : 'Upload & verify' },
+            ]
+            const doneCount = checks.filter(c => c.done).length
+            const total = checks.length + 1 // +1 for identity (coming soon)
+            return (
+              <div className="bg-white rounded-2xl p-4 border border-gray-100">
+                <div className="flex items-center justify-between mb-1">
+                  <div className="flex items-center gap-2">
+                    <Icon name="award" className="text-[#6b4edb] text-base" />
+                    <p className="text-[#1A3C6E] font-bold text-sm">Verification</p>
+                  </div>
+                  <span className="text-xs font-bold text-[#0d7377]">{doneCount}/{total}</span>
+                </div>
+                <p className="text-[11px] text-gray-400 mb-3">Your hire-ready status recruiters can trust.</p>
+                <div className="flex flex-col gap-2">
+                  {checks.map(c => (
+                    <div key={c.label} className="flex items-center justify-between">
+                      <span className="text-xs text-gray-600">{c.label}</span>
+                      {c.done ? (
+                        <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-800">✓ {c.hint}</span>
+                      ) : (
+                        <button onClick={() => c.go && navigate(c.go)} className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 hover:bg-amber-200">{c.hint} →</button>
+                      )}
+                    </div>
+                  ))}
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs text-gray-600">Identity (DigiLocker)</span>
+                    <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">Coming soon</span>
+                  </div>
+                </div>
+                <button onClick={() => navigate('/grid')} className="text-[#6b4edb] text-xs font-bold mt-3 block">View my GRID Card →</button>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">Aadhaar</span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Pending</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-xs text-gray-600">DigiLocker</span>
-                <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Pending</span>
-              </div>
-            </div>
-            <button onClick={() => navigate('/grid')} className="text-[#6b4edb] text-xs font-bold mt-3 block">Verify on GRID →</button>
-          </div>
+            )
+          })()}
 
         </div>
 
