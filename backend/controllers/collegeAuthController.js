@@ -47,4 +47,28 @@ const changeCollegePassword = async (req, res) => {
   }
 }
 
-module.exports = { collegeLogin, changeCollegePassword }
+// Public: a college/TPO applies to partner with GRID. Creates a pending
+// application for the super admin to review — no login account yet.
+const applyCollege = async (req, res) => {
+  try {
+    const { collegeName, tpoName, tpoEmail, tpoPhone, city, state, collegeType, aisheCode, studentCount, website, message } = req.body
+    if (!collegeName || !collegeName.trim()) return res.status(400).json({ message: 'College name is required' })
+    if (!tpoEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(tpoEmail)) return res.status(400).json({ message: 'A valid contact email is required' })
+
+    // Soft de-dupe: don't let the same email spam pending applications.
+    const dup = await prisma.collegeApplication.findFirst({ where: { tpoEmail, status: 'pending' } })
+    if (dup) return res.status(200).json({ message: 'We already have your application on file — our team will be in touch.' })
+
+    await prisma.collegeApplication.create({
+      data: {
+        collegeName: collegeName.trim(), tpoName, tpoEmail, tpoPhone,
+        city, state, collegeType, aisheCode, studentCount, website, message
+      }
+    })
+    res.status(201).json({ message: 'Application received! Our team will review it and reach out to you.' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+module.exports = { collegeLogin, changeCollegePassword, applyCollege }

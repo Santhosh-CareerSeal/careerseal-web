@@ -6,7 +6,7 @@ const adminLoginLimiter = rateLimit({
   message: { message: 'Too many login attempts. Try again in 15 minutes.' }
 })
 const router = express.Router()
-const { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
+const { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getCollegeApplications, approveCollegeApplication, rejectCollegeApplication, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest } = require('../controllers/adminController')
 const { protect } = require('../middleware/authMiddleware')
 const { adminOnly, superOnly } = require('../middleware/adminMiddleware')
 
@@ -36,6 +36,9 @@ router.post('/requests', protect, adminOnly, createAdminRequest) // staff raises
 // --- Super admin only (trust decisions, platform management) ---
 router.post('/colleges', protect, superOnly, addCollege)
 router.patch('/colleges/:collegeId/vetted', protect, superOnly, toggleCollegeVetted)
+router.get('/college-applications', protect, adminOnly, getCollegeApplications)
+router.post('/college-applications/:id/approve', protect, superOnly, approveCollegeApplication)
+router.post('/college-applications/:id/reject', protect, superOnly, rejectCollegeApplication)
 router.patch('/companies/:companyId/verify', protect, superOnly, toggleCompanyVerified)
 router.patch('/fraud-flags/:flagId', protect, superOnly, resolveFraudFlag)
 router.patch('/ask-questions/:questionId', protect, superOnly, updateAskQuestion)

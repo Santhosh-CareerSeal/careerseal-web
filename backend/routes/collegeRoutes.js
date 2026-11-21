@@ -1,9 +1,12 @@
 const express = require('express')
 const router = express.Router()
-const { collegeLogin, changeCollegePassword } = require('../controllers/collegeAuthController')
+const { collegeLogin, changeCollegePassword, applyCollege } = require('../controllers/collegeAuthController')
+const rateLimit = require('express-rate-limit')
+const applyLimiter = rateLimit({ windowMs: 60 * 60 * 1000, max: 5, message: { message: 'Too many applications. Please try again later.' } })
 const { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports } = require('../controllers/collegeController')
 const { protect } = require('../middleware/authMiddleware')
 
+router.post('/apply', applyLimiter, applyCollege)
 router.post('/login', collegeLogin)
 router.post('/change-password', protect, changeCollegePassword)
 router.get('/list', getActiveCollegesList)

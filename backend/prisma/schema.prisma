@@ -304,6 +304,27 @@ model FraudFlag {
   @@index([studentId])
 }
 
+model CollegeApplication {
+  id           Int      @id @default(autoincrement())
+  collegeName  String
+  tpoName      String?
+  tpoEmail     String
+  tpoPhone     String?
+  city         String?
+  state        String?
+  collegeType  String?
+  aisheCode    String?
+  studentCount String?
+  website      String?
+  message      String?
+  status       String   @default("pending") // pending | approved | rejected
+  reviewedBy   String?
+  reviewedAt   DateTime?
+  createdAt    DateTime @default(now())
+
+  @@index([status])
+}
+
 model AskQuestion {
   id          Int      @id @default(autoincrement())
   question    String

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs')
+const crypto = require('crypto')
 const jwt = require('jsonwebtoken')
 const { PrismaClient } = require('@prisma/client')
 const { sendPasswordResetEmail, sendVerificationEmail } = require('../services/emailService')
@@ -175,6 +176,80 @@ const addCollege = async (req, res) => {
       include: { college: true }
     })
     res.status(201).json({ message: 'College created successfully', college: created.college })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// List college partnership applications (newest first)
+const getCollegeApplications = async (req, res) => {
+  try {
+    const status = req.query.status // optional filter
+    const where = status ? { status } : {}
+    const applications = await prisma.collegeApplication.findMany({ where, orderBy: { createdAt: 'desc' } })
+    res.json({ applications })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// Approve an application -> provision the college account (reuses addCollege
+// logic) with a generated temp password returned once for the admin to share.
+const approveCollegeApplication = async (req, res) => {
+  try {
+    const { id } = req.params
+    const app = await prisma.collegeApplication.findUnique({ where: { id: parseInt(id) } })
+    if (!app) return res.status(404).json({ message: 'Application not found' })
+    if (app.status === 'approved') return res.status(400).json({ message: 'Already approved' })
+
+    const existing = await prisma.user.findUnique({ where: { email: app.tpoEmail } })
+    if (existing) return res.status(400).json({ message: 'A user with this email already exists' })
+
+    const slug = app.collegeName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
+    if (await prisma.college.findUnique({ where: { slug } })) {
+      return res.status(400).json({ message: 'A college with a similar name already exists' })
+    }
+
+    const tempPassword = crypto.randomBytes(6).toString('base64').replace(/[^a-zA-Z0-9]/g, '').slice(0, 10)
+    const passwordHash = await bcrypt.hash(tempPassword, 10)
+    await prisma.user.create({
+      data: {
+        name: app.tpoName || app.collegeName,
+        email: app.tpoEmail,
+        passwordHash,
+        role: 'college',
+        emailVerified: true,
+        college: {
+          create: {
+            collegeName: app.collegeName, slug,
+            city: app.city || null, state: app.state || null,
+            collegeType: app.collegeType || 'Degree',
+            vetted: true,
+            tpoName: app.tpoName || null, tpoEmail: app.tpoEmail, tpoPhone: app.tpoPhone || null
+          }
+        }
+      }
+    })
+    await prisma.collegeApplication.update({
+      where: { id: app.id },
+      data: { status: 'approved', reviewedBy: req.user?.email || 'admin', reviewedAt: new Date() }
+    })
+    // tempPassword is returned ONCE so the admin can pass it to the TPO, who
+    // changes it after first login.
+    res.json({ message: 'College account created', tpoEmail: app.tpoEmail, tempPassword })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const rejectCollegeApplication = async (req, res) => {
+  try {
+    const { id } = req.params
+    await prisma.collegeApplication.update({
+      where: { id: parseInt(id) },
+      data: { status: 'rejected', reviewedBy: req.user?.email || 'admin', reviewedAt: new Date() }
+    })
+    res.json({ message: 'Application rejected' })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -671,4 +746,4 @@ const resolveAdminRequest = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
 }
 
-module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
+module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, getCollegeApplications, approveCollegeApplication, rejectCollegeApplication, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }

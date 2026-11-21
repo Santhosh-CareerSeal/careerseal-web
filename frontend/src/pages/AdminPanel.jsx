@@ -25,6 +25,8 @@ function AdminPanel() {
   const [answerDrafts, setAnswerDrafts] = useState({})
   const [savingAns, setSavingAns] = useState(null)
   const [colleges, setColleges] = useState([])
+  const [collegeApps, setCollegeApps] = useState([])
+  const [appMsg, setAppMsg] = useState('')
   const [users, setUsers] = useState([])
   const [companies, setCompanies] = useState([])
   const [expanded, setExpanded] = useState(null)
@@ -66,20 +68,45 @@ function AdminPanel() {
 
   const loadAll = async () => {
     try {
-      const [statsRes, collegesRes, companiesRes, activityRes] = await Promise.all([
+      const [statsRes, collegesRes, companiesRes, activityRes, appsRes] = await Promise.all([
         axios.get(`${API_URL}/api/admin/stats`, { headers }),
         axios.get(`${API_URL}/api/admin/colleges`, { headers }),
         axios.get(`${API_URL}/api/admin/companies`, { headers }),
-        axios.get(`${API_URL}/api/admin/activity`, { headers }).catch(() => ({ data: { activity: [] } }))
+        axios.get(`${API_URL}/api/admin/activity`, { headers }).catch(() => ({ data: { activity: [] } })),
+        axios.get(`${API_URL}/api/admin/college-applications`, { headers, params: { status: 'pending' } }).catch(() => ({ data: { applications: [] } }))
       ])
       setStats(statsRes.data)
       setColleges(collegesRes.data.colleges || [])
       setCompanies(companiesRes.data.companies || [])
       setActivity(activityRes.data.activity || [])
+      setCollegeApps(appsRes.data.applications || [])
     } catch (e) {
       if (e.response?.status === 403 || e.response?.status === 401) navigate('/admin-login')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const approveApp = async (app) => {
+    if (!window.confirm(`Approve ${app.collegeName}? This creates a login for ${app.tpoEmail}.`)) return
+    try {
+      const res = await axios.post(`${API_URL}/api/admin/college-applications/${app.id}/approve`, {}, { headers })
+      setAppMsg(`✓ ${app.collegeName} approved. Share these with the TPO — temp password: ${res.data.tempPassword} (login: ${res.data.tpoEmail}). They can change it after signing in.`)
+      setCollegeApps(apps => apps.filter(a => a.id !== app.id))
+      loadAll()
+    } catch (e) {
+      setAppMsg(e.response?.data?.message || 'Could not approve application')
+    }
+  }
+
+  const rejectApp = async (app) => {
+    if (!window.confirm(`Reject ${app.collegeName}'s application?`)) return
+    try {
+      await axios.post(`${API_URL}/api/admin/college-applications/${app.id}/reject`, {}, { headers })
+      setCollegeApps(apps => apps.filter(a => a.id !== app.id))
+      setAppMsg(`${app.collegeName}'s application was rejected.`)
+    } catch (e) {
+      setAppMsg(e.response?.data?.message || 'Could not reject application')
     }
   }
 
@@ -553,6 +580,43 @@ function AdminPanel() {
 
         {active === 'colleges' && (
           <div>
+            {appMsg && (
+              <div className="bg-[#eef6ff] border border-[#bcd8f5] text-[#1A3C6E] text-sm rounded-xl px-4 py-3 mb-4 flex items-start justify-between gap-3">
+                <span>{appMsg}</span>
+                <button onClick={() => setAppMsg('')} className="text-[#6b7280] font-bold">✕</button>
+              </div>
+            )}
+
+            {/* Partnership applications */}
+            {collegeApps.length > 0 && (
+              <div className="bg-white rounded-2xl p-5 border border-amber-200 mb-5">
+                <p className="text-sm font-extrabold text-[#1A3C6E] mb-1">🎓 Partnership applications <span className="text-amber-600">({collegeApps.length} pending)</span></p>
+                <p className="text-xs text-gray-400 mb-4">Colleges that applied via the public form. Approving creates their login account.</p>
+                <div className="flex flex-col gap-3">
+                  {collegeApps.map(app => (
+                    <div key={app.id} className="border border-gray-100 rounded-xl p-4">
+                      <div className="flex items-start justify-between gap-3 flex-wrap">
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-[#1A3C6E]">{app.collegeName}</p>
+                          <p className="text-xs text-gray-500">{[app.city, app.state].filter(Boolean).join(', ') || '—'} · {app.studentCount ? `~${app.studentCount} students` : 'size n/a'}{app.aisheCode ? ` · AISHE ${app.aisheCode}` : ''}</p>
+                          <p className="text-xs text-gray-500 mt-1">{app.tpoName ? `${app.tpoName} · ` : ''}<a href={`mailto:${app.tpoEmail}`} className="text-[#6b4edb] font-semibold">{app.tpoEmail}</a>{app.tpoPhone ? ` · ${app.tpoPhone}` : ''}</p>
+                          {app.website && <p className="text-xs text-gray-400 mt-0.5 break-all">{app.website}</p>}
+                          {app.message && <p className="text-xs text-gray-500 mt-1.5 italic">“{app.message}”</p>}
+                        </div>
+                        {!isStaff && (
+                          <div className="flex gap-2 flex-shrink-0">
+                            <button onClick={() => approveApp(app)} className="bg-[#0f7a4f] text-white text-xs font-bold px-3 py-2 rounded-lg hover:opacity-90">Approve</button>
+                            <button onClick={() => rejectApp(app)} className="bg-gray-100 text-gray-600 text-xs font-bold px-3 py-2 rounded-lg hover:bg-gray-200">Reject</button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                {isStaff && <p className="text-xs text-gray-400 mt-3">Only a super admin can approve or reject applications.</p>}
+              </div>
+            )}
+
             <div className="flex items-center justify-between mb-4">
               <h1 className="text-xl font-bold text-[#1A3C6E]">Colleges ({colleges.length})</h1>
               {!isStaff && (

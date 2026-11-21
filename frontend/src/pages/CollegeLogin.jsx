@@ -67,7 +67,7 @@ function CollegeLogin() {
 
           <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100">
             <p className="text-xs text-blue-700 font-bold mb-1">Access restricted</p>
-            <p className="text-xs text-blue-600">This portal is only for GRID partner institutions. Contact us at support@thegridcard.com to partner with us.</p>
+            <p className="text-xs text-blue-600">This portal is only for GRID partner institutions. <a href="/for-colleges" className="font-bold underline">Apply to partner →</a></p>
           </div>
         </div>
 
