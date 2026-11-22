@@ -5,6 +5,7 @@ import API_URL from '../config'
 import getHomeDest from '../utils/homeDest'
 import PasswordField from '../components/PasswordField'
 import QRCode from 'qrcode'
+import { supabase } from '../supabaseClient'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Footer from '../components/Footer'
@@ -57,6 +58,7 @@ export default function CollegePortal() {
   const [loading, setLoading] = useState(true)
   const [inviteQr, setInviteQr] = useState('')
   const [inviteCopied, setInviteCopied] = useState(false)
+  const [logoUploading, setLogoUploading] = useState(false)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -225,6 +227,36 @@ export default function CollegePortal() {
   }, [joinUrl])
   const copyInvite = async () => { try { await navigator.clipboard.writeText(joinUrl); setInviteCopied(true); setTimeout(() => setInviteCopied(false), 1600) } catch { /* no-op */ } }
 
+  const downloadCsv = (filename, rows) => {
+    const csv = rows.map(r => r.map(x => `"${String(x ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+    const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a'); a.href = url; a.download = filename; a.click(); URL.revokeObjectURL(url)
+  }
+  const handleCollegeLogoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml'].includes(file.type)) { alert('Only JPG, PNG, WEBP or SVG allowed'); return }
+    if (file.size > 5 * 1024 * 1024) { alert('Logo must be under 5MB'); return }
+    setLogoUploading(true)
+    try {
+      const ext = file.name.split('.').pop().toLowerCase()
+      const fileName = `college_${college?.id || 'x'}_${Date.now()}.${ext}`
+      const { error: upErr } = await supabase.storage.from('profile-photos').upload(fileName, file, { cacheControl: '3600', upsert: false, contentType: file.type })
+      if (upErr) throw upErr
+      const { data } = supabase.storage.from('profile-photos').getPublicUrl(fileName)
+      await axios.patch(`${API_URL}/api/college/profile`, { logoUrl: data.publicUrl }, { headers })
+      setCollege(c => ({ ...c, logoUrl: data.publicUrl }))
+    } catch (err) { console.error(err); alert('Logo upload failed, please try again') }
+    finally { setLogoUploading(false) }
+  }
+
+  const exportStudents = () => {
+    const header = ['Name', 'Email', 'Branch', 'GRID Published', 'Verified Skills', 'Placed', 'Applications']
+    const rows = [header, ...filteredStudents.map(s => [s.name, s.email, s.branch, s.gridPublished ? 'Yes' : 'No', s.verifiedSkillsCount || 0, s.placed ? 'Yes' : 'No', s.applicationsCount || 0])]
+    downloadCsv(`${(college?.collegeName || 'students').replace(/[^a-z0-9]+/gi, '-')}-roster.csv`, rows)
+  }
+
   const filteredStudents = students.filter(s => {
     const matchesFilter = filter === 'all' || (filter === 'placed' && s.placed) || (filter === 'grid' && s.gridPublished) || (filter === 'verified' && s.verifiedSkillsCount > 0)
     const matchesSearch = !search || s.name?.toLowerCase().includes(search.toLowerCase()) || s.branch?.toLowerCase().includes(search.toLowerCase())
@@ -379,6 +411,10 @@ export default function CollegePortal() {
                   {f === 'all' ? 'All' : f === 'placed' ? 'Placed' : f === 'grid' ? 'GRID Published' : 'Skills Verified'}
                 </button>
               ))}
+              <button onClick={exportStudents} disabled={filteredStudents.length === 0}
+                style={{ padding: '8px 16px', borderRadius: '20px', border: 'none', fontSize: '12px', fontWeight: 700, cursor: filteredStudents.length === 0 ? 'not-allowed' : 'pointer', background: '#E1F5EE', color: '#085041', opacity: filteredStudents.length === 0 ? 0.5 : 1 }}>
+                Export ⬇
+              </button>
             </div>
 
             {filteredStudents.length === 0 ? (
@@ -642,6 +678,21 @@ export default function CollegePortal() {
             <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 20px' }}>Settings</p>
             <div style={{ background: 'white', borderRadius: '14px', padding: '20px', border: '1px solid #eee', marginBottom: '12px' }}>
               <p style={{ fontSize: '13px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 14px' }}>Institution Profile</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '14px', paddingBottom: '14px', marginBottom: '6px', borderBottom: '1px solid #f0f0f0' }}>
+                {college?.logoUrl ? (
+                  <img src={college.logoUrl} alt="logo" style={{ width: '60px', height: '60px', borderRadius: '12px', objectFit: 'cover', border: '1px solid #eee', flexShrink: 0 }} />
+                ) : (
+                  <div style={{ width: '60px', height: '60px', borderRadius: '12px', background: 'linear-gradient(135deg,#0d7377,#1a3c6e)', display: 'grid', placeItems: 'center', color: 'white', fontWeight: 800, fontSize: '24px', flexShrink: 0 }}>{(college?.collegeName || 'C').charAt(0).toUpperCase()}</div>
+                )}
+                <div>
+                  <p style={{ fontSize: '12px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 2px' }}>College logo</p>
+                  <p style={{ fontSize: '11px', color: '#9ca3af', margin: '0 0 7px' }}>Shown to students & on reports · up to 5MB</p>
+                  <label style={{ display: 'inline-block', background: '#f1f3f6', color: '#1A3C6E', fontSize: '12px', fontWeight: 700, padding: '6px 13px', borderRadius: '9px', cursor: logoUploading ? 'wait' : 'pointer' }}>
+                    {logoUploading ? 'Uploading…' : (college?.logoUrl ? 'Change logo' : 'Upload logo')}
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/svg+xml" onChange={handleCollegeLogoUpload} disabled={logoUploading} style={{ display: 'none' }} />
+                  </label>
+                </div>
+              </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {[
                   { label: 'College Name', value: college?.collegeName },

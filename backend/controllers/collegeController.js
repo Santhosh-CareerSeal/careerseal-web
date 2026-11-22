@@ -38,6 +38,25 @@ const getCollegeProfile = async (req, res) => {
   }
 }
 
+// College updates its own profile (logo + a few editable fields).
+const updateCollegeProfile = async (req, res) => {
+  try {
+    const userId = req.user.userId
+    const college = await prisma.college.findUnique({ where: { userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const { logoUrl, tpoPhone, city, state } = req.body
+    const data = {}
+    if (logoUrl !== undefined) data.logoUrl = logoUrl
+    if (tpoPhone !== undefined) data.tpoPhone = tpoPhone
+    if (city !== undefined) data.city = city
+    if (state !== undefined) data.state = state
+    const updated = await prisma.college.update({ where: { userId }, data })
+    res.json({ message: 'Profile updated', college: updated })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 const getCollegeDashboard = async (req, res) => {
   try {
     const userId = req.user.userId
@@ -394,4 +413,4 @@ const getCollegeReports = async (req, res) => {
   }
 }
 
-module.exports = { getActiveCollegesList, getCollegeBySlug, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }
+module.exports = { getActiveCollegesList, getCollegeBySlug, updateCollegeProfile, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }
