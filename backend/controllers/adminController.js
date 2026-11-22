@@ -281,13 +281,47 @@ const deleteCollege = async (req, res) => {
     const { collegeId } = req.params
     const college = await prisma.college.findUnique({ where: { id: parseInt(collegeId) } })
     if (!college) return res.status(404).json({ message: 'College not found' })
+
+    // Snapshot drives, placements and students into the Archive before deleting.
+    const students = await prisma.student.findMany({
+      where: { collegeId: college.id },
+      include: { user: { select: { name: true } }, applications: { select: { status: true } } }
+    })
+    const drives = await prisma.job.findMany({ where: { targetCollegeId: college.id, isDrive: true } })
+    const placedStatuses = ['placed', 'hired', 'selected', 'accepted', 'offered']
+    const studentRows = students.map(s => {
+      const placed = (s.applications || []).some(a => placedStatuses.includes((a.status || '').toLowerCase()))
+      return { name: s.user?.name || null, gridNumber: s.gridNumber, branch: s.branch, placed }
+    })
+    const driveRows = drives.map(d => ({ title: d.title, company: d.driveCompany || null, date: d.driveDate || null }))
+    const placementCount = studentRows.filter(s => s.placed).length
+    await prisma.collegeArchive.create({
+      data: {
+        collegeName: college.collegeName, city: college.city, state: college.state, slug: college.slug,
+        tpoName: college.tpoName, tpoEmail: college.tpoEmail, wasVetted: college.vetted,
+        studentCount: students.length, driveCount: drives.length, placementCount,
+        snapshot: { students: studentRows, drives: driveRows },
+        deletedBy: req.user?.email || 'admin'
+      }
+    })
+
     // Unlink any students and jobs that reference this college so FKs don't block.
     await prisma.student.updateMany({ where: { collegeId: college.id }, data: { collegeId: null } })
     await prisma.job.updateMany({ where: { targetCollegeId: college.id }, data: { targetCollegeId: null } })
     const userId = college.userId
     await prisma.college.delete({ where: { id: college.id } })
     if (userId) await prisma.user.delete({ where: { id: userId } }).catch(() => {})
-    res.json({ message: 'College deleted' })
+    res.json({ message: 'College deleted and archived' })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// List archived (deleted) colleges with their snapshots.
+const getCollegeArchive = async (req, res) => {
+  try {
+    const archive = await prisma.collegeArchive.findMany({ orderBy: { deletedAt: 'desc' } })
+    res.json({ archive })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -785,4 +819,4 @@ const resolveAdminRequest = async (req, res) => {
   } catch (e) { res.status(500).json({ message: 'Server error', error: e.message }) }
 }
 
-module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, deleteCollege, resetCollegePassword, getCollegeApplications, approveCollegeApplication, rejectCollegeApplication, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }
+module.exports = { adminLogin, getAdminStats, getRecentActivity, getAdminColleges, addCollege, toggleCollegeVetted, deleteCollege, resetCollegePassword, getCollegeApplications, approveCollegeApplication, rejectCollegeApplication, getCollegeArchive, getAdminUsers, getAdminCompanies, toggleCompanyVerified, getAdminApplications, changeAdminPassword, getAdminDocuments, toggleDocumentVerified, viewAdminDocument, getFraudFlags, resolveFraudFlag, getAskQuestions, updateAskQuestion, deleteAskQuestion, grantExamRetake, adminResendVerification, adminVerifyEmail, adminSendPasswordReset, setUserActive, listStaff, createStaff, removeStaff, createAdminRequest, listAdminRequests, resolveAdminRequest }

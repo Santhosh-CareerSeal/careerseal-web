@@ -305,6 +305,25 @@ model FraudFlag {
   @@index([studentId])
 }
 
+model CollegeArchive {
+  id             Int      @id @default(autoincrement())
+  collegeName    String
+  city           String?
+  state          String?
+  slug           String?
+  tpoName        String?
+  tpoEmail       String?
+  wasVetted      Boolean  @default(false)
+  studentCount   Int      @default(0)
+  driveCount     Int      @default(0)
+  placementCount Int      @default(0)
+  snapshot       Json?
+  deletedBy      String?
+  deletedAt      DateTime @default(now())
+
+  @@index([deletedAt])
+}
+
 model CollegeApplication {
   id           Int      @id @default(autoincrement())
   collegeName  String

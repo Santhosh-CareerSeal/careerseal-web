@@ -12,6 +12,7 @@ const TABS = [
   { id: 'applications', label: 'Applications', icon: '📨' },
   { id: 'documents', label: 'Documents', icon: '📄' },
   { id: 'fraud', label: 'Fraud Flags', icon: '🚩' },
+  { id: 'archive', label: 'Archive', icon: '🗄️' },
   { id: 'ask', label: 'Ask GRID', icon: '💬' },
   { id: 'team', label: 'Team & Requests', icon: '🛡️', superOnly: true },
   { id: 'settings', label: 'Settings', icon: '⚙️' }
@@ -27,6 +28,8 @@ function AdminPanel() {
   const [colleges, setColleges] = useState([])
   const [collegeApps, setCollegeApps] = useState([])
   const [appMsg, setAppMsg] = useState('')
+  const [archive, setArchive] = useState(null)
+  const [openArchive, setOpenArchive] = useState(null)
   const [users, setUsers] = useState([])
   const [companies, setCompanies] = useState([])
   const [expanded, setExpanded] = useState(null)
@@ -283,6 +286,9 @@ function AdminPanel() {
   }, [active])
   useEffect(() => {
     if (active === 'fraud') loadFlags()
+    if (active === 'archive' && archive === null) {
+      axios.get(`${API_URL}/api/admin/college-archive`, { headers }).then(r => setArchive(r.data.archive || [])).catch(() => setArchive([]))
+    }
   }, [active, flagFilter])
   useEffect(() => {
     if (active === 'ask') loadAskQs()
@@ -924,6 +930,73 @@ function AdminPanel() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+        {active === 'archive' && (
+          <div>
+            <div className="mb-4">
+              <h1 className="text-xl font-bold text-[#1A3C6E]">Archive</h1>
+              <p className="text-xs text-gray-400 mt-0.5">Deleted colleges, kept for reference. Students stay live in GRID — this preserves the college-level drives & placements snapshot.</p>
+            </div>
+            {archive === null ? (
+              <p className="text-sm text-gray-400">Loading…</p>
+            ) : archive.length === 0 ? (
+              <div className="bg-white rounded-2xl p-12 text-center border border-gray-100">
+                <p className="text-3xl mb-2">🗄️</p>
+                <p className="text-sm font-bold text-[#1A3C6E]">Nothing archived yet</p>
+                <p className="text-xs text-gray-400">When you delete a college, its snapshot is kept here.</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {archive.map(a => (
+                  <div key={a.id} className="bg-white rounded-2xl p-4 border border-gray-100">
+                    <div className="flex items-start justify-between gap-3 flex-wrap">
+                      <div>
+                        <p className="font-bold text-[#1A3C6E] text-sm">{a.collegeName}</p>
+                        <p className="text-xs text-gray-400 mt-0.5">{[a.city, a.state].filter(Boolean).join(', ') || '—'} · deleted {new Date(a.deletedAt).toLocaleDateString()} by {a.deletedBy || 'admin'}{a.wasVetted ? ' · was vetted' : ''}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-gray-600">
+                          <span><b className="text-[#1A3C6E]">{a.studentCount}</b> students</span>
+                          <span><b className="text-[#1A3C6E]">{a.driveCount}</b> drives</span>
+                          <span><b className="text-[#1A3C6E]">{a.placementCount}</b> placements</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 flex-shrink-0">
+                        <button onClick={() => setOpenArchive(openArchive === a.id ? null : a.id)} className="text-xs font-bold text-[#4338ca] bg-indigo-50 px-3 py-2 rounded-lg">{openArchive === a.id ? 'Hide' : 'View snapshot'}</button>
+                        <button onClick={() => {
+                          const rows = [['Name', 'GRID Number', 'Branch', 'Placed'], ...((a.snapshot?.students) || []).map(s => [s.name, s.gridNumber, s.branch, s.placed ? 'Yes' : 'No'])]
+                          const csv = rows.map(r => r.map(x => `"${String(x ?? '').replace(/"/g, '""')}"`).join(',')).join('\n')
+                          const url = URL.createObjectURL(new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8;' }))
+                          const el = document.createElement('a'); el.href = url; el.download = `${a.collegeName.replace(/[^a-z0-9]+/gi, '-')}-archive.csv`; el.click(); URL.revokeObjectURL(url)
+                        }} className="text-xs font-bold text-green-700 bg-green-50 px-3 py-2 rounded-lg">Export ⬇</button>
+                      </div>
+                    </div>
+                    {openArchive === a.id && (
+                      <div className="mt-4 border-t border-dashed border-gray-200 pt-4">
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-2">Drives ({(a.snapshot?.drives || []).length})</p>
+                        {(a.snapshot?.drives || []).length === 0 ? <p className="text-xs text-gray-400 mb-3">No drives.</p> : (
+                          <div className="mb-3">
+                            {(a.snapshot.drives).map((d, i) => (
+                              <div key={i} className="flex justify-between text-xs text-gray-600 py-1.5 border-b border-gray-50">
+                                <span className="font-semibold text-[#1A3C6E]">{d.title}</span><span>{d.company || '—'}{d.date ? ` · ${d.date}` : ''}</span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                        <p className="text-[10px] font-bold uppercase tracking-wide text-gray-400 mb-2">Students ({(a.snapshot?.students || []).length})</p>
+                        <div className="max-h-52 overflow-y-auto">
+                          {(a.snapshot?.students || []).map((s, i) => (
+                            <div key={i} className="flex justify-between text-xs text-gray-600 py-1.5 border-b border-gray-50">
+                              <span><b className="text-[#1A3C6E]">{s.name || '—'}</b> · {s.branch || '—'}</span>
+                              <span>{s.gridNumber || ''} {s.placed ? '· 🎉 placed' : ''}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
         {active === 'ask' && (
