@@ -59,6 +59,8 @@ export default function CollegePortal() {
   const [inviteQr, setInviteQr] = useState('')
   const [inviteCopied, setInviteCopied] = useState(false)
   const [logoUploading, setLogoUploading] = useState(false)
+  const [placeModal, setPlaceModal] = useState(null) // { studentId, name, companyName, role, ctc }
+  const [placeSaving, setPlaceSaving] = useState(false)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -251,6 +253,24 @@ export default function CollegePortal() {
     finally { setLogoUploading(false) }
   }
 
+  const refreshStudents = async () => {
+    try { const r = await axios.get(`${API_URL}/api/college/students`, { headers }); setStudents(r.data.students || []) } catch (e) { /* no-op */ }
+    try { const a = await axios.get(`${API_URL}/api/college/analytics`, { headers }); setAnalytics(a.data) } catch (e) { /* no-op */ }
+  }
+  const savePlacement = async () => {
+    if (!placeModal?.companyName?.trim()) { alert('Company name is required'); return }
+    setPlaceSaving(true)
+    try {
+      await axios.post(`${API_URL}/api/college/students/${placeModal.studentId}/placement`, { companyName: placeModal.companyName, role: placeModal.role, ctc: placeModal.ctc }, { headers })
+      setPlaceModal(null); await refreshStudents()
+    } catch (e) { alert(e.response?.data?.message || 'Could not save placement') }
+    finally { setPlaceSaving(false) }
+  }
+  const clearPlacement = async (studentId) => {
+    if (!window.confirm('Remove this placement record?')) return
+    try { await axios.delete(`${API_URL}/api/college/students/${studentId}/placement`, { headers }); setPlaceModal(null); await refreshStudents() } catch (e) { alert('Could not remove placement') }
+  }
+
   const exportStudents = () => {
     const header = ['Name', 'Email', 'Branch', 'GRID Published', 'Verified Skills', 'Placed', 'Applications']
     const rows = [header, ...filteredStudents.map(s => [s.name, s.email, s.branch, s.gridPublished ? 'Yes' : 'No', s.verifiedSkillsCount || 0, s.placed ? 'Yes' : 'No', s.applicationsCount || 0])]
@@ -425,13 +445,13 @@ export default function CollegePortal() {
               </div>
             ) : (
               <div style={{ background: 'white', borderRadius: '14px', border: '1px solid #eee', overflow: 'hidden' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: '8px', padding: '10px 16px', borderBottom: '1px solid #f0f0f0', background: '#f8f9fa' }}>
-                  {['Student', 'Branch', 'GRID', 'Skills', 'Status'].map((h, i) => (
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.9fr 0.8fr 0.7fr 1fr 1.4fr', gap: '8px', padding: '10px 16px', borderBottom: '1px solid #f0f0f0', background: '#f8f9fa' }}>
+                  {['Student', 'Branch', 'GRID', 'Skills', 'Status', 'Placement'].map((h, i) => (
                     <p key={i} style={{ fontSize: '10px', fontWeight: '700', color: '#9ca3af', margin: 0, letterSpacing: '1px' }}>{h}</p>
                   ))}
                 </div>
                 {filteredStudents.map((s, i) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr 1fr', gap: '8px', padding: '12px 16px', borderBottom: i < filteredStudents.length - 1 ? '1px solid #f9f9f9' : 'none', alignItems: 'center' }}>
+                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '2fr 0.9fr 0.8fr 0.7fr 1fr 1.4fr', gap: '8px', padding: '12px 16px', borderBottom: i < filteredStudents.length - 1 ? '1px solid #f9f9f9' : 'none', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '30px', height: '30px', borderRadius: '50%', background: '#1A3C6E', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '11px', fontWeight: '700', flexShrink: 0 }}>
                         {s.name?.charAt(0) || 'S'}
@@ -446,9 +466,22 @@ export default function CollegePortal() {
                       {s.gridPublished ? '✓ Live' : 'Not yet'}
                     </span>
                     <span style={{ fontSize: '12px', color: '#1A3C6E', fontWeight: '600' }}>{s.verifiedSkillsCount || 0}</span>
-                    <span style={{ background: s.placed ? '#E1F5EE' : s.applicationsCount > 0 ? '#FFF9C4' : '#f0f0f0', color: s.placed ? '#085041' : s.applicationsCount > 0 ? '#854F0B' : '#9ca3af', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: '600', display: 'inline-block' }}>
+                    <span style={{ background: s.placed ? '#E1F5EE' : s.applicationsCount > 0 ? '#FFF9C4' : '#f0f0f0', color: s.placed ? '#085041' : s.applicationsCount > 0 ? '#854F0B' : '#9ca3af', fontSize: '10px', padding: '2px 8px', borderRadius: '20px', fontWeight: '600', display: 'inline-block', width: 'fit-content' }}>
                       {s.placed ? '🎉 Placed' : s.applicationsCount > 0 ? `${s.applicationsCount} applied` : 'No apps'}
                     </span>
+                    <div>
+                      {s.placement ? (
+                        <button onClick={() => setPlaceModal({ studentId: s.id, name: s.name, companyName: s.placement.companyName || '', role: s.placement.role || '', ctc: s.placement.ctc ?? '' })}
+                          style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '8px', padding: '4px 9px', fontSize: '11px', fontWeight: 700, color: '#166534', cursor: 'pointer', textAlign: 'left' }}>
+                          {s.placement.companyName}{s.placement.ctc ? ` · ₹${s.placement.ctc}L` : ''} ✎
+                        </button>
+                      ) : (
+                        <button onClick={() => setPlaceModal({ studentId: s.id, name: s.name, companyName: '', role: '', ctc: '' })}
+                          style={{ background: 'none', border: '1px dashed #cbd5e1', borderRadius: '8px', padding: '4px 9px', fontSize: '11px', fontWeight: 700, color: '#6b4edb', cursor: 'pointer' }}>
+                          + Record
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -575,6 +608,44 @@ export default function CollegePortal() {
                 <div key={i} style={{ background: 'white', borderRadius: '14px', padding: '16px', border: '1px solid #eee' }}>
                   <p style={{ fontSize: '10px', color: '#9ca3af', margin: '0 0 6px', fontWeight: '600', letterSpacing: '1px' }}>{s.label}</p>
                   <p style={{ fontSize: '28px', fontWeight: '700', color: '#1A3C6E', margin: 0 }}>{s.value}</p>
+                </div>
+              ))}
+            </div>
+
+            {/* CTC highlights (from recorded placements) */}
+            <div style={{ background: 'white', borderRadius: '14px', padding: '16px', border: '1px solid #eee', marginBottom: '20px' }}>
+              <p style={{ fontSize: '14px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 12px' }}>CTC highlights</p>
+              {analytics?.ctcStats ? (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px' }}>
+                  {[
+                    { l: 'HIGHEST', v: `₹${analytics.ctcStats.highest}L` },
+                    { l: 'AVERAGE', v: `₹${analytics.ctcStats.average}L` },
+                    { l: 'MEDIAN', v: `₹${analytics.ctcStats.median}L` },
+                    { l: 'OFFERS', v: analytics.ctcStats.offers },
+                  ].map((x, i) => (
+                    <div key={i}>
+                      <p style={{ fontSize: '10px', color: '#9ca3af', margin: '0 0 2px', fontWeight: 600, letterSpacing: '1px' }}>{x.l}</p>
+                      <p style={{ fontSize: '22px', fontWeight: 800, color: '#0D7377', margin: 0 }}>{x.v}</p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>No CTC data yet. Record placements in the <b>Students</b> tab (add company + CTC) and the numbers appear here.</p>
+              )}
+            </div>
+
+            {/* Branch-wise placement rate */}
+            <div style={{ background: 'white', borderRadius: '14px', padding: '16px', border: '1px solid #eee', marginBottom: '20px' }}>
+              <p style={{ fontSize: '14px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 12px' }}>Placement by branch</p>
+              {(analytics?.branchPlacement || []).filter(b => b.total > 0).length === 0 ? (
+                <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>No data yet</p>
+              ) : analytics.branchPlacement.filter(b => b.total > 0).sort((a, b) => b.rate - a.rate).map((b, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+                  <span style={{ width: '90px', fontSize: '12px', color: '#4b5563', flexShrink: 0 }}>{b.branch}</span>
+                  <div style={{ flex: 1, height: '16px', background: '#f0f1f4', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${b.rate}%`, background: 'linear-gradient(90deg,#6b4edb,#0d7377)', borderRadius: '6px' }} />
+                  </div>
+                  <span style={{ width: '70px', textAlign: 'right', fontSize: '12px', fontWeight: 700, color: '#1A3C6E', flexShrink: 0 }}>{b.rate}% <span style={{ color: '#9ca3af', fontWeight: 400 }}>({b.placed}/{b.total})</span></span>
                 </div>
               ))}
             </div>
@@ -725,6 +796,27 @@ export default function CollegePortal() {
 
         <Footer />
       </div>
+
+      {placeModal && (
+        <div onClick={() => setPlaceModal(null)} style={{ position: 'fixed', inset: 0, background: 'rgba(14,27,46,0.6)', display: 'grid', placeItems: 'center', zIndex: 1000, padding: '18px' }}>
+          <div onClick={e => e.stopPropagation()} style={{ background: 'white', borderRadius: '16px', padding: '24px', width: '420px', maxWidth: '100%' }}>
+            <p style={{ fontSize: '17px', fontWeight: 800, color: '#1A3C6E', margin: '0 0 2px' }}>Record placement</p>
+            <p style={{ fontSize: '12.5px', color: '#6b7280', margin: '0 0 16px' }}>{placeModal.name} — feeds your placement analytics &amp; CTC.</p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <div><label style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280' }}>COMPANY *</label><input value={placeModal.companyName} onChange={e => setPlaceModal(m => ({ ...m, companyName: e.target.value }))} placeholder="e.g. Acme Corp" style={{ width: '100%', border: '2px solid #eef0f3', borderRadius: '10px', padding: '10px 13px', fontSize: '14px', outline: 'none', marginTop: '4px' }} /></div>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <div style={{ flex: 1 }}><label style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280' }}>ROLE</label><input value={placeModal.role} onChange={e => setPlaceModal(m => ({ ...m, role: e.target.value }))} placeholder="e.g. SDE-1" style={{ width: '100%', border: '2px solid #eef0f3', borderRadius: '10px', padding: '10px 13px', fontSize: '14px', outline: 'none', marginTop: '4px' }} /></div>
+                <div style={{ width: '120px' }}><label style={{ fontSize: '11px', fontWeight: 700, color: '#6b7280' }}>CTC (LPA)</label><input value={placeModal.ctc} onChange={e => setPlaceModal(m => ({ ...m, ctc: e.target.value.replace(/[^0-9.]/g, '') }))} placeholder="e.g. 9" inputMode="decimal" style={{ width: '100%', border: '2px solid #eef0f3', borderRadius: '10px', padding: '10px 13px', fontSize: '14px', outline: 'none', marginTop: '4px' }} /></div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', marginTop: '4px' }}>
+                <button onClick={savePlacement} disabled={placeSaving} style={{ flex: 1, background: 'linear-gradient(135deg,#6b4edb,#0d7377)', color: 'white', border: 'none', borderRadius: '10px', padding: '12px', fontSize: '14px', fontWeight: 800, cursor: 'pointer', opacity: placeSaving ? 0.7 : 1 }}>{placeSaving ? 'Saving…' : 'Save placement'}</button>
+                <button onClick={() => setPlaceModal(null)} style={{ background: '#f1f3f6', color: '#6b7280', border: 'none', borderRadius: '10px', padding: '12px 16px', fontSize: '14px', fontWeight: 700, cursor: 'pointer' }}>Cancel</button>
+              </div>
+              <button onClick={() => clearPlacement(placeModal.studentId)} style={{ background: 'none', border: 'none', color: '#ef4444', fontSize: '12px', fontWeight: 700, cursor: 'pointer', alignSelf: 'flex-start' }}>Remove placement</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

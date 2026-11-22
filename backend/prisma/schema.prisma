@@ -111,6 +111,7 @@ model Student {
   schoolCollege         String?
   user                  User?         @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   applications          Application[]
+  placement             Placement?
   roadmap               Roadmap?
   examAttempts    StudentExamAttempt[]
   verifiedSkills  VerifiedSkill[]
@@ -303,6 +304,20 @@ model FraudFlag {
 
   @@index([status])
   @@index([studentId])
+}
+
+model Placement {
+  id          Int      @id @default(autoincrement())
+  studentId   Int      @unique
+  collegeId   Int?
+  companyName String
+  role        String?
+  ctc         Float?   // in LPA (lakhs per annum)
+  placedAt    DateTime @default(now())
+  recordedBy  String?  // 'college' | 'company'
+  student     Student  @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([collegeId])
 }
 
 model CollegeArchive {

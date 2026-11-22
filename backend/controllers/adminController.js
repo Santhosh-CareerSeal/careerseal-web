@@ -285,13 +285,13 @@ const deleteCollege = async (req, res) => {
     // Snapshot drives, placements and students into the Archive before deleting.
     const students = await prisma.student.findMany({
       where: { collegeId: college.id },
-      include: { user: { select: { name: true } }, applications: { select: { status: true } } }
+      include: { user: { select: { name: true } }, applications: { select: { status: true } }, placement: true }
     })
     const drives = await prisma.job.findMany({ where: { targetCollegeId: college.id, isDrive: true } })
     const placedStatuses = ['placed', 'hired', 'selected', 'accepted', 'offered']
     const studentRows = students.map(s => {
-      const placed = (s.applications || []).some(a => placedStatuses.includes((a.status || '').toLowerCase()))
-      return { name: s.user?.name || null, gridNumber: s.gridNumber, branch: s.branch, placed }
+      const placed = !!s.placement || (s.applications || []).some(a => placedStatuses.includes((a.status || '').toLowerCase()))
+      return { name: s.user?.name || null, gridNumber: s.gridNumber, branch: s.branch, placed, company: s.placement?.companyName || null, ctc: s.placement?.ctc ?? null }
     })
     const driveRows = drives.map(d => ({ title: d.title, company: d.driveCompany || null, date: d.driveDate || null }))
     const placementCount = studentRows.filter(s => s.placed).length

@@ -65,13 +65,13 @@ const getCollegeDashboard = async (req, res) => {
 
     const students = await prisma.student.findMany({
       where: { collegeId: college.id },
-      include: { user: { select: { name: true, email: true } }, verifiedSkills: true, applications: true }
+      include: { user: { select: { name: true, email: true } }, verifiedSkills: true, applications: true, placement: true }
     })
 
     const totalStudents = students.length
     const profileCompleteCount = students.filter(s => s.profileComplete).length
     const gridPublishedCount = students.filter(s => s.gridPublished).length
-    const placedCount = students.filter(s => s.applications.some(a => a.status === 'hired')).length
+    const placedCount = students.filter(s => !!s.placement || s.applications.some(a => a.status === 'hired')).length
     const totalApplications = students.reduce((sum, s) => sum + s.applications.length, 0)
 
     const recentStudents = students
@@ -108,7 +108,7 @@ const getCollegeStudents = async (req, res) => {
 
     const students = await prisma.student.findMany({
       where: { collegeId: college.id },
-      include: { user: { select: { name: true, email: true } }, verifiedSkills: true, applications: true }
+      include: { user: { select: { name: true, email: true } }, verifiedSkills: true, applications: true, placement: true }
     })
 
     const formatted = students.map(s => ({
@@ -116,6 +116,7 @@ const getCollegeStudents = async (req, res) => {
       name: s.user?.name,
       email: s.user?.email,
       gridNumber: s.gridNumber,
+      placement: s.placement ? { companyName: s.placement.companyName, role: s.placement.role, ctc: s.placement.ctc } : null,
       gridPublished: s.gridPublished,
       profileComplete: s.profileComplete,
       branch: s.branch,
@@ -125,10 +126,49 @@ const getCollegeStudents = async (req, res) => {
       technicalSkills: s.technicalSkills,
       verifiedSkillsCount: s.verifiedSkills.filter(v => new Date(v.expiresAt) > new Date()).length,
       applicationsCount: s.applications.length,
-      placed: s.applications.some(a => a.status === 'hired')
+      placed: !!s.placement || s.applications.some(a => a.status === 'hired')
     }))
 
     res.json({ students: formatted })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+// College records / updates a student's placement outcome (company, role, CTC).
+const recordPlacement = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const studentId = parseInt(req.params.studentId)
+    const student = await prisma.student.findFirst({ where: { id: studentId, collegeId: college.id } })
+    if (!student) return res.status(404).json({ message: 'Student not found in your college' })
+
+    const { companyName, role, ctc } = req.body
+    if (!companyName || !companyName.trim()) return res.status(400).json({ message: 'Company name is required' })
+    const ctcNum = ctc === '' || ctc == null ? null : parseFloat(ctc)
+    if (ctc != null && ctc !== '' && (isNaN(ctcNum) || ctcNum < 0)) return res.status(400).json({ message: 'Enter a valid CTC in LPA' })
+
+    const placement = await prisma.placement.upsert({
+      where: { studentId },
+      update: { companyName: companyName.trim(), role: role || null, ctc: ctcNum, collegeId: college.id, recordedBy: 'college' },
+      create: { studentId, collegeId: college.id, companyName: companyName.trim(), role: role || null, ctc: ctcNum, recordedBy: 'college' }
+    })
+    res.json({ message: 'Placement recorded', placement })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
+const removePlacement = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({ where: { userId: req.user.userId } })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    const studentId = parseInt(req.params.studentId)
+    const student = await prisma.student.findFirst({ where: { id: studentId, collegeId: college.id } })
+    if (!student) return res.status(404).json({ message: 'Student not found in your college' })
+    await prisma.placement.deleteMany({ where: { studentId } })
+    res.json({ message: 'Placement removed' })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })
   }
@@ -142,24 +182,46 @@ const getCollegeAnalytics = async (req, res) => {
 
     const students = await prisma.student.findMany({
       where: { collegeId: college.id },
-      include: { applications: { include: { job: { include: { company: true } } } } }
+      include: { applications: { include: { job: { include: { company: true } } } }, placement: true }
     })
 
+    const isPlaced = (s) => !!s.placement || s.applications.some(a => a.status === 'hired')
+
     const branchCounts = {}
+    const branchMap = {}
     students.forEach(s => {
       const branch = s.branch || 'Not specified'
       branchCounts[branch] = (branchCounts[branch] || 0) + 1
+      if (!branchMap[branch]) branchMap[branch] = { branch, total: 0, placed: 0 }
+      branchMap[branch].total++
+      if (isPlaced(s)) branchMap[branch].placed++
     })
+    const branchPlacement = Object.values(branchMap).map(b => ({ ...b, rate: b.total ? Math.round((b.placed / b.total) * 100) : 0 }))
 
-    const placedStudents = students.filter(s => s.applications.some(a => a.status === 'hired'))
+    const placedStudents = students.filter(isPlaced)
     const placementRate = students.length > 0 ? Math.round((placedStudents.length / students.length) * 100) : 0
 
+    // CTC stats come from recorded Placement records (real salary data).
+    const ctcs = students.map(s => s.placement?.ctc).filter(v => typeof v === 'number' && v > 0).sort((a, b) => a - b)
+    const ctcStats = ctcs.length ? {
+      highest: ctcs[ctcs.length - 1],
+      average: Math.round((ctcs.reduce((a, b) => a + b, 0) / ctcs.length) * 100) / 100,
+      median: ctcs.length % 2 ? ctcs[(ctcs.length - 1) / 2] : Math.round(((ctcs[ctcs.length / 2 - 1] + ctcs[ctcs.length / 2]) / 2) * 100) / 100,
+      offers: ctcs.length
+    } : null
+
+    // Top companies: prefer recorded placements, fall back to hired applications.
     const companyCounts = {}
     students.forEach(s => {
-      s.applications.filter(a => a.status === 'hired').forEach(a => {
-        const companyName = a.job?.company?.companyName || 'Unknown'
-        companyCounts[companyName] = (companyCounts[companyName] || 0) + 1
-      })
+      if (s.placement?.companyName) {
+        const n = s.placement.companyName
+        companyCounts[n] = (companyCounts[n] || 0) + 1
+      } else {
+        s.applications.filter(a => a.status === 'hired').forEach(a => {
+          const n = a.job?.company?.companyName || a.job?.driveCompany || 'Unknown'
+          companyCounts[n] = (companyCounts[n] || 0) + 1
+        })
+      }
     })
     const topCompanies = Object.entries(companyCounts).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([name, count]) => ({ name, count }))
 
@@ -168,6 +230,8 @@ const getCollegeAnalytics = async (req, res) => {
       placedStudents: placedStudents.length,
       placementRate,
       branchBreakdown: Object.entries(branchCounts).map(([branch, count]) => ({ branch, count })),
+      branchPlacement,
+      ctcStats,
       topCompanies
     })
   } catch (error) {
@@ -413,4 +477,4 @@ const getCollegeReports = async (req, res) => {
   }
 }
 
-module.exports = { getActiveCollegesList, getCollegeBySlug, updateCollegeProfile, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }
+module.exports = { getActiveCollegesList, getCollegeBySlug, updateCollegeProfile, recordPlacement, removePlacement, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }
