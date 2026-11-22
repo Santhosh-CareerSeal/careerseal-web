@@ -54,10 +54,13 @@ const getCollegeDashboard = async (req, res) => {
         branch: s.branch
       }))
 
+    const acct = await prisma.user.findUnique({ where: { id: userId }, select: { mustChangePassword: true } })
+
     res.json({
       college,
       stats: { totalStudents, profileCompleteCount, gridPublishedCount, placedCount, totalApplications },
-      recentStudents
+      recentStudents,
+      mustChangePassword: acct?.mustChangePassword === true
     })
   } catch (error) {
     res.status(500).json({ message: 'Server error', error: error.message })

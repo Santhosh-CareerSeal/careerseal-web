@@ -196,6 +196,9 @@ export default function CollegePortal() {
         setCollege(dashRes.data.college)
         setStats(dashRes.data.stats)
         setRecentStudents(dashRes.data.recentStudents || [])
+        // Server is authoritative for the forced-change gate (localStorage may be stale).
+        if (dashRes.data.mustChangePassword === true) setMustChange(true)
+        else if (dashRes.data.mustChangePassword === false) setMustChange(false)
         setStudents(studentsRes.data.students || [])
         setAnalytics(analyticsRes.data)
         fetchDrives()
