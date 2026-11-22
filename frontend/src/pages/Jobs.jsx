@@ -23,22 +23,57 @@ function getJobIcon(title = '') {
   return JOB_ICONS.default
 }
 
+// Related-skill groups: used ONLY to rank fairly (e.g. a Java student seeing a
+// Spring role sorts higher). This never hides or filters a job — search and the
+// job list stay full regardless.
+const SKILL_SYNONYMS = [
+  ['java', 'j2ee', 'jee', 'spring', 'springboot', 'spring boot', 'hibernate', 'jsp', 'servlet'],
+  ['testing', 'test', 'qa', 'quality assurance', 'sdet', 'automation testing', 'manual testing', 'selenium', 'cypress'],
+  ['javascript', 'js', 'es6', 'typescript', 'ts', 'ecmascript'],
+  ['react', 'reactjs', 'react.js', 'redux', 'next', 'nextjs', 'next.js'],
+  ['node', 'nodejs', 'node.js', 'express', 'expressjs', 'nestjs'],
+  ['python', 'django', 'flask', 'fastapi', 'pandas', 'numpy'],
+  ['frontend', 'front-end', 'front end', 'ui', 'html', 'css', 'tailwind', 'sass'],
+  ['backend', 'back-end', 'back end', 'api', 'rest', 'restful', 'microservices', 'graphql'],
+  ['data', 'data science', 'data analysis', 'ml', 'machine learning', 'ai', 'deep learning', 'nlp'],
+  ['devops', 'ci/cd', 'cicd', 'docker', 'kubernetes', 'k8s', 'jenkins', 'terraform', 'aws', 'azure', 'gcp', 'cloud'],
+  ['mobile', 'android', 'ios', 'flutter', 'react native', 'kotlin', 'swift'],
+  ['sql', 'mysql', 'postgres', 'postgresql', 'plsql', 'oracle', 'database', 'mongodb', 'nosql'],
+]
+
+// Expand a skill into itself + its related group, so related roles rank fairly.
+function synonymsOf(term) {
+  const t = (term || '').toLowerCase().trim()
+  if (!t) return []
+  const group = SKILL_SYNONYMS.find(g => g.some(x => t.includes(x) || x.includes(t)))
+  return group ? Array.from(new Set([t, ...group])) : [t]
+}
+
+// Count how many of the student's skills the job wants, counting related skills.
+function countSkillMatches(job, student) {
+  const studentSkills = (student?.technicalSkills || student?.skills || '')
+    .toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
+  const jobSkills = (job.requiredSkills || job.description || '')
+    .toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
+  if (studentSkills.length === 0 || jobSkills.length === 0) return { matched: 0, total: studentSkills.length }
+  const matched = studentSkills.filter(skill => {
+    const terms = synonymsOf(skill)
+    return terms.some(term =>
+      jobSkills.some(js => js.includes(term) || term.includes(js)) ||
+      (job.title || '').toLowerCase().includes(term) ||
+      (job.description || '').toLowerCase().includes(term)
+    )
+  })
+  return { matched: matched.length, total: studentSkills.length }
+}
+
 function getMatchScore(job, student) {
   if (!student) return 0
   let score = 0
 
-  const studentSkills = (student.technicalSkills || student.skills || '')
-    .toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
-  const jobSkills = (job.requiredSkills || job.description || '')
-    .toLowerCase().split(',').map(s => s.trim()).filter(Boolean)
-
-  if (studentSkills.length > 0 && jobSkills.length > 0) {
-    const matched = studentSkills.filter(skill =>
-      jobSkills.some(js => js.includes(skill) || skill.includes(js)) ||
-      (job.title || '').toLowerCase().includes(skill) ||
-      (job.description || '').toLowerCase().includes(skill)
-    )
-    const skillScore = Math.min((matched.length / Math.max(studentSkills.length, 1)) * 50, 50)
+  const { matched, total } = countSkillMatches(job, student)
+  if (total > 0) {
+    const skillScore = Math.min((matched / Math.max(total, 1)) * 50, 50)
     score += skillScore
   }
 
@@ -65,6 +100,25 @@ function getMatchScore(job, student) {
   return Math.round(Math.min(score, 100))
 }
 
+// Short, human reasons for the match % — so the number isn't a black box.
+function getMatchReasons(job, student) {
+  if (!student) return []
+  const reasons = []
+  const { matched } = countSkillMatches(job, student)
+  if (matched > 0) reasons.push(`${matched} skill${matched > 1 ? 's' : ''} match`)
+  if (student.preferredWorkLocation && job.location) {
+    const sl = student.preferredWorkLocation.toLowerCase()
+    const jl = job.location.toLowerCase()
+    if (sl.includes('remote') || jl.includes('remote')) reasons.push('remote-friendly')
+    else if (sl.includes(jl) || jl.includes(sl)) reasons.push('same location')
+  }
+  if (student.preferredJobType && job.jobType &&
+      student.preferredJobType.toLowerCase() === job.jobType.toLowerCase()) {
+    reasons.push('your preferred job type')
+  }
+  return reasons.slice(0, 3)
+}
+
 function getMatchLabel(score) {
   if (score >= 70) return { label: 'Best match', color: '#0D7377', bg: '#0D7377', text: 'white' }
   if (score >= 40) return { label: 'Good match', color: '#EF9F27', bg: '#FFF9C4', text: '#854F0B' }
@@ -79,6 +133,10 @@ function Jobs() {
   const [loading, setLoading] = useState(true)
   const [applying, setApplying] = useState(null)
   const [applied, setApplied] = useState([])
+  const [verifiedSkills, setVerifiedSkills] = useState([])
+  const [savedJobs, setSavedJobs] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('gridSavedJobs') || '[]') } catch { return [] }
+  })
   const [search, setSearch] = useState('')
   const [location, setLocation] = useState('')
   const [sortBy, setSortBy] = useState('match')
@@ -95,14 +153,16 @@ function Jobs() {
         if (!token) { navigate('/login'); return }
         const storedUser = JSON.parse(localStorage.getItem('user') || '{}')
         setUser(storedUser)
-        const [jobsRes, profileRes, appRes] = await Promise.all([
+        const [jobsRes, profileRes, appRes, examRes] = await Promise.all([
           cget(`${API_URL}/api/jobs`, { headers: { Authorization: `Bearer ${token}` } }),
           cget(`${API_URL}/api/profile/details`, { headers: { Authorization: `Bearer ${token}` } }),
-          cget(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } })
+          cget(`${API_URL}/api/applications/my`, { headers: { Authorization: `Bearer ${token}` } }),
+          cget(`${API_URL}/api/exams/verified`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: {} }))
         ])
         setJobs(jobsRes.data.jobs || [])
         setStudent(profileRes.data.student)
         setApplied((appRes.data.applications || []).map(a => a.jobId))
+        setVerifiedSkills(examRes.data.verifiedSkills || examRes.data.skillStatus || examRes.data.skills || [])
       } catch (e) {
         navigate('/login')
       } finally {
@@ -117,6 +177,24 @@ function Jobs() {
       ...f,
       [cat]: f[cat].includes(val) ? f[cat].filter(v => v !== val) : [...f[cat], val]
     }))
+  }
+
+  const toggleSave = (jobId) => {
+    setSavedJobs(prev => {
+      const next = prev.includes(jobId) ? prev.filter(x => x !== jobId) : [...prev, jobId]
+      try { localStorage.setItem('gridSavedJobs', JSON.stringify(next)) } catch { /* private mode */ }
+      return next
+    })
+  }
+
+  // A skill is verified if it's in the student's verified list and not expired.
+  const isVerifiedSkill = (sk) => {
+    const s = (sk || '').toLowerCase()
+    return verifiedSkills.some(v => {
+      if (v.expiresAt && new Date(v.expiresAt) < new Date()) return false
+      const vs = (v.skill || '').toLowerCase()
+      return vs.includes(s) || s.includes(vs)
+    })
   }
 
   const filteredJobs = jobs.filter(job => {
@@ -135,7 +213,8 @@ function Jobs() {
     return matchesSearch && matchesLocation && matchesChip
   }).map(job => ({
     ...job,
-    matchScore: getMatchScore(job, student)
+    matchScore: getMatchScore(job, student),
+    matchReasons: getMatchReasons(job, student)
   })).sort((a, b) => {
     if (sortBy === 'match') return b.matchScore - a.matchScore
     if (sortBy === 'latest') return new Date(b.createdAt) - new Date(a.createdAt)
@@ -356,6 +435,11 @@ function Jobs() {
                             background: job.matchScore >= 70 ? '#0D7377' : job.matchScore >= 40 ? '#EF9F27' : '#d1d5db'
                           }}></div>
                         </div>
+                        {job.matchReasons?.length > 0 && (
+                          <p className="text-[11px] text-gray-400 mt-1.5">
+                            Why {job.matchScore}%: {job.matchReasons.join(' · ')}
+                          </p>
+                        )}
                       </div>
                     )}
 
@@ -374,28 +458,50 @@ function Jobs() {
                     )}
                     <div className="flex justify-between items-center">
                       <div className="flex gap-2 flex-wrap">
-                        {skillsList.slice(0, 4).map((skill, i) => (
-                          <span key={i} className={`text-xs px-2 py-1 rounded-full ${hasSkill(skill) ? 'bg-[#E1F5EE] text-[#085041] font-bold' : 'bg-gray-100 text-gray-500'}`}>
-                            {hasSkill(skill) ? '✓ ' : ''}{skill}
-                          </span>
-                        ))}
+                        {skillsList.slice(0, 4).map((skill, i) => {
+                          const verified = isVerifiedSkill(skill)
+                          const typed = !verified && hasSkill(skill)
+                          const cls = verified
+                            ? 'bg-[#E1F5EE] text-[#085041] font-bold border border-[#bfe8d3]'
+                            : typed
+                              ? 'bg-[#EEF2FF] text-[#1A3C6E] font-semibold'
+                              : 'bg-gray-100 text-gray-500'
+                          return (
+                            <span
+                              key={i}
+                              className={`text-xs px-2 py-1 rounded-full ${cls}`}
+                              title={verified ? 'Tested & verified on GRID' : typed ? 'On your profile (not yet tested)' : ''}
+                            >
+                              {verified ? '✓ ' : ''}{skill}
+                            </span>
+                          )
+                        })}
                         {job.experienceLevel && (
                           <span className={`text-xs px-2 py-1 rounded-full font-bold ${job.experienceLevel === 'Fresher' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
                             {job.experienceLevel}
                           </span>
                         )}
                       </div>
-                      {isApplied ? (
-                        <span className="text-xs font-bold px-4 py-2 rounded-xl bg-green-50 text-green-700 border border-green-200">✓ Applied</span>
-                      ) : (
+                      <div className="flex items-center gap-2 flex-shrink-0">
                         <button
-                          onClick={() => handleApply(job.id)}
-                          disabled={isApplying}
-                          className="bg-[#6b4edb] text-white text-xs font-bold px-5 py-2 rounded-xl hover:bg-[#5538c9] transition-colors flex-shrink-0"
+                          onClick={() => toggleSave(job.id)}
+                          title={savedJobs.includes(job.id) ? 'Saved — click to remove' : 'Save for later'}
+                          className={`text-xs font-bold px-3 py-2 rounded-xl border transition-colors ${savedJobs.includes(job.id) ? 'bg-[#FFF7E6] text-[#9a6b12] border-[#fed7aa]' : 'bg-[#f0f4ff] text-[#1A3C6E] border-[#c7d2fe] hover:bg-[#e6edff]'}`}
                         >
-                          {isApplying ? 'Applying...' : 'Apply now →'}
+                          {savedJobs.includes(job.id) ? '★ Saved' : '☆ Save'}
                         </button>
-                      )}
+                        {isApplied ? (
+                          <span className="text-xs font-bold px-4 py-2 rounded-xl bg-green-50 text-green-700 border border-green-200">✓ Applied</span>
+                        ) : (
+                          <button
+                            onClick={() => handleApply(job.id)}
+                            disabled={isApplying}
+                            className="bg-[#6b4edb] text-white text-xs font-bold px-5 py-2 rounded-xl hover:bg-[#5538c9] transition-colors"
+                          >
+                            {isApplying ? 'Applying...' : 'Apply now →'}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 )
