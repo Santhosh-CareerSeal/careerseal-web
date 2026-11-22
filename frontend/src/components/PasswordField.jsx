@@ -7,7 +7,7 @@ function PasswordField({ className = '', eyeClassName = '', style, ...props }) {
   const [show, setShow] = useState(false)
   return (
     <div className="relative w-full">
-      <input {...props} type={show ? 'text' : 'password'} className={`w-full ${className}`} style={{ ...style, paddingRight: 40 }} />
+      <input autoComplete="off" autoCorrect="off" autoCapitalize="off" spellCheck={false} data-lpignore="true" data-form-type="other" {...props} type={show ? 'text' : 'password'} className={`w-full ${className}`} style={{ ...style, paddingRight: 40 }} />
       <button
         type="button"
         onClick={() => setShow(s => !s)}
