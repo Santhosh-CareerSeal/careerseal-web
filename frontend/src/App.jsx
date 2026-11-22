@@ -15,6 +15,7 @@ import ProfileDetails from './pages/ProfileDetails'
 import PublicProfile from './pages/PublicProfile'
 import VerifyLookup from './pages/VerifyLookup'
 import ForColleges from './pages/ForColleges'
+import JoinCollege from './pages/JoinCollege'
 import Roadmap from './pages/Roadmap'
 import Settings from './pages/Settings'
 import Exams from './pages/Exams'
@@ -177,6 +178,7 @@ function App() {
         <Route path="/id/:gridNumber" element={<PublicProfile />} />
         <Route path="/verify" element={<VerifyLookup />} />
         <Route path="/for-colleges" element={<ForColleges />} />
+        <Route path="/join/:slug" element={<JoinCollege />} />
         <Route path="/roadmap" element={<Roadmap />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/exams" element={<Exams />} />

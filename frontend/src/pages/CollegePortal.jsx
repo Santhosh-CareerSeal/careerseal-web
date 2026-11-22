@@ -4,6 +4,7 @@ import axios from 'axios'
 import API_URL from '../config'
 import getHomeDest from '../utils/homeDest'
 import PasswordField from '../components/PasswordField'
+import QRCode from 'qrcode'
 import jsPDF from 'jspdf'
 import autoTable from 'jspdf-autotable'
 import Footer from '../components/Footer'
@@ -54,6 +55,8 @@ export default function CollegePortal() {
   const [analytics, setAnalytics] = useState(null)
   const [recentStudents, setRecentStudents] = useState([])
   const [loading, setLoading] = useState(true)
+  const [inviteQr, setInviteQr] = useState('')
+  const [inviteCopied, setInviteCopied] = useState(false)
   const [filter, setFilter] = useState('all')
   const [search, setSearch] = useState('')
   const [currentPassword, setCurrentPassword] = useState('')
@@ -215,6 +218,13 @@ export default function CollegePortal() {
     init()
   }, [])
 
+  const joinUrl = college?.slug ? `https://thegridcard.com/join/${college.slug}` : ''
+  useEffect(() => {
+    if (!joinUrl) { setInviteQr(''); return }
+    QRCode.toDataURL(joinUrl, { width: 320, margin: 1, color: { dark: '#1A3C6E', light: '#ffffff' } }).then(setInviteQr).catch(() => setInviteQr(''))
+  }, [joinUrl])
+  const copyInvite = async () => { try { await navigator.clipboard.writeText(joinUrl); setInviteCopied(true); setTimeout(() => setInviteCopied(false), 1600) } catch { /* no-op */ } }
+
   const filteredStudents = students.filter(s => {
     const matchesFilter = filter === 'all' || (filter === 'placed' && s.placed) || (filter === 'grid' && s.gridPublished) || (filter === 'verified' && s.verifiedSkillsCount > 0)
     const matchesSearch = !search || s.name?.toLowerCase().includes(search.toLowerCase()) || s.branch?.toLowerCase().includes(search.toLowerCase())
@@ -258,6 +268,47 @@ export default function CollegePortal() {
               <p style={{ fontSize: '20px', fontWeight: '700', color: '#1A3C6E', margin: '0 0 4px' }}>Welcome, {college?.tpoName || college?.collegeName} 👋</p>
               <p style={{ fontSize: '12px', color: '#9ca3af', margin: 0 }}>Here's your placement overview for this season</p>
             </div>
+
+            {/* Invite your students */}
+            <div style={{ background: 'linear-gradient(135deg,#1a3c6e,#6b4edb 55%,#0d7377)', borderRadius: '16px', padding: '20px 22px', marginBottom: '20px', display: 'flex', gap: '18px', alignItems: 'center', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '240px' }}>
+                <p style={{ color: 'white', fontWeight: 800, fontSize: '16px', margin: '0 0 2px' }}>🎓 Invite your students</p>
+                <p style={{ color: 'rgba(255,255,255,0.75)', fontSize: '12px', margin: '0 0 12px' }}>Share this link or QR — students who join through it are auto-linked to {college?.collegeName || 'your college'} and appear here, verified.</p>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center', background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: '10px', padding: '8px 10px' }}>
+                  <span style={{ flex: 1, color: 'white', fontSize: '12px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{joinUrl || '…'}</span>
+                  <button onClick={copyInvite} style={{ background: 'white', color: '#1A3C6E', border: 'none', borderRadius: '7px', padding: '6px 13px', fontSize: '12px', fontWeight: 800, cursor: 'pointer', whiteSpace: 'nowrap' }}>{inviteCopied ? 'Copied ✓' : 'Copy link'}</button>
+                </div>
+                <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '11px', margin: '10px 0 0' }}>Join code: <b style={{ color: '#9FE1CB' }}>{college?.slug || '—'}</b></p>
+              </div>
+              {inviteQr && <img src={inviteQr} alt="Invite QR" style={{ width: '96px', height: '96px', borderRadius: '10px', background: 'white', padding: '4px', flex: 'none' }} />}
+            </div>
+
+            {/* Readiness funnel */}
+            {(() => {
+              const t = stats?.totalStudents || 0
+              const steps = [
+                { label: 'Joined', n: t },
+                { label: 'Profile complete', n: stats?.profileCompleteCount || 0 },
+                { label: 'GRID published', n: stats?.gridPublishedCount || 0 },
+                { label: 'Placed', n: stats?.placedCount || 0 },
+              ]
+              return (
+                <div style={{ background: 'white', borderRadius: '14px', padding: '16px', border: '1px solid #eee', marginBottom: '20px' }}>
+                  <p style={{ fontSize: '14px', fontWeight: 700, color: '#1A3C6E', margin: '0 0 12px' }}>Placement readiness funnel</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {steps.map(s => (
+                      <div key={s.label} style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                        <span style={{ width: '120px', fontSize: '12px', color: '#4b5563', flexShrink: 0 }}>{s.label}</span>
+                        <div style={{ flex: 1, height: '20px', background: '#f0f1f4', borderRadius: '7px', overflow: 'hidden' }}>
+                          <div style={{ height: '100%', width: `${t ? Math.round((s.n / t) * 100) : 0}%`, minWidth: s.n > 0 ? '8px' : '0', background: 'linear-gradient(90deg,#6b4edb,#0d7377)', borderRadius: '7px' }} />
+                        </div>
+                        <span style={{ width: '44px', textAlign: 'right', fontSize: '13px', fontWeight: 800, color: '#1A3C6E', flexShrink: 0 }}>{s.n}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })()}
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', marginBottom: '20px' }}>
               {[

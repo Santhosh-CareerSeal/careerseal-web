@@ -13,6 +13,20 @@ const getActiveCollegesList = async (req, res) => {
   }
 }
 
+// Public: resolve a college by its slug for the /join/:slug invite flow.
+const getCollegeBySlug = async (req, res) => {
+  try {
+    const college = await prisma.college.findUnique({
+      where: { slug: req.params.slug },
+      select: { id: true, collegeName: true, city: true, state: true, slug: true, logoUrl: true }
+    })
+    if (!college) return res.status(404).json({ message: 'College not found' })
+    res.json({ college })
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message })
+  }
+}
+
 const getCollegeProfile = async (req, res) => {
   try {
     const userId = req.user.userId
@@ -380,4 +394,4 @@ const getCollegeReports = async (req, res) => {
   }
 }
 
-module.exports = { getActiveCollegesList, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }
+module.exports = { getActiveCollegesList, getCollegeBySlug, getCollegeProfile, getCollegeDashboard, getCollegeStudents, getCollegeAnalytics, getCollegeSuggestions, getCollegeJobs, getCollegeDrives, createCollegeDrive, updateCollegeDrive, deleteCollegeDrive, getDriveEligibleStudents, getCollegeReports }

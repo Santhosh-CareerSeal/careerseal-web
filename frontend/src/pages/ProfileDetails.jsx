@@ -217,6 +217,16 @@ function ProfileDetails() {
           const collegeRes = await axios.get(`${API_URL}/api/college/list`)
           setColleges(collegeRes.data.colleges || [])
         } catch (e) { console.error(e) }
+        // Auto-link to a college if the student arrived via a /join/:slug invite.
+        try {
+          const pendingSlug = localStorage.getItem('pendingCollegeSlug')
+          if (pendingSlug) {
+            const bySlug = await axios.get(`${API_URL}/api/college/by-slug/${pendingSlug}`)
+            const c = bySlug.data.college
+            if (c) setForm(f => (f.collegeId ? f : { ...f, collegeName: c.collegeName, collegeId: String(c.id) }))
+            localStorage.removeItem('pendingCollegeSlug')
+          }
+        } catch (e) { /* invite link optional */ }
       } catch (e) { console.error(e) }
       finally { setLoading(false) }
     }
